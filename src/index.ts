@@ -108,6 +108,21 @@ try {
     // test: https://manhua.zaimanhua.com/view/heimaohemonvdeketang/64175/133789
     case 'www.zaimanhua.com':
     case 'manhua.zaimanhua.com': {
+      // 桌面站的章节数据是登录后由前端异步请求的，不会写入 __NUXT__，
+      // 所以先尝试从页面数据读取，拿不到时再通过 API 获取（需要登录 token）
+      const getToken = () => {
+        try {
+          const token = unsafeWindow.localStorage?.getItem?.('token');
+          if (token) return token;
+        } catch {}
+        const cookieToken = document.cookie.match(/(?:^|; )token=([^;]+)/)?.[1];
+        if (!cookieToken) return '';
+        try {
+          return decodeURIComponent(cookieToken);
+        } catch {
+          return cookieToken;
+        }
+      };
       setup({
         name: 'zaiManHua',
         isMangaPage: async () => {
@@ -115,9 +130,31 @@ try {
           await wait(() => Boolean(querySelector('.scrollbar-demo-item')));
           return true;
         },
-        getImgList: () =>
-          unsafeWindow.__NUXT__.data.getChapters?.data?.chapterInfo
-            ?.page_url as string[],
+        getImgList: async () => {
+          const nuxtImgList =
+            unsafeWindow.__NUXT__?.data?.getChapters?.data?.chapterInfo
+              ?.page_url;
+          if (nuxtImgList?.length) return nuxtImgList as string[];
+          const [, , , comicId, chapterId] = location.pathname.split('/');
+          const token = getToken();
+          const res = await request(
+            `${location.origin}/api/v1/comic2/chapter/detail?channel=pc&app_name=zmh&version=1.0.0&timestamp=${Date.now()}&uid=0&comic_id=${comicId}&chapter_id=${chapterId}`,
+            {
+              responseType: 'json',
+              fetch: false,
+              headers: {
+                Authorization: token ? `Bearer ${token}` : '',
+                Platform: 'pc',
+              },
+            },
+          );
+          if (res.response?.errno)
+            toast.error(
+              `${t('alert.comic_load_error')}: ${res.response.errmsg}`,
+              { throw: true },
+            );
+          return (res.response?.data?.chapterInfo?.page_url ?? []) as string[];
+        },
         onNext: () => querySelectorClick('#next_chapter'),
         onPrev: () => querySelectorClick('#prev_chapter'),
       });
