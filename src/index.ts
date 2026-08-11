@@ -110,19 +110,45 @@ try {
     case 'manhua.zaimanhua.com': {
       // 桌面站的章节数据是登录后由前端异步请求的，不会写入 __NUXT__，
       // 所以先尝试从页面数据读取，拿不到时再通过 API 获取（需要登录 token）
+      // 部分浏览器（如 Firefox 系的油猴沙箱）可能无法通过 unsafeWindow 读取页面 localStorage
       const getToken = () => {
-        try {
-          const token = unsafeWindow.localStorage?.getItem?.('token');
-          if (token) return token;
-        } catch {}
-        const cookieToken = document.cookie.match(/(?:^|; )token=([^;]+)/)?.[1];
-        if (!cookieToken) return '';
-        try {
-          return decodeURIComponent(cookieToken);
-        } catch {
-          return cookieToken;
+        for (const win of [unsafeWindow, window]) {
+          try {
+            const token = win.localStorage?.getItem?.('token');
+            if (token) return token;
+          } catch {}
         }
+        const cookieToken = document.cookie.match(/(?:^|; )token=([^;]+)/)?.[1];
+        if (cookieToken) {
+          try {
+            return decodeURIComponent(cookieToken);
+          } catch {
+            return cookieToken;
+          }
+        }
+        try {
+          const sessionToken = sessionStorage.getItem('token');
+          if (sessionToken) return sessionToken;
+        } catch {}
+        return '';
       };
+
+      /** 从页面 DOM 收集已渲染的图片（单页模式只有当前一页，切到上下滚动后会渲染全部） */
+      const getImgListByDom = async () => {
+        const getImgs = () =>
+          [...querySelectorAll<HTMLImageElement>('img')]
+            .map((img) => img.src)
+            .filter((src) => src.startsWith('https://images.zaimanhua.com'));
+        let list = getImgs();
+        // 单页模式下 DOM 里只有当前一页，切换到上下滚动阅读让全部图片渲染出来
+        if (list.length <= 1) {
+          querySelector('#qiehuan_txt')?.click();
+          await wait(() => getImgs().length > 1, 1000 * 10);
+          list = getImgs();
+        }
+        return list;
+      };
+
       setup({
         name: 'zaiManHua',
         isMangaPage: async () => {
@@ -135,25 +161,37 @@ try {
             unsafeWindow.__NUXT__?.data?.getChapters?.data?.chapterInfo
               ?.page_url;
           if (nuxtImgList?.length) return nuxtImgList as string[];
+
           const [, , , comicId, chapterId] = location.pathname.split('/');
           const token = getToken();
-          const res = await request(
-            `${location.origin}/api/v1/comic2/chapter/detail?channel=pc&app_name=zmh&version=1.0.0&timestamp=${Date.now()}&uid=0&comic_id=${comicId}&chapter_id=${chapterId}`,
-            {
+          const url = `${location.origin}/api/v1/comic2/chapter/detail?channel=pc&app_name=zmh&version=1.0.0&timestamp=${Date.now()}&uid=0&comic_id=${comicId}&chapter_id=${chapterId}`;
+          try {
+            const res = await request(url, {
               responseType: 'json',
               fetch: false,
               headers: {
                 Authorization: token ? `Bearer ${token}` : '',
                 Platform: 'pc',
               },
-            },
-          );
-          if (res.response?.errno)
-            toast.error(
-              `${t('alert.comic_load_error')}: ${res.response.errmsg}`,
-              { throw: true },
-            );
-          return (res.response?.data?.chapterInfo?.page_url ?? []) as string[];
+            });
+            const apiList = res.response?.data?.chapterInfo?.page_url;
+            if (apiList?.length) return apiList as string[];
+            // API 拿不到图时（例如读不到登录 token），尝试从页面 DOM 获取
+            const domList = await getImgListByDom();
+            if (domList.length) return domList;
+            if (res.response?.errno)
+              toast.error(
+                `${t('alert.comic_load_error')}: ${res.response.errmsg}`,
+                { throw: true },
+              );
+          } catch (error) {
+            const domList = await getImgListByDom();
+            if (domList.length) return domList;
+            throw error;
+          }
+          const domList = await getImgListByDom();
+          if (domList.length) return domList;
+          return [];
         },
         onNext: () => querySelectorClick('#next_chapter'),
         onPrev: () => querySelectorClick('#prev_chapter'),

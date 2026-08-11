@@ -16539,17 +16539,32 @@ try {
 		case "www.zaimanhua.com":
 		case "manhua.zaimanhua.com": {
 			const getToken = () => {
-				try {
-					const token = unsafeWindow.localStorage?.getItem?.("token");
+				for (const win of [unsafeWindow, window]) try {
+					const token = win.localStorage?.getItem?.("token");
 					if (token) return token;
 				} catch {}
 				const cookieToken = document.cookie.match(/(?:^|; )token=([^;]+)/)?.[1];
-				if (!cookieToken) return "";
-				try {
+				if (cookieToken) try {
 					return decodeURIComponent(cookieToken);
 				} catch {
 					return cookieToken;
 				}
+				try {
+					const sessionToken = sessionStorage.getItem("token");
+					if (sessionToken) return sessionToken;
+				} catch {}
+				return "";
+			};
+			/** 从页面 DOM 收集已渲染的图片（单页模式只有当前一页，切到上下滚动后会渲染全部） */
+			const getImgListByDom = async () => {
+				const getImgs = () => [...helper.querySelectorAll("img")].map((img) => img.src).filter((src) => src.startsWith("https://images.zaimanhua.com"));
+				let list = getImgs();
+				if (list.length <= 1) {
+					helper.querySelector("#qiehuan_txt")?.click();
+					await helper.wait(() => getImgs().length > 1, 1e3 * 10);
+					list = getImgs();
+				}
+				return list;
 			};
 			core.setup({
 				name: "zaiManHua",
@@ -16563,16 +16578,29 @@ try {
 					if (nuxtImgList?.length) return nuxtImgList;
 					const [, , , comicId, chapterId] = location.pathname.split("/");
 					const token = getToken();
-					const res = await core.request(`${location.origin}/api/v1/comic2/chapter/detail?channel=pc&app_name=zmh&version=1.0.0&timestamp=${Date.now()}&uid=0&comic_id=${comicId}&chapter_id=${chapterId}`, {
-						responseType: "json",
-						fetch: false,
-						headers: {
-							Authorization: token ? `Bearer ${token}` : "",
-							Platform: "pc"
-						}
-					});
-					if (res.response?.errno) core.toast.error(`${helper.t("alert.comic_load_error")}: ${res.response.errmsg}`, { throw: true });
-					return res.response?.data?.chapterInfo?.page_url ?? [];
+					const url = `${location.origin}/api/v1/comic2/chapter/detail?channel=pc&app_name=zmh&version=1.0.0&timestamp=${Date.now()}&uid=0&comic_id=${comicId}&chapter_id=${chapterId}`;
+					try {
+						const res = await core.request(url, {
+							responseType: "json",
+							fetch: false,
+							headers: {
+								Authorization: token ? `Bearer ${token}` : "",
+								Platform: "pc"
+							}
+						});
+						const apiList = res.response?.data?.chapterInfo?.page_url;
+						if (apiList?.length) return apiList;
+						const domList = await getImgListByDom();
+						if (domList.length) return domList;
+						if (res.response?.errno) core.toast.error(`${helper.t("alert.comic_load_error")}: ${res.response.errmsg}`, { throw: true });
+					} catch (error) {
+						const domList = await getImgListByDom();
+						if (domList.length) return domList;
+						throw error;
+					}
+					const domList = await getImgListByDom();
+					if (domList.length) return domList;
+					return [];
 				},
 				onNext: () => helper.querySelectorClick("#next_chapter"),
 				onPrev: () => helper.querySelectorClick("#prev_chapter")
