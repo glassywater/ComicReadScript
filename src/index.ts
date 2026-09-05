@@ -592,7 +592,51 @@ try {
     }
 
     // #R18（中文）[NoyAcg](https://noy1.top)
-    // test: https://noy1.top/#/read/13349
+    // test: https://noymanga.com/reader/13349
+    // https://noymanga.com/reader/60142/582549
+    case 'noymanga.com': {
+      setup({
+        name: 'NoyAcg',
+        isMangaPage: () =>
+          // 单章漫画的章节号为 0，例如 /reader/13349/0
+          /reader\/(?<bookId>\d+)\/(?<chapterId>\d+)/u.exec(location.pathname)
+            ?.groups as { bookId: string; chapterId: string },
+        getImgList: async (_, { bookId, chapterId }) => {
+          // https://noymanga.com/reader/13349
+          /** 本子等单章作品返回的数据 */
+          type NoySingleRes = { data: { count: number } };
+
+          // https://noymanga.com/reader/60142/582549
+          /** 有章节的作品返回的数据 */
+          type NoyChapterRes = NoySingleRes & {
+            chapter: { this: { count: number } };
+          };
+
+          const { response } = await request<NoyChapterRes | NoySingleRes>(
+            `/api/v4/book/detail/${bookId}/${chapterId}`,
+            { responseType: 'json' },
+          );
+          const isChapter = 'chapter' in response;
+          const count = isChapter
+            ? response.chapter.this.count
+            : response.data.count;
+          const imgPrefix = isChapter ? `${bookId}/${chapterId}` : bookId;
+          return range(
+            count,
+            (i) => `https://img.noymanga.com/${imgPrefix}/${i + 1}.webp`,
+          );
+        },
+        onPrev: () =>
+          querySelectorClick(() =>
+            querySelector('path[d="m15 18-6-6 6-6"]')?.closest('button'),
+          ),
+        onNext: () =>
+          querySelectorClick(() =>
+            querySelector('path[d="m9 18 6-6-6-6"]')?.closest('button'),
+          ),
+      });
+      break;
+    }
     case 'noy1.top': {
       setup({
         name: 'NoyAcg',
@@ -612,38 +656,6 @@ try {
           );
           return range(imgNum, (i) => `${cdn}${id}/${i + 1}.webp`);
         },
-      });
-      break;
-    }
-    case 'noymanga.com': {
-      setup({
-        name: 'NoyAcg',
-        isMangaPage: () =>
-          /reader\/(?<bookId>\d+)\/(?<chapterId>\d+)/u.exec(location.pathname)
-            ?.groups as { bookId: string; chapterId: string },
-        getImgList: async (_, { bookId, chapterId }) => {
-          type ChapterData = { id: number; count: number };
-          type ResData = { chapter: { this: ChapterData } };
-          const {
-            response: { chapter },
-          } = await request<ResData>(
-            `/api/v4/book/detail/${bookId}/${chapterId}`,
-            { responseType: 'json' },
-          );
-          return range(
-            chapter.this.count,
-            (i) =>
-              `https://img.noymanga.com/${bookId}/${chapterId}/${i + 1}.webp`,
-          );
-        },
-        onPrev: () =>
-          querySelectorClick(() =>
-            querySelector('path[d="m15 18-6-6 6-6"]')?.closest('button'),
-          ),
-        onNext: () =>
-          querySelectorClick(() =>
-            querySelector('path[d="m9 18 6-6-6-6"]')?.closest('button'),
-          ),
       });
       break;
     }
