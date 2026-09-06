@@ -84,9 +84,19 @@ export const createBundleConfigs = (
           name: 'self-import',
           transform(code, id) {
             if (!/.+\.tsx?$/u.test(id)) return null;
-            // rollldown 对 import * as 的处理会导致脚本加载机制失效，
-            // 为了兼容 vite，不能直接删掉 `* as`，只能在这里修改代码。
-            return code.replaceAll(/import \* as \b/gu, 'import ');
+            return (
+              code
+                // rollldown 对 import * as 的处理会导致脚本加载机制失效，
+                // 为了兼容 vite，不能直接删掉 `* as`，只能在这里修改代码。
+                .replaceAll(/import \* as \b/gu, 'import ')
+                // 为了能在 vscode 上使用「转到定义」跳转到对应站点文件里
+                // src/index.ts 里使用 import('site/xxx') 来写代码，
+                // 在这里再改回正确的 selfImport 调用
+                .replaceAll(
+                  /\b(?:void)?\s*import\(\s*(?<quote>['"])site\//gu,
+                  'selfImport($<quote>site/',
+                )
+            );
           },
         },
         ...(transforms ?? []).map((fn) => codeEdit('selfPlugin', fn)),

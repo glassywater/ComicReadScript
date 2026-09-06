@@ -50,6 +50,7 @@
       "core": ["./src/userscript/core"],
       "components/*": ["./src/components/*"],
       "worker/*": ["./src/worker/*"],
+      "site/*": ["./src/site/*"],
       "helper": ["./src/helper"],
       "helper/*": ["./src/helper/*"],
       "request": ["./src/request"],
