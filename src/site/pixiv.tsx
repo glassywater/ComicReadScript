@@ -17,18 +17,13 @@ setupSiteAdapter({
     load_original_image: true,
   },
   getPageContext: async () => {
-    const listId = /^\/users\/(?<listId>\d+)/u.exec(location.pathname)?.groups
-      ?.listId;
+    // pixiv 在切换为英语后会在路径前面加入一个 `/en/`，需要忽略
+    const path = location.pathname.replace(/^\/(?:[^/]+\/)?/u, '/');
+    const listId = /^\/users\/(?<listId>\d+)/u.exec(path)?.groups?.listId;
     if (listId) return { type: 'list', id: listId } as const;
 
-    if (!location.pathname.startsWith('/artworks/')) return;
-
-    const id = /^\/artworks\/(?<artworkId>\d+)/u.exec(location.pathname)?.groups
-      ?.artworkId;
-    if (!id) {
-      imgs.length = 0;
-      return;
-    }
+    const id = /^\/artworks\/(?<id>\d+)/u.exec(path)?.groups?.id;
+    if (!id) return;
 
     const res = await request<{ body: typeof imgs }>(
       `/ajax/illust/${id}/pages`,
@@ -61,6 +56,10 @@ setupSiteAdapter({
         state.comicMap.original = { getImgList: getImgList(true) };
         state.comicMap.regular = { getImgList: getImgList(false) };
       });
+
+      return (nextPageCtx) => {
+        if (nextPageCtx?.type !== 'manga') imgs.length = 0;
+      };
     },
     list: async (coreCtx, { id }) => {
       const { options } = coreCtx;
