@@ -247,6 +247,7 @@
       "quick_rating": "快捷评分",
       "quick_tag_define": "快捷查看标签定义",
       "remember_current_site": "不再记住当前站点",
+      "sort_by_filename": "根据文件名排序",
       "tag_lint": "标签检查"
     },
     "changed_load_failed": "网站发生变化，无法加载漫画",

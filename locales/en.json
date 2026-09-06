@@ -247,6 +247,7 @@
       "quick_rating": "Quick rating",
       "quick_tag_define": "Quick view tag definition",
       "remember_current_site": "Don't remember this site",
+      "sort_by_filename": "Sort by filename",
       "tag_lint": "Tag lint"
     },
     "changed_load_failed": "The website has undergone changes, unable to load comics",

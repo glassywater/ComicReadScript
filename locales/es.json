@@ -247,6 +247,7 @@
       "quick_rating": "Valoración rápida",
       "quick_tag_define": "Ver rápidamente la definición de la etiqueta",
       "remember_current_site": "No recordar este sitio",
+      "sort_by_filename": "Ordenar por nombre de archivo",
       "tag_lint": "Comprobación de etiquetas"
     },
     "changed_load_failed": "El sitio ha cambiado, no se pudo cargar el cómic",
