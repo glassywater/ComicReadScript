@@ -13,8 +13,10 @@ import {
   onMount,
   runWithOwner,
 } from 'solid-js';
+import { type SetStoreFunction, createStore, produce } from 'solid-js/store';
 
-import { createScheduled, isEqual, throttle } from './other';
+import { isEqual } from './deepObject';
+import { createScheduled, throttle } from './throttleDebounce';
 
 export { ReactiveMap } from '@solid-primitives/map';
 export { ReactiveSet } from '@solid-primitives/set';
@@ -97,4 +99,20 @@ export const onAutoMount = (
     const cleanFn = fn(owner);
     if (cleanFn) onCleanup(cleanFn);
   });
+};
+
+export type SetStateFunction<State> = SetStoreFunction<State> &
+  ((fn: (state: State) => void) => void);
+
+/** 对 solid-js/store 的 createStore 包装，setState 支持传入 produce 函数 */
+export const useStore = <State extends object>(initState: State) => {
+  const [store, _setState] = createStore(initState);
+
+  const setState: SetStateFunction<State> = (...args) => {
+    if (args.length === 1 && typeof args[0] === 'function')
+      return _setState(produce(args[0]));
+    return _setState(...(args as [any]));
+  };
+
+  return { store: store as Readonly<State>, setState };
 };

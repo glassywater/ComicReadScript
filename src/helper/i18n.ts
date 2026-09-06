@@ -10,7 +10,7 @@ import {
 import en from '../../locales/en.json' with { type: 'json' };
 import ru from '../../locales/ru.json' with { type: 'json' };
 import zh from '../../locales/zh.json' with { type: 'json' };
-import { byPath } from './other';
+import { byPath } from './deepObject';
 
 export const [lang, setLang] = createSignal<Languages>('zh');
 

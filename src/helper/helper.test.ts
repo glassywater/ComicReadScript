@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { descRange, extractRange } from './other';
+import { descRange, extractRange } from './range';
 
 describe('页面范围', () => {
   it('extractRange', () => {
