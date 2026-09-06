@@ -513,6 +513,7 @@ declare const getImageData: (img: HTMLImageElement, maxSize?: number) => ImageDa
 declare const withEventStop: <T extends Event>(handler?: (e: T) => void) => (e: T) => void;
 declare const versionLt: (version1: string, version2: string) => boolean;
 declare const gql: (strings: TemplateStringsArray, ...values: string[]) => string;
+declare const getNaturalCollator: () => Intl.Collator;
 declare const createEqualsSignal: typeof createSignal;
 declare const createRootMemo: typeof createMemo;
 declare const createThrottleMemo: <T>(fn: EffectFunction<T | undefined, T>, wait?: number, init?: T, options?: MemoOptions<T>) => Accessor<T>;
@@ -829,7 +830,7 @@ export declare const initComicReader: {
 export declare const defaultConfig: () => InitConfig;
 
 declare namespace helper {
-	export { AnimationFrame, FaviconProgress, PQueue, PointerState, ReactiveMap, ReactiveSet, SetStateFunction, StyleMap, UseDrag, UseStore, WakeLock$1 as WakeLock, approx, assign, boolDataVal, byPath, canvasToBlob, canvasToBlobUrl, clamp, createEffectOn, createEqualsSignal, createMemoMap, createRootEffect, createRootMemo, createScheduled, createThrottleMemo, css, debounce, descRange, difference, domParse, ensureGmValue, exposeToGlobal, extractRange, fileType, getFileName, getImageData, getKeyboardCode, getMostItem, gql, hijackFn, inRange, isArray, isEqual, isHTMLElement, isImageElement, isNumber, isString, isUrl, keyboardCodeToText, lang, log, mountComponents, needDarkMode, onAutoMount, onUrlChange, once, plimit, promisifyRequest, querySelector, querySelectorAll, querySelectorClick, range, requestIdleCallback$1 as requestIdleCallback, saveAs, scrollIntoView, setInitLang, setLang, singleThreaded, sleep, t, testImgUrl, throttle, useCache, useDrag, useFaviconProgress, useStore, versionLt, wait, waitDom, waitImgLoad, waitUrlChange, withEventStop };
+	export { AnimationFrame, FaviconProgress, PQueue, PointerState, ReactiveMap, ReactiveSet, SetStateFunction, StyleMap, UseDrag, UseStore, WakeLock$1 as WakeLock, approx, assign, boolDataVal, byPath, canvasToBlob, canvasToBlobUrl, clamp, createEffectOn, createEqualsSignal, createMemoMap, createRootEffect, createRootMemo, createScheduled, createThrottleMemo, css, debounce, descRange, difference, domParse, ensureGmValue, exposeToGlobal, extractRange, fileType, getFileName, getImageData, getKeyboardCode, getMostItem, getNaturalCollator, gql, hijackFn, inRange, isArray, isEqual, isHTMLElement, isImageElement, isNumber, isString, isUrl, keyboardCodeToText, lang, log, mountComponents, needDarkMode, onAutoMount, onUrlChange, once, plimit, promisifyRequest, querySelector, querySelectorAll, querySelectorClick, range, requestIdleCallback$1 as requestIdleCallback, saveAs, scrollIntoView, setInitLang, setLang, singleThreaded, sleep, t, testImgUrl, throttle, useCache, useDrag, useFaviconProgress, useStore, versionLt, wait, waitDom, waitImgLoad, waitUrlChange, withEventStop };
 }
 
 export {
