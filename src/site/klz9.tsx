@@ -2,11 +2,14 @@ import { setupSimple } from 'core';
 import { querySelector, querySelectorAll, wait } from 'helper';
 
 (() => {
-  if (!location.pathname.includes('-chapter-')) return;
+  const isOld = location.hostname === 'old.klz9.com';
+  // 旧站图片在 #list-imga，新站在 <main>
+  const imgSelector = isOld ? '#list-imga img' : 'main img:not(a img)';
 
   const getNavBtn = (index: 0 | 1) =>
     querySelectorAll<HTMLButtonElement>('main button.flex-1')[index];
 
+  // 只适用于新站
   const handlePrevNext = (index: 0 | 1) => {
     const btn = getNavBtn(index);
     return btn && !btn.disabled ? () => btn.click() : undefined;
@@ -14,13 +17,16 @@ import { querySelector, querySelectorAll, wait } from 'helper';
 
   void setupSimple({
     name: 'KLZ9',
-    selector: 'main img:not(a img)',
+    selector: imgSelector,
+    // 统一用「路径以 -chapter-数字.html 结尾」判断漫画页
     isMangaPage: async () => {
-      if (!location.pathname.includes('-chapter-')) return false;
-      await wait(() => querySelector('main img:not(a img)'));
+      if (!/-chapter-\d+\.html$/iu.test(location.pathname)) return false;
+      await wait(() => querySelector(imgSelector));
       return { id: location.pathname };
     },
-    onPrev: () => handlePrevNext(0),
-    onNext: () => handlePrevNext(1),
+    // 旧站返回 undefined → 回退到 getChapterSwitch 自动识别的 a.prev/a.next；
+    // 新站用 button.flex-1
+    onPrev: () => (isOld ? undefined : handlePrevNext(0)),
+    onNext: () => (isOld ? undefined : handlePrevNext(1)),
   });
 })();
