@@ -15,6 +15,22 @@ const gmApi = {
 };
 const gmApiList = Object.keys(gmApi);
 
+// 部分站点启用了 Trusted Types CSP，
+// 会禁止 Element.innerHTML、eval()、创建 script 等注入操作，
+// 因此需要使用 Trusted Types 隐式生效的 default 策略来绕过 CSP 限制
+const { trustedTypes } = unsafeWindow;
+if (trustedTypes) {
+  try {
+    if (!trustedTypes.defaultPolicy)
+      trustedTypes.createPolicy('default', {
+        createHTML: (s: string) => s,
+        createScript: (s: string) => s,
+        createScriptURL: (s: string) => s,
+        createURL: (s: string) => s,
+      });
+  } catch {}
+}
+
 const crsLib: Window['crsLib'] = {
   // 有些 cjs 模块会检查这个，所以在这里声明下
   process: { env: { NODE_ENV: process.env.NODE_ENV } },
@@ -42,7 +58,6 @@ const evalCode = (code: string) => {
   // 所以优先使用最通用的 GM_addElement 来加载
   if (gmApi.GM_addElement)
     return GM_addElement('script', { textContent: code })?.remove();
-
   eval.call(gmApi.unsafeWindow, code);
 };
 
