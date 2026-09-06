@@ -1,5 +1,5 @@
 import { request } from 'core';
-import { domParse } from 'helper';
+import { domParse, getNaturalCollator } from 'helper';
 import { type Promisable } from 'type-fest';
 
 const getTagSetHtml = async (tagset?: string) => {
@@ -72,7 +72,7 @@ const collectTags = (html: Document, tagList: Tag[] = []) => {
 };
 
 const sortTagList = (tagList: Tag[]) => {
-  const collator = new Intl.Collator();
+  const collator = getNaturalCollator();
   const sortFn = (a: Tag, b: Tag) => {
     if (a.color !== b.color) return b.color - a.color;
     if (a.group !== b.group) return collator.compare(a.group, b.group);

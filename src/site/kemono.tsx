@@ -2,6 +2,7 @@ import { request, setupSiteAdapter } from 'core';
 import {
   createEffectOn,
   domParse,
+  getNaturalCollator,
   querySelector,
   querySelectorAll,
   querySelectorClick,
@@ -31,7 +32,7 @@ const fileNameOf = (a: HTMLAnchorElement | null) => {
 };
 
 const naturalCompare = (a: string, b: string) =>
-  a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+  getNaturalCollator().compare(a, b);
 
 /** 对元素列表按文件名自然排序，返回排序后的新数组 */
 const sortByFileName = <T extends Element>(

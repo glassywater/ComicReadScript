@@ -1,16 +1,15 @@
 import { toast } from 'components/Toast';
-import { t } from 'helper';
+import { getNaturalCollator, t } from 'helper';
 
 import { getImgData } from './fileParser';
 import { handleExit, setState, store } from './store';
-
-const collator = new Intl.Collator(undefined, { numeric: true });
 
 const sortFiles = (files: File[]) => {
   // 我也不知道这个 path 是哪里来的，总之它就是存在
   // 在 edge 上 webkitRelativePath 为空，但有 path。在火狐上，则是两个属性都有
   const getFilePath = (file: File) =>
     file.webkitRelativePath || (file as any).path || file.name;
+  const collator = getNaturalCollator();
   files.sort((a, b) => collator.compare(getFilePath(a), getFilePath(b)));
 };
 

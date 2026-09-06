@@ -868,3 +868,11 @@ export const versionLt = (version1: string, version2: string) => {
  */
 export const gql = (strings: TemplateStringsArray, ...values: string[]) =>
   strings.reduce((acc, str, i) => acc + str + (values[i] ?? ''), '');
+
+/** 尽量模拟 Windows 资源管理器的默认文件名排序行为 */
+export const getNaturalCollator = () =>
+  // 为了在「中日韩英」四语下都能稳定，要使用 ja-JP，避免 zh 的多音字问题
+  new Intl.Collator('ja-JP', {
+    numeric: true,
+    sensitivity: 'base',
+  });
