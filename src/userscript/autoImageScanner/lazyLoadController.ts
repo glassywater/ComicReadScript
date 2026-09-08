@@ -1,6 +1,6 @@
 import { isImageElement, querySelectorAll } from 'helper';
 
-import { type ImageSlotGroup } from './imageSlot';
+import { type ImageSlotGroup } from './imageSlotGroups';
 import {
   lazyLoadTrigger,
   needTrigger,
@@ -8,26 +8,26 @@ import {
 } from './triggerLazyLoad';
 
 export class LazyLoadController {
+  /** 当前生效的图片 selector */
   private readonly getImgSelector: () => string;
-  private readonly getImageSlotGroups: () => ImageSlotGroup[];
+  /** 所有图片槽位组 */
+  private readonly getImageSlotGroups: () => readonly ImageSlotGroup[];
+  /** 页面上所有不在黑名单中的图片元素 */
   private readonly getAllImg: () => HTMLImageElement[];
+  /** 当前是否允许触发懒加载 */
   private readonly runCondition: () => boolean;
+  /** 懒加载失败后的回调 */
   private readonly onLazyLoadFailed?: () => void;
 
   /** 懒加载触发 promise，用于避免重复触发 */
   private triggerPromise: Promise<void> | undefined;
 
   constructor(options: {
-    /** 获取当前生效的图片 selector */
-    getImgSelector: () => string;
-    /** 获取所有图片槽位组 */
-    getImageSlotGroups: () => ImageSlotGroup[];
-    /** 获取页面上所有不在黑名单中的图片元素 */
-    getAllImg: () => HTMLImageElement[];
-    /** 判断当前是否允许触发懒加载 */
-    runCondition: () => boolean;
-    /** 懒加载失败后的回调 */
-    onLazyLoadFailed?: () => void;
+    getImgSelector: LazyLoadController['getImgSelector'];
+    getImageSlotGroups: LazyLoadController['getImageSlotGroups'];
+    getAllImg: LazyLoadController['getAllImg'];
+    runCondition: LazyLoadController['runCondition'];
+    onLazyLoadFailed?: LazyLoadController['onLazyLoadFailed'];
   }) {
     this.getImgSelector = options.getImgSelector;
     this.getImageSlotGroups = options.getImageSlotGroups;
@@ -42,6 +42,7 @@ export class LazyLoadController {
 
   /** 手动触发一轮完整的懒加载 */
   trigger() {
+    if (!this.runCondition()) return Promise.resolve();
     if (this.triggerPromise) return this.triggerPromise;
 
     this.triggerPromise = (async () => {
@@ -82,13 +83,29 @@ export class LazyLoadController {
     // https://www.twmanga.com/comic/chapter/sanjiaoguanxirumen-founai/0_0.html
     // https://klz9.com/love-live-flowers-hasunosora-jogakuin-school-idol-club-chapter-1.html
     if (!this.runCondition()) return;
-    const imgTargets = this.getAllImg().filter(needTrigger);
-    if (imgTargets.length > 0) await triggerLazyLoad(imgTargets);
 
-    const groupTargets: HTMLElement[] = [];
-    for (const group of this.getImageSlotGroups())
-      for (const slot of group.slots)
-        if (!isImageElement(slot) && needTrigger(slot)) groupTargets.push(slot);
-    if (groupTargets.length > 0) await triggerLazyLoad(groupTargets);
+    /** 当前已确认的成组图片槽位列表 */
+    const activeGroups = this.getImageSlotGroups();
+
+    let targets: HTMLElement[];
+    if (activeGroups.length > 0) {
+      // 有成组结果时，只处理组内需要触发懒加载的元素
+      targets = [];
+      for (const group of activeGroups) {
+        for (const slot of group.slots)
+          if (!isImageElement(slot) && needTrigger(slot)) targets.push(slot);
+        for (const img of group.coveredImgs)
+          if (needTrigger(img)) targets.push(img);
+      }
+    } else if (this.getImgSelector()) {
+      // 有 selector 但找不到成组图片时，
+      // 因为 selector 匹配的图片已由 triggerExpectImg 处理，故不进行触发
+      return;
+    } else {
+      // 无 selector 且找不到成组图片时，对所有图片进行触发
+      targets = this.getAllImg().filter(needTrigger);
+    }
+
+    if (targets.length > 0) await triggerLazyLoad(targets);
   };
 }

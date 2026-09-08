@@ -46,6 +46,15 @@ export default defineConfig({
     'capitalized-comments': 'off',
     // 要求所有控制语句使用花括号
     curly: 'off',
+    // class 里的每个方法都必须使用 this
+    // 'class-methods-use-this': [
+    //   'warn',
+    //   {
+    //     enforceForClassFields: false,
+    //     ignoreOverrideMethods: true,
+    //     ignoreClassesWithImplements: 'all',
+    //   },
+    // ],
     // 禁止使用 TODO、FIXME 等警告注释
     'eslint/no-warning-comments': 'off',
     // 要求正则表达式使用 Unicode 标志

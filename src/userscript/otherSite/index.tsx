@@ -118,7 +118,7 @@ export const otherSite = async () => {
 
       await scanner.waitFirstImage(Infinity);
       toast.dismiss('no_img');
-      return scanner.imgList;
+      return scanner.imgList as string[];
     },
   });
 

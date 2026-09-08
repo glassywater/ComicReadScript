@@ -6,8 +6,6 @@ import {
   sortElementsByDomOrder,
   sortElementsByTop,
 } from './helper';
-import { type ImageSlotGroup, buildSlotElementsFromGroup } from './imageSlot';
-import { type ImageInfo } from './ImageWatcher';
 import { getDatasetUrl, isLazyLoadFailed } from './triggerLazyLoad';
 
 type ImageListUpdateResult = {
@@ -17,10 +15,9 @@ type ImageListUpdateResult = {
   isEmpty: boolean;
 };
 
-/** 根据合格图片集合和最优图片槽位组，维护最终可用的 imgList */
+/** 根据传入的图片槽位列表，维护最终可用的 imgList */
 export class ImageListBuilder {
   private readonly enableSortImageByTop: boolean;
-  private readonly filterByContainer: boolean;
   private readonly onImgListChange?: (imgList: string[]) => void;
   private readonly onEmpty?: () => void;
 
@@ -31,54 +28,56 @@ export class ImageListBuilder {
   });
 
   private isUpdatingImgList = false;
+  /** AutoImageScanner 传入的代际标记，scanner 停止后作废过期的 update */
   private generation = 0;
+  /**
+   * update 的并发序号
+   *
+   * 新一次 update 开始时自增，旧 update 的异步闭包检测到序号落后即放弃写入
+   */
   private updateSeq = 0;
-
-  /** 过滤后真正用于展示的图片槽位列表 */
-  private _slotElements: HTMLElement[] = [];
-  /** 找到的所有符合条件的图片 url */
-  private _imgList: string[] = [];
 
   constructor(options: {
     enableSortImageByTop: boolean;
-    filterByContainer: boolean;
     onImgListChange?: (imgList: string[]) => void;
     onEmpty?: () => void;
   }) {
     this.enableSortImageByTop = options.enableSortImageByTop;
-    this.filterByContainer = options.filterByContainer;
     this.onImgListChange = options.onImgListChange;
     this.onEmpty = options.onEmpty;
   }
 
-  /** 当前过滤后真正用于展示的图片槽位列表 */
+  /** 过滤后用于展示的图片槽位列表 */
+  private _slotElements: HTMLElement[] = [];
+  /** 过滤后用于展示的图片槽位列表 */
   get slotElements() {
     return this._slotElements;
   }
 
   /** 当前找到的所有符合条件的图片 url */
-  get imgList() {
+  private _imgList: string[] = [];
+  /** 当前找到的所有符合条件的图片 url */
+  get imgList(): readonly string[] {
     return this._imgList;
   }
 
-  /** 根据最新合格图片集合和最优槽位组，更新 slotElements 与 imgList */
+  /** 根据最新图片槽位列表，更新 slotElements 与 imgList */
   async update(
-    qualifiedMap: ReadonlyMap<HTMLImageElement, ImageInfo>,
-    bestGroup: ImageSlotGroup | undefined,
+    selectedSlots: HTMLElement[],
     generation: number,
   ): Promise<ImageListUpdateResult> {
     const seq = ++this.updateSeq;
     this.generation = generation;
 
-    const selectedSlots =
-      this.filterByContainer && bestGroup
-        ? buildSlotElementsFromGroup(bestGroup)
-        : [...qualifiedMap.keys()];
     this._slotElements = this.enableSortImageByTop
       ? sortElementsByTop(selectedSlots)
       : sortElementsByDomOrder(selectedSlots);
 
     if (this._slotElements.length === 0) {
+      if (this._imgList.length > 0) {
+        this._imgList = [];
+        this.onImgListChange?.([]);
+      }
       this.onEmpty?.();
       return { isEdited: false, isEmpty: true };
     }
@@ -105,22 +104,26 @@ export class ImageListBuilder {
       await plimit(
         this._slotElements.map((e, i) => async () => {
           if (seq !== this.updateSeq || generation !== this.generation) return;
-          // 占位元素保持空字符串，等待懒加载成功后再替换
-          if (!isImageElement(e)) {
+          // 非 img 槽位直接跳过不做处理
+          if (!isImageElement(e)) return;
+
+          try {
+            let newUrl = await this.blobUrlResolver.resolve(e);
+            if (seq !== this.updateSeq || generation !== this.generation)
+              return;
+            if (this.placeholderImgList.has(newUrl))
+              newUrl = getDatasetUrl(e) ?? '';
+            if (newUrl === this._imgList[i]) return;
+
+            isEdited ||= true;
+            this._imgList[i] = newUrl;
+          } catch {
+            if (seq !== this.updateSeq || generation !== this.generation)
+              return;
             if (this._imgList[i] === '') return;
             isEdited ||= true;
             this._imgList[i] = '';
-            return;
           }
-
-          let newUrl = await this.blobUrlResolver.resolve(e);
-          if (seq !== this.updateSeq || generation !== this.generation) return;
-          if (this.placeholderImgList.has(newUrl))
-            newUrl = getDatasetUrl(e) ?? '';
-          if (newUrl === this._imgList[i]) return;
-
-          isEdited ||= true;
-          this._imgList[i] = newUrl;
         }),
       );
     } finally {
@@ -133,6 +136,9 @@ export class ImageListBuilder {
       return { isEdited: false, isEmpty: true };
     this.removeFailedSlots();
     if (this._slotElements.length === 0) return { isEdited, isEmpty: true };
+    // removeFailedSlots 内部会调用 onImgListChange / onEmpty 外部回调，
+    // 回调可能（直接或经同步的响应式 effect 链）再次触发 update 或 clear，
+    // 改变 updateSeq / generation，故此处复查以丢弃过期的本轮结果
     if (seq !== this.updateSeq || generation !== this.generation)
       return { isEdited: false, isEmpty: true };
     return { isEdited, isEmpty: false };

@@ -9,6 +9,7 @@ import {
 } from 'helper';
 
 import { DwellWatcher } from './dwellWatcher';
+import { hasLazyLoadProofSize } from './sizeStandards';
 
 /** 新元素短停留时间 */
 const SHORT_STAY_TIME = 310;
@@ -62,7 +63,7 @@ export const isLazyLoaded = (e: HTMLElement, oldSrc?: string) => {
     if (!e.offsetParent) return false;
     // 有些网站会使用 svg 占位
     if (e.src.startsWith('data:image/svg')) return false;
-    if (e.naturalWidth > 500 || e.naturalHeight > 500) return true;
+    if (hasLazyLoadProofSize(e)) return true;
     if (oldSrc !== undefined && e.src !== oldSrc) return true;
   } else {
     const imgDomList = e.querySelectorAll('img');
@@ -177,23 +178,13 @@ class LazyLoadManager {
       .map(([e]) => e);
   }
 
-  /** 按 DOM 顺序排序 */
-  private sortByDomOrder(list: HTMLElement[]) {
-    return list.toSorted((a, b) => {
-      if (a === b) return 0;
-      return a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING
-        ? -1
-        : 1;
-    });
-  }
-
   /** 扫描所有新元素，让它们完成短停留 */
   private async sweepNew() {
     this.prune();
-    const targets = this.sortByDomOrder([...this.newSet]);
+    const targets = sortByDomOrder([...this.newSet]);
     for (const e of targets) {
       if (!this.newSet.has(e)) continue;
-      this.scrollToElement(e);
+      scrollToElement(e);
       await this.waitForBatch(
         (target) => this.newSet.has(target),
         SHORT_STAY_TIME,
@@ -204,10 +195,10 @@ class LazyLoadManager {
   /** 扫描指定旧元素，让它们完成长停留 */
   private async sweepOld(targets: HTMLElement[]) {
     this.prune();
-    const sorted = this.sortByDomOrder(targets);
+    const sorted = sortByDomOrder(targets);
     for (const e of sorted) {
       if (!this.oldMap.has(e)) continue;
-      this.scrollToElement(e);
+      scrollToElement(e);
       await this.waitForBatch(
         (target) => this.oldMap.has(target),
         LONG_STAY_TIME,
@@ -234,12 +225,6 @@ class LazyLoadManager {
       duration,
       50,
     );
-  }
-
-  /** 滚动到元素顶部并派发 scroll 事件，触发网站懒加载 */
-  private scrollToElement(e: HTMLElement) {
-    e.scrollIntoView({ behavior: 'instant', block: 'start' });
-    e.dispatchEvent(new Event('scroll', { bubbles: true }));
   }
 
   /** 触发网页底部翻页 */
@@ -311,3 +296,18 @@ export const triggerLazyLoad = lazyLoadTrigger.trigger;
 export const needTrigger = (e: HTMLElement) => lazyLoadTrigger.needTrigger(e);
 export const isLazyLoadFailed = (e: HTMLElement) =>
   lazyLoadTrigger.isLazyLoadFailed(e);
+
+/** 按 DOM 顺序排序 */
+const sortByDomOrder = (list: HTMLElement[]) =>
+  list.toSorted((a, b) => {
+    if (a === b) return 0;
+    return a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING
+      ? -1
+      : 1;
+  });
+
+/** 滚动到元素顶部并派发 scroll 事件，触发网站懒加载 */
+const scrollToElement = (e: HTMLElement) => {
+  e.scrollIntoView({ behavior: 'instant', block: 'start' });
+  e.dispatchEvent(new Event('scroll', { bubbles: true }));
+};

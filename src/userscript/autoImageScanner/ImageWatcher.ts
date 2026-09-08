@@ -1,6 +1,6 @@
 import { ReactiveMap, isHTMLElement, isImageElement } from 'helper';
 
-export type ImageInfo = {
+export type ImageSizeInfo = {
   display: { width: number; height: number };
   natural: { width: number; height: number };
 };
@@ -12,10 +12,13 @@ export type ImageWatcherOptions = {
    * @param display 显示尺寸
    * @param natural 原始尺寸
    */
-  filterImg: (info: ImageInfo, img: HTMLImageElement) => boolean;
+  filterImg: (info: ImageSizeInfo, img: HTMLImageElement) => boolean;
 
   /** 当符合条件的图片集合发生变化时触发的回调 */
-  onChanged: (map: Map<HTMLImageElement, ImageInfo>) => void;
+  onChanged: (map: Map<HTMLImageElement, ImageSizeInfo>) => void;
+
+  /** 当 DOM 结构发生增删时触发的回调，用于决定是否需要重新识别内容区 */
+  onStructureChange?: () => void;
 };
 
 /** 遍历节点及其子树中的所有图片元素 */
@@ -42,8 +45,11 @@ export class ImageWatcher {
   // 如果图片的 src 发生改变，会将其从这里移除，重新进行检查
   private readonly qualifiedMap = new ReactiveMap<
     HTMLImageElement,
-    ImageInfo
+    ImageSizeInfo
   >();
+
+  // 记录已通过 observeImage 观察过的图片，便于 stop/remove 时取消监听
+  private readonly observedImages = new Set<HTMLImageElement>();
 
   // 需要监听的属性列表
   private readonly targetAttributes = [
@@ -81,49 +87,53 @@ export class ImageWatcher {
   public stop(): void {
     this.mo.disconnect();
     this.ro.disconnect();
+    for (const img of this.observedImages) {
+      img.removeEventListener('load', this.handleImageLoad);
+      this.ro.unobserve(img);
+    }
+    this.observedImages.clear();
     this.qualifiedMap.clear();
   }
 
+  /** 图片 load 时的处理方法，保留引用以便在 stop/remove 时取消监听 */
+  private readonly handleImageLoad = (event: Event) => {
+    const img = event.currentTarget as HTMLImageElement;
+    if (this.tryQualify(img, undefined, true))
+      this.options.onChanged(this.qualifiedMap);
+  };
+
   /** 使用 ResizeObserver 监测图片尺寸变化，并在图片加载完成后重新检查 */
   private readonly observeImage = (img: HTMLImageElement) => {
+    this.observedImages.add(img);
     this.ro.observe(img);
 
     if (img.complete) return;
 
-    img.addEventListener(
-      'load',
-      () => {
-        if (this.tryQualify(img)) this.options.onChanged(this.qualifiedMap);
-      },
-      { once: true },
-    );
+    img.removeEventListener('load', this.handleImageLoad);
+    img.addEventListener('load', this.handleImageLoad, { once: true });
   };
 
-  /** 构造图片尺寸信息 */
-  private createImageInfo(
-    img: HTMLImageElement,
-    display: { width: number; height: number },
-  ): ImageInfo {
-    return {
-      display,
-      natural: { width: img.naturalWidth, height: img.naturalHeight },
-    };
-  }
-
-  /** 尝试将图片加入 qualifiedMap，成功返回 true */
+  /**
+   * 将图片加入或更新 qualifiedMap。
+   * 返回 true 表示本次调用让 qualifiedMap 产生了变化；
+   * updateExisting 为 true 时，已存在的图片如果尺寸发生变化也会更新。
+   */
   private tryQualify(
     img: HTMLImageElement,
     display?: { width: number; height: number },
+    updateExisting = false,
   ): boolean {
-    if (this.qualifiedMap.has(img)) return false;
+    const oldInfo = this.qualifiedMap.get(img);
+    if (oldInfo && !updateExisting) return false;
 
     const rect = display ?? img.getBoundingClientRect();
-    const imageInfo = this.createImageInfo(img, rect);
+    const imageInfo = createImageInfo(img, rect);
 
     if (!this.options.filterImg(imageInfo, img)) return false;
 
+    if (oldInfo && sameImageInfo(oldInfo, imageInfo)) return false;
+
     this.qualifiedMap.set(img, imageInfo);
-    this.ro.unobserve(img);
     return true;
   }
 
@@ -134,13 +144,7 @@ export class ImageWatcher {
     for (const entry of entries) {
       const img = entry.target as HTMLImageElement;
 
-      if (
-        this.tryQualify(img, {
-          width: entry.contentRect.width,
-          height: entry.contentRect.height,
-        })
-      )
-        changed = true;
+      if (this.tryQualify(img, entry.contentRect, true)) changed = true;
     }
 
     if (changed) this.options.onChanged(this.qualifiedMap);
@@ -151,6 +155,13 @@ export class ImageWatcher {
     if (!this.qualifiedMap.has(img)) return false;
     this.qualifiedMap.delete(img);
     return true;
+  };
+
+  /** 取消对单张图片的 RO 与 load 监听 */
+  private readonly unobserveImage = (img: HTMLImageElement) => {
+    img.removeEventListener('load', this.handleImageLoad);
+    this.ro.unobserve(img);
+    this.observedImages.delete(img);
   };
 
   /** 处理新增节点中的图片 */
@@ -167,6 +178,7 @@ export class ImageWatcher {
   private handleRemovedNodes(nodes: NodeList): boolean {
     let changed = false;
     forEachImage(nodes, (img) => {
+      this.unobserveImage(img);
       if (this.deleteImg(img)) changed = true;
     });
     return changed;
@@ -176,22 +188,32 @@ export class ImageWatcher {
   private handleAttributeMutation(node: Node): boolean {
     if (!isImageElement(node)) return false;
 
-    // 图片的 src 变了以后，要将其视为一张新图来看待
-    if (this.tryQualify(node)) return true;
+    const oldInfo = this.qualifiedMap.get(node);
+    const imageInfo = createImageInfo(node, node.getBoundingClientRect());
 
-    let changed = false;
-    if (this.deleteImg(node)) changed = true;
+    if (this.options.filterImg(imageInfo, node)) {
+      // 尺寸没有变化时跳过
+      if (oldInfo && sameImageInfo(oldInfo, imageInfo)) return false;
+      this.qualifiedMap.set(node, imageInfo);
+      this.observeImage(node);
+      return true;
+    }
+
+    // 不符合条件时（可能只是新图尚未加载完成）移出集合，视为新图对待，
+    // 挂上监听等加载完再重新判定
     this.observeImage(node);
-    return changed;
+    return this.deleteImg(node);
   }
 
   /** 处理监听节点的增删改 */
   private readonly handleMutation = (mutations: MutationRecord[]): void => {
     let changed = false;
+    let structureChanged = false;
 
     for (const mutation of mutations) {
       switch (mutation.type) {
         case 'childList': {
+          structureChanged = true;
           changed = this.handleAddedNodes(mutation.addedNodes) || changed;
           changed = this.handleRemovedNodes(mutation.removedNodes) || changed;
           break;
@@ -204,6 +226,23 @@ export class ImageWatcher {
       }
     }
 
+    if (structureChanged) this.options.onStructureChange?.();
     if (changed) this.options.onChanged(this.qualifiedMap);
   };
 }
+
+/** 构造图片尺寸信息 */
+const createImageInfo = (
+  img: HTMLImageElement,
+  display: { width: number; height: number },
+): ImageSizeInfo => ({
+  display,
+  natural: { width: img.naturalWidth, height: img.naturalHeight },
+});
+
+/** 判断两张图片尺寸信息是否完全一致 */
+const sameImageInfo = (a: ImageSizeInfo, b: ImageSizeInfo) =>
+  a.display.width === b.display.width &&
+  a.display.height === b.display.height &&
+  a.natural.width === b.natural.width &&
+  a.natural.height === b.natural.height;

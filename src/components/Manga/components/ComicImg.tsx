@@ -133,7 +133,7 @@ export const ComicImg: Component<TComicImg & { index: number }> = (img) => {
       data-load-type={img.loadType === 'loaded' ? undefined : img.loadType}
     >
       {/* 因为 img 无法使用 ::after，所以得用 picture 包一下 */}
-      <picture style={styles().picture}>
+      <picture style={styles().picture} data-src={img.src}>
         <Show when={src()}>
           <img
             style={styles().imgEle}

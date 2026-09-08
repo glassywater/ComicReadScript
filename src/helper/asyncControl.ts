@@ -22,8 +22,10 @@ export const once = <T extends (...args: any[]) => any>(
 type SingleThreadedState<T extends any[]> = {
   running: boolean;
   argList: T[];
-  /** 是否保留运行期间的调用到当此运行结束后调用 */
+  /** 是否在一轮运行结束后清空等待调用队列 */
   abandon?: boolean;
+  /** 是否在一轮运行结束后只补跑最后一次等待调用 */
+  latestOnly?: boolean;
   /** 连续调用的间隔 */
   timeout?: number;
   /** 确保本次运行完后再运行一次 */
@@ -57,6 +59,8 @@ export const singleThreaded = <T extends any[]>(
       if (state.argList.length === 0) throw error;
     } finally {
       if (state.abandon) state.argList.length = 0;
+      else if (state.latestOnly && state.argList.length > 1)
+        state.argList.splice(0, state.argList.length - 1);
       if (state.argList.length > 0) setTimeout(work, state.timeout);
       else state.running = false;
     }

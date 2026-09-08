@@ -13,3 +13,4 @@ test/cookie.ts
 .excalidraw
 .dsh
 .pnpm-store
+debug.*

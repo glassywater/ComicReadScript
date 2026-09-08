@@ -1,4 +1,4 @@
-import { canvasToBlobUrl, testImgUrl } from 'helper';
+import { canvasToBlobUrl, requestIdleCallback, testImgUrl } from 'helper';
 
 /** 按照元素的显示高度来排序元素 */
 export const sortElementsByTop = <T extends HTMLElement>(
@@ -26,6 +26,8 @@ export const sortElementsByDomOrder = <T extends HTMLElement>(
 /** 处理 URL.createObjectURL 后马上 URL.revokeObjectURL 的图片 */
 export class BlobUrlResolver {
   private readonly blobUrlMap = new Map<string, string>();
+  private readonly pendingRevoke = new Set<string>();
+  private revokeScheduled = false;
 
   async resolve(e: HTMLImageElement): Promise<string> {
     if (this.blobUrlMap.has(e.src)) return this.blobUrlMap.get(e.src)!;
@@ -37,12 +39,29 @@ export class BlobUrlResolver {
     canvasCtx.drawImage(e, 0, 0);
 
     const url = await canvasToBlobUrl(canvas);
+    const oldUrl = this.blobUrlMap.get(e.src);
+    if (oldUrl) this.scheduleRevoke(oldUrl);
     this.blobUrlMap.set(e.src, url);
     return url;
   }
 
   clear() {
+    for (const url of this.blobUrlMap.values()) this.scheduleRevoke(url);
     this.blobUrlMap.clear();
+  }
+
+  /** 登记一个需要释放的 ObjectURL */
+  private scheduleRevoke(url: string) {
+    this.pendingRevoke.add(url);
+    if (this.revokeScheduled) return;
+    this.revokeScheduled = true;
+    // 立即 revoke 可能会影响到下游扔在使用的旧 URL，所以延迟到空闲
+    requestIdleCallback(() => {
+      this.revokeScheduled = false;
+      for (const pendingUrl of this.pendingRevoke)
+        URL.revokeObjectURL(pendingUrl);
+      this.pendingRevoke.clear();
+    });
   }
 
   /** 在 https 页面下将 http 图片地址升级为 https */
