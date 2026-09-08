@@ -33,6 +33,7 @@ export const handleImgLoaded = (url: string, e?: HTMLImageElement) => {
   loadState.imgErrorMap.delete(url);
 
   const img = store.imgMap[url];
+  if (!img) return;
   if (img.translationType === 'show') return;
   if (img.loadType !== 'loaded') {
     setState('imgMap', url, 'loadType', 'loaded');
@@ -121,12 +122,14 @@ createEffectOn(
         headers,
         onerror: () => handleImgError(url),
         onprogress({ loaded, total }) {
+          if (!Reflect.has(store.imgMap, url)) return;
           setState('imgMap', url, 'progress', (loaded / total) * 100);
           // 一段时间内都没进度后超时中断
           handleTimeout();
         },
         onload({ response }) {
           loadState.abortMap.delete(url);
+          if (!Reflect.has(store.imgMap, url)) return;
           setState('imgMap', url, {
             blobUrl: URL.createObjectURL(response),
             progress: undefined,

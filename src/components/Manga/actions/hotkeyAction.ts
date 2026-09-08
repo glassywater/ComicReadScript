@@ -112,6 +112,10 @@ const handleSwapPageTurnKey = (nextPage: boolean) => {
 };
 
 export const handleHotkey = (hotkey: string, e?: KeyboardEvent) => {
+  // 等待图片加载期间禁用快捷键，避免中途修改状态产生 bug
+  // 仅保留退出功能
+  if (store.imgList.length === 0 && hotkey !== 'exit') return;
+
   // 用户手动触发快捷键时，停止自动滚动并直接走完当前翻页动画
   stopAutoScroll();
   finishTurnAnimation();

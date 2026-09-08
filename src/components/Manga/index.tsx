@@ -1,6 +1,7 @@
 import { boolDataVal } from 'helper';
 import {
   type Component,
+  Show,
   createEffect,
   enableScheduling,
   onMount,
@@ -17,6 +18,7 @@ import {
 } from './actions';
 import { ComicImgFlow } from './components/ComicImgFlow';
 import { EndPage } from './components/EndPage';
+import { LoadingMask } from './components/LoadingMask';
 import { Scrollbar } from './components/Scrollbar';
 import { Toolbar } from './components/Toolbar';
 import { TouchArea } from './components/TouchArea';
@@ -99,6 +101,7 @@ export const Manga: Component<MangaProps> = (props) => {
         <WheelProgress />
         <EndPage />
         <Toolbar />
+        <Show when={store.imgList.length === 0} children={<LoadingMask />} />
       </div>
     </>
   );

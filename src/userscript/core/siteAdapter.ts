@@ -188,21 +188,28 @@ export const setupSiteAdapter = async <
   ) => {
     if (!force && isEqual(pageCtx, newPageCtx)) return;
 
+    const wasMangaPage = pageCtx?.isManga ?? pageCtx?.type === 'manga';
+
     for (const cleanup of cleanupFns) await cleanup(newPageCtx);
     cleanupFns.length = 0;
     pageCtx = newPageCtx;
     const isMangePage = newPageCtx?.isManga ?? newPageCtx?.type === 'manga';
 
+    // 在漫画页间切换时不退出阅读模式，避免闪烁
+    const keepShow = wasMangaPage && isMangePage && store.manga.show;
+
     setState((state) => {
       state.flag.hasPageHandler =
         Boolean(newPageCtx?.type) && Reflect.has(handlers, newPageCtx!.type);
-      state.manga.show = false;
-      // 页面类型切换时重置 comicMap，触发响应式更新
-      state.comicMap = {
-        '': {
-          getImgList: Object.assign(() => [], { type: 'init' as const }),
-        },
-      };
+      if (!keepShow) {
+        state.manga.show = false;
+        // 页面类型切换时重置 comicMap，触发响应式更新
+        state.comicMap = {
+          '': {
+            getImgList: Object.assign(() => [], { type: 'init' as const }),
+          },
+        };
+      }
     });
 
     // handlers.all 需要在所有页面运行，包括 pageCtx 为 undefined 的页面
@@ -233,6 +240,16 @@ export const setupSiteAdapter = async <
       newPageCtx as Extract<PageContext, { type: PageContext['type'] }>,
     );
     if (handlerCleanup) cleanupFns.push(handlerCleanup);
+
+    if (keepShow) {
+      try {
+        await loadComic();
+      } catch {
+        // 新章节图片加载失败时退出阅读模式
+        setState('manga', 'show', false);
+      }
+      return;
+    }
 
     if (!isMangePage || !store.options.autoShow) return;
 

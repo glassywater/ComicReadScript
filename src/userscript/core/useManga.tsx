@@ -101,7 +101,7 @@ export const useManga = <T extends Record<string, any>>({
   const wakeLock = new WakeLock();
 
   createEffectOn(
-    createRootMemo(() => store.manga.show && store.manga.imgList.length > 0),
+    createRootMemo(() => store.manga.show),
     (show) => {
       if (show) {
         dom.setAttribute('show', '');

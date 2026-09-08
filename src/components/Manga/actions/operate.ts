@@ -50,6 +50,9 @@ export const handleKeyDown = (e: KeyboardEvent) => {
     }
   }
 
+  // 等待图片加载期间禁用其他按键操作，避免中途修改状态产生 bug
+  if (store.imgList.length === 0) return;
+
   // 处理标注了 data-only-number 的元素
   if ((e.target as HTMLElement).dataset.onlyNumber !== undefined) {
     // 拦截能输入数字外的按键
