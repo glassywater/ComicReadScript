@@ -3,7 +3,7 @@
 // @name:en         ComicRead
 // @name:ru         ComicRead
 // @namespace       ComicRead
-// @version         12.13.0
+// @version         12.14.0
 // @description     为漫画站增加双页阅读、翻译等优化体验的增强功能。百合会（记录阅读历史、自动签到等）、百合会新站、E-Hentai（关联外站、快捷收藏、标签染色、识别广告页等）、nhentai（彻底屏蔽漫画、无限滚动）、Yurifans（自动签到）、拷贝漫画(copymanga)（显示最后阅读记录、解锁隐藏漫画）、再漫画、漫画柜(manhuagui)、动漫屋(dm5)、mangabz、komiic、無限動漫、绅士漫画(wnacg)、禁漫天堂、NoyAcg、熱辣漫畫、hanime1、hitomi、hdoujin、SchaleNetwork、nude-moon、HentaiZap、IMHentai、HentaiEra、HentaiEnvy、EAHentai、HentaiNexus、AsmHentai、3Hentai、MangaDex、welovemanga、kisslove(klz9)、Pawchive、kemono、nekohouse、Pixiv、微博、明日方舟泰拉记事社、Postimages、ニコニコ漫画、最前線、芸能ヌード、Suwayomi、LANraragi
 // @description:en  Add dual-page reading, translation and other enhancements to comic sites. E-Hentai (Associate nhentai, Quick favorite, Colorize tags, Floating tag list, etc.) | nhentai (Totally block comics, Auto page turning) | hitomi | hdoujin | SchaleNetwork | nude-moon | HentaiZap | IMHentai | HentaiEra | HentaiEnvy | EAHentai | HentaiNexus | AsmHentai | 3Hentai | Pawchive | kemono | nekohouse | MangaDex | welovemanga | kisslove(klz9)
 // @description:ru  Добавляет расширенные функции для удобства на сайт, такие как двухстраничный режим и перевод.
@@ -99,22 +99,22 @@
 // @connect         self
 // @connect         127.0.0.1
 // @connect         *
-// @connect         mapi.elfgjfghkk.club
-// @connect         api.2024manga.com
-// @connect         mapi.hotmangasf.com
 // @connect         mapi.hotmangasg.com
-// @connect         mapi.fgjfghkk.club
-// @connect         www.manga2026.xyz
-// @connect         api.manga2025.com
-// @connect         mapi.hotmangasd.com
-// @connect         mapi.fgjfghkkcenter.club
+// @connect         api.2024manga.com
 // @connect         m.manga2025.com
+// @connect         api.manga2025.com
+// @connect         mapi.fgjfghkk.club
+// @connect         mapi.fgjfghkkcenter.club
+// @connect         mapi.elfgjfghkk.club
+// @connect         mapi.hotmangasd.com
+// @connect         mapi.hotmangasf.com
+// @connect         www.manga2026.xyz
 // @connect         www.manga2025.com
+// @connect         mapi.copy20.com
+// @connect         api.2026copy.com
 // @connect         api.copy4000.com
 // @connect         api.mangacopy.com
 // @connect         api.copy3000.com
-// @connect         mapi.copy20.com
-// @connect         api.2026copy.com
 // @grant           GM_getValue
 // @grant           GM_setValue
 // @grant           GM_addElement
@@ -173,81 +173,79 @@ exports.isLanguages = isLanguages;
 exports.langList = langList;
 exports.setSaveLang = setSaveLang;
 `,
-	"helper": `\nlet solid_js_web = require("solid-js/web");
-let helper_languages = require("helper/languages");
+	"helper": `\nlet helper_languages = require("helper/languages");
 let solid_js = require("solid-js");
+let solid_js_web = require("solid-js/web");
 let solid_js_store = require("solid-js/store");
-//#region src/helper/components.ts
-const getDom = (id) => {
-	let dom = document.getElementById(id);
-	if (dom) {
-		dom.innerHTML = "";
-		return dom;
-	}
-	dom = document.createElement("div");
-	dom.id = id;
-	document.body.append(dom);
-	return dom;
-};
-/** 挂载 solid-js 组件 */
-const mountComponents = (id, fc) => {
-	const dom = getDom(id);
-	dom.style.setProperty("display", "unset", "important");
-	const shadowDom = dom.attachShadow({ mode: "closed" });
-	solid_js_web.render(fc, shadowDom);
-	return dom;
-};
+//#region src/helper/logger.ts
+const prefix = ["%cComicRead", "background-color: #607d8b; color: white; padding: 2px 4px; border-radius: 4px;"];
+const log = (...args) => console.log(...prefix, ...args);
+log.warn = (...args) => console.warn(...prefix, ...args);
+log.error = (...args) => console.error(...prefix, ...args);
 //#endregion
-//#region src/helper/faviconProgress.ts
-var FaviconProgress = class {
-	initLink;
-	color;
-	canvas;
-	ctx;
-	link;
-	constructor(color = "#607D8B") {
-		this.color = color;
-		this.canvas = document.createElement("canvas");
-		this.canvas.width = 32;
-		this.canvas.height = 32;
-		this.ctx = this.canvas.getContext("2d");
-		const existingLink = document.querySelector("link[rel~='icon']");
-		if (existingLink) this.link = existingLink;
-		else {
-			const link = document.createElement("link");
-			link.type = "image/x-icon";
-			link.rel = "icon";
-			document.head.append(link);
-			this.link = link;
-		}
-		this.initLink = this.link.href || "/favicon.ico";
-	}
-	update(progress) {
-		this.ctx.clearRect(0, 0, 32, 32);
-		this.ctx.beginPath();
-		this.ctx.arc(16, 16, 16, 0, Math.PI * 2);
-		this.ctx.fillStyle = "#FAFAFA";
-		this.ctx.fill();
-		const startAngle = -Math.PI / 2;
-		const endAngle = Math.PI * 2 * progress + startAngle;
-		this.ctx.beginPath();
-		this.ctx.moveTo(16, 16);
-		this.ctx.arc(16, 16, 16, startAngle, endAngle);
-		this.ctx.fillStyle = this.color;
-		this.ctx.fill();
-		this.updateFavicon();
-	}
-	updateFavicon() {
-		if (!this.link || !this.canvas) return;
-		this.link.href = this.canvas.toDataURL("image/png");
-	}
-	/** 恢复默认图标 */
-	recover() {
-		if (!this.link || !this.initLink) return;
-		this.link.href = this.initLink;
-	}
+//#region src/helper/image.ts
+/** 图片文件扩展名缩写 */
+const fileType = {
+	j: "jpg",
+	p: "png",
+	g: "gif",
+	w: "webp",
+	b: "bmp"
 };
-const useFaviconProgress = () => {};
+/** 等待指定的图片元素加载完成 */
+const waitImgLoad = (target, timeout) => new Promise((resolve, reject) => {
+	const img = typeof target === "string" ? new Image() : target;
+	if (img.complete && img.naturalHeight) resolve(img);
+	const id = timeout ? window.setTimeout(() => reject(/* @__PURE__ */ new Error("timeout")), timeout) : void 0;
+	const handleError = (e) => {
+		window.clearTimeout(id);
+		reject(new Error(e.message));
+	};
+	const handleLoad = () => {
+		window.clearTimeout(id);
+		img.removeEventListener("error", handleError);
+		resolve(img);
+	};
+	img.addEventListener("load", handleLoad, { once: true });
+	img.addEventListener("error", handleError, { once: true });
+	if (typeof target === "string") img.src = target;
+});
+/** 测试图片 url 能否正确加载 */
+const testImgUrl = (url) => new Promise((resolve) => {
+	const img = new Image();
+	img.onload = () => resolve(true);
+	img.onerror = () => resolve(false);
+	img.src = url;
+});
+const canvasToBlob = (canvas, type, quality = 1) => {
+	if (canvas instanceof OffscreenCanvas) return canvas.convertToBlob({
+		type,
+		quality
+	});
+	return new Promise((resolve, reject) => {
+		canvas.toBlob((blob) => blob ? resolve(blob) : reject(/* @__PURE__ */ new Error("Canvas toBlob failed")), type, quality);
+	});
+};
+const canvasToBlobUrl = async (canvas, type, quality = 1) => {
+	const blob = await canvasToBlob(canvas, type, quality);
+	return URL.createObjectURL(blob);
+};
+/**
+* 获取图片像素数据
+*
+* 传入 maxSize 时按最长边缩放到该尺寸内
+*/
+const getImageData = (img, maxSize) => {
+	const { naturalWidth: width, naturalHeight: height } = img;
+	if (!width || !height) throw new Error(\`图片未加载完成: \${img.src}\`);
+	const scale = maxSize && maxSize > 0 ? Math.min(maxSize / width, maxSize / height) : 1;
+	const w = Math.max(1, Math.floor(width * scale));
+	const h = Math.max(1, Math.floor(height * scale));
+	const ctx = new OffscreenCanvas(w, h).getContext("2d", { willReadFrequently: true });
+	if (scale !== 1) ctx.imageSmoothingEnabled = false;
+	ctx.drawImage(img, 0, 0, w, h);
+	return ctx.getImageData(0, 0, w, h);
+};
 //#endregion
 //#region locales/en.json
 var en_default = {
@@ -304,6 +302,7 @@ var en_default = {
 		"jump_prev": "Jump to previous chapter",
 		"jump_to_end": "Jump to the last page",
 		"jump_to_home": "Jump to the first page",
+		"jump_to_page": "Jump to page",
 		"multi_select_load": "Multi-select load",
 		"page_down": "Turn page down",
 		"page_up": "Turn page up",
@@ -343,6 +342,8 @@ var en_default = {
 		"hotkeys": "Hotkeys",
 		"img_loading": "Image loading",
 		"interval": "Interval",
+		"jump_page_invalid": "Enter a valid page number",
+		"jump_page_message": "Enter page number",
 		"loading_img": "Fetching image",
 		"login_expired": "Login expired, please log in again",
 		"multi_select_mode": "Multi-select mode",
@@ -350,6 +351,7 @@ var en_default = {
 		"or": "or",
 		"other": "Other",
 		"page_range": "Please enter the page range:\\n (e.g., 1, 3-5, 9-)",
+		"range_tip": "Range: 1 – {{total}}",
 		"read_mode": "Reading mode",
 		"selected": "Selected",
 		"setting": "Settings"
@@ -668,6 +670,7 @@ var ru_default = {
 		"jump_prev": "Перейти к предыдущей главе",
 		"jump_to_end": "Перейти к последней странице",
 		"jump_to_home": "Перейти к первой странице",
+		"jump_to_page": "Перейти к странице",
 		"multi_select_load": "Множественная загрузка",
 		"page_down": "Перелистнуть страницу вниз",
 		"page_up": "Перелистнуть страницу вверх",
@@ -707,6 +710,8 @@ var ru_default = {
 		"hotkeys": "Горячие клавиши",
 		"img_loading": "Изображение загружается",
 		"interval": "Интервал",
+		"jump_page_invalid": "Введите корректный номер страницы",
+		"jump_page_message": "Введите номер страницы",
 		"loading_img": "Получение изображения",
 		"login_expired": "Сеанс истёк, войдите снова",
 		"multi_select_mode": "Режим множественного выбора",
@@ -714,6 +719,7 @@ var ru_default = {
 		"or": "или",
 		"other": "Другое",
 		"page_range": "Введите диапазон страниц:\\n (например, 1, 3-5, 9-)",
+		"range_tip": "Диапазон: 1 – {{total}}",
 		"read_mode": "Режим чтения",
 		"selected": "Выбрано",
 		"setting": "Настройки"
@@ -1032,6 +1038,7 @@ var zh_default = {
 		"jump_prev": "跳至上一话",
 		"jump_to_end": "跳至尾页",
 		"jump_to_home": "跳至首页",
+		"jump_to_page": "跳至指定页",
 		"multi_select_load": "多选加载",
 		"page_down": "向下翻页",
 		"page_up": "向上翻页",
@@ -1071,6 +1078,8 @@ var zh_default = {
 		"hotkeys": "快捷键",
 		"img_loading": "图片加载中",
 		"interval": "间隔",
+		"jump_page_invalid": "请输入有效的页数",
+		"jump_page_message": "输入要跳转的页数",
 		"loading_img": "获取图片中",
 		"login_expired": "登录状态失效，请重新登录",
 		"multi_select_mode": "多选模式",
@@ -1078,6 +1087,7 @@ var zh_default = {
 		"or": "或",
 		"other": "其他",
 		"page_range": "请输入页码范围：\\n（例如：1, 3-5, 9-)",
+		"range_tip": "范围：1 ~ {{total}}",
 		"read_mode": "阅读模式",
 		"selected": "已选中",
 		"setting": "设置"
@@ -1341,6 +1351,633 @@ var zh_default = {
 	}
 };
 //#endregion
+//#region node_modules/.pnpm/dequal@2.0.3/node_modules/dequal/dist/index.mjs
+var has = Object.prototype.hasOwnProperty;
+function find(iter, tar, key) {
+	for (key of iter.keys()) if (dequal(key, tar)) return key;
+}
+function dequal(foo, bar) {
+	var ctor, len, tmp;
+	if (foo === bar) return true;
+	if (foo && bar && (ctor = foo.constructor) === bar.constructor) {
+		if (ctor === Date) return foo.getTime() === bar.getTime();
+		if (ctor === RegExp) return foo.toString() === bar.toString();
+		if (ctor === Array) {
+			if ((len = foo.length) === bar.length) while (len-- && dequal(foo[len], bar[len]));
+			return len === -1;
+		}
+		if (ctor === Set) {
+			if (foo.size !== bar.size) return false;
+			for (len of foo) {
+				tmp = len;
+				if (tmp && typeof tmp === "object") {
+					tmp = find(bar, tmp);
+					if (!tmp) return false;
+				}
+				if (!bar.has(tmp)) return false;
+			}
+			return true;
+		}
+		if (ctor === Map) {
+			if (foo.size !== bar.size) return false;
+			for (len of foo) {
+				tmp = len[0];
+				if (tmp && typeof tmp === "object") {
+					tmp = find(bar, tmp);
+					if (!tmp) return false;
+				}
+				if (!dequal(len[1], bar.get(tmp))) return false;
+			}
+			return true;
+		}
+		if (ctor === ArrayBuffer) {
+			foo = new Uint8Array(foo);
+			bar = new Uint8Array(bar);
+		} else if (ctor === DataView) {
+			if ((len = foo.byteLength) === bar.byteLength) while (len-- && foo.getInt8(len) === bar.getInt8(len));
+			return len === -1;
+		}
+		if (ArrayBuffer.isView(foo)) {
+			if ((len = foo.byteLength) === bar.byteLength) while (len-- && foo[len] === bar[len]);
+			return len === -1;
+		}
+		if (!ctor || typeof foo === "object") {
+			len = 0;
+			for (ctor in foo) {
+				if (has.call(foo, ctor) && ++len && !has.call(bar, ctor)) return false;
+				if (!(ctor in bar) || !dequal(foo[ctor], bar[ctor])) return false;
+			}
+			return Object.keys(bar).length === len;
+		}
+	}
+	return foo !== foo && bar !== bar;
+}
+//#endregion
+//#region src/helper/deepObject.ts
+/**
+* 求 a 和 b 的差集，相当于从 a 中删去和 b 相同的属性
+*
+* 不会修改参数对象，返回的是新对象
+*/
+const difference = (a, b) => {
+	const res = {};
+	const keys = Object.keys(a);
+	for (const key of keys) if (typeof a[key] === "object" && typeof b[key] === "object") {
+		const _res = difference(a[key], b[key]);
+		if (Object.keys(_res).length > 0) res[key] = _res;
+	} else if (a[key] !== b?.[key]) res[key] = a[key];
+	return res;
+};
+const _assign = (a, b) => {
+	const res = JSON.parse(JSON.stringify(a));
+	const keys = Object.keys(b);
+	for (const key of keys) if (res[key] === void 0) res[key] = b[key];
+	else if (typeof b[key] === "object") {
+		const _res = _assign(res[key], b[key]);
+		if (Object.keys(_res).length > 0) res[key] = _res;
+	} else if (res[key] !== b[key]) res[key] = b[key];
+	return res;
+};
+/**
+* Object.assign 的深拷贝版，不会导致子对象属性的缺失
+*
+* 不会修改参数对象，返回的是新对象
+*/
+const assign = (target, ...sources) => {
+	let res = target;
+	for (const source of sources) if (typeof source === "object") res = _assign(res, source);
+	return res;
+};
+/** 根据路径获取对象下的指定值 */
+const byPath = (obj, path, handleVal) => {
+	const keys = typeof path === "string" ? path.split(".") : path;
+	let target = obj;
+	for (let i = 0; i < keys.length; i++) {
+		let key = keys[i];
+		while (!Reflect.has(target, key) && i < keys.length) {
+			i += 1;
+			if (keys[i] === void 0) break;
+			key += \`.\${keys[i]}\`;
+		}
+		if (handleVal && i > keys.length - 2 && Reflect.has(target, key)) {
+			const res = handleVal(target, key);
+			while (i < keys.length - 1) {
+				target = target[key];
+				i += 1;
+				key = keys[i];
+			}
+			if (res !== void 0) target[key] = res;
+			break;
+		}
+		target = target[key];
+	}
+	if (target === obj) return null;
+	return target;
+};
+//#endregion
+//#region src/helper/i18n.ts
+const [lang, setLang] = solid_js.createSignal("zh");
+const setInitLang = async () => setLang(await helper_languages.getInitLang());
+const t = solid_js.createRoot(() => {
+	solid_js.createEffect(solid_js.on(lang, () => helper_languages.setSaveLang(lang()), { defer: true }));
+	const locales = solid_js.createMemo(() => {
+		switch (lang()) {
+			case "en": return en_default;
+			case "ru": return ru_default;
+			default: return zh_default;
+		}
+	});
+	return (keys, variables) => {
+		let text = byPath(locales(), keys) ?? "";
+		if (variables) for (const [k, v] of Object.entries(variables)) text = text.replaceAll(\`{{\${k}}}\`, String(v));
+		return text;
+	};
+});
+//#endregion
+//#region src/helper/asyncControl.ts
+const sleep = (ms) => new Promise((resolve) => {
+	setTimeout(resolve, ms);
+});
+/** 创建一个只会执行一次的函数，并缓存首次调用的返回值 */
+const once = (fn) => {
+	let wrapper = (...args) => {
+		const result = fn(...args);
+		wrapper = () => result;
+		return result;
+	};
+	return (...args) => wrapper(...args);
+};
+/** 确保函数在同一时间下只有一个在运行 */
+const singleThreaded = (callback, initState) => {
+	const state = {
+		running: false,
+		argList: [],
+		continueRun: (...args) => state.argList.length > 0 || state.argList.push(args),
+		...initState
+	};
+	const work = async () => {
+		if (state.argList.length === 0) return;
+		const args = state.argList.shift();
+		try {
+			state.running = true;
+			await callback(state, ...args);
+		} catch (error) {
+			await sleep(100);
+			if (state.argList.length === 0) throw error;
+		} finally {
+			if (state.abandon) state.argList.length = 0;
+			else if (state.latestOnly && state.argList.length > 1) state.argList.splice(0, state.argList.length - 1);
+			if (state.argList.length > 0) setTimeout(work, state.timeout);
+			else state.running = false;
+		}
+	};
+	return (...args) => {
+		state.argList.push(args);
+		if (!state.running) return work();
+	};
+};
+/**
+* 限制 Promise 并发
+* @param fnList 任务函数列表
+* @param callBack 成功执行一个 Promise 后调用，主要用于显示进度
+* @param limit 限制数
+* @returns 所有 Promise 的返回值
+*/
+const plimit = async (fnList, callBack = void 0, limit = 10) => {
+	let doneNum = 0;
+	const totalNum = fnList.length;
+	const resList = [];
+	const execPool = /* @__PURE__ */ new Set();
+	const taskList = fnList.map((fn, i) => {
+		let p;
+		return () => {
+			p = (async () => {
+				resList[i] = await fn();
+				doneNum += 1;
+				execPool.delete(p);
+				callBack?.(doneNum, totalNum, resList, i);
+			})();
+			execPool.add(p);
+		};
+	});
+	while (doneNum !== totalNum) {
+		while (taskList.length > 0 && execPool.size < limit) taskList.shift()();
+		await Promise.race(execPool);
+	}
+	return resList;
+};
+/** Promise 并发队列 */
+var PQueue = class {
+	wait = /* @__PURE__ */ new Set();
+	running = /* @__PURE__ */ new Set();
+	done = /* @__PURE__ */ new Set();
+	handleTask;
+	concurrency;
+	constructor(handleTask, concurrency = 1) {
+		this.handleTask = handleTask;
+		this.concurrency = concurrency;
+	}
+	has = (item) => this.running.has(item) || this.done.has(item) || this.wait.has(item);
+	async processQueue() {
+		if (this.running.size >= this.concurrency || this.wait.size === 0) return;
+		const [item] = this.wait;
+		if (item === void 0) return;
+		this.wait.delete(item);
+		if (!this.running.has(item)) try {
+			this.running.add(item);
+			await this.handleTask(item);
+			this.done.add(item);
+		} catch (error) {
+			console.error(error);
+		} finally {
+			this.running.delete(item);
+		}
+		return this.processQueue();
+	}
+	add(item) {
+		if (this.has(item)) return;
+		this.wait.add(item);
+		this.processQueue();
+	}
+	set(...items) {
+		this.wait.clear();
+		this.wait = new Set(items.filter((item) => !this.has(item)));
+		this.processQueue();
+	}
+	clear() {
+		this.wait.clear();
+		this.done.clear();
+	}
+};
+async function wait(fn, timeout = Infinity, waitTime = 100) {
+	let res = await fn();
+	let _timeout = timeout;
+	while (_timeout > 0 && !res) {
+		await sleep(waitTime);
+		_timeout -= waitTime;
+		res = await fn();
+	}
+	return res;
+}
+//#endregion
+//#region src/helper/components.ts
+const getDom = (id) => {
+	let dom = document.getElementById(id);
+	if (dom) {
+		dom.innerHTML = "";
+		return dom;
+	}
+	dom = document.createElement("div");
+	dom.id = id;
+	document.body.append(dom);
+	return dom;
+};
+/** 挂载 solid-js 组件 */
+const mountComponents = (id, fc) => {
+	const dom = getDom(id);
+	dom.style.setProperty("display", "unset", "important");
+	const shadowDom = dom.attachShadow({ mode: "closed" });
+	solid_js_web.render(fc, shadowDom);
+	return dom;
+};
+//#endregion
+//#region src/helper/domQuery.ts
+/**
+* 对 document.querySelector 的封装
+* 将默认返回类型改为 HTMLElement
+*/
+const querySelector = (selector) => document.querySelector(selector);
+/**
+* 对 document.querySelector 的封装
+* 将默认返回类型改为 HTMLElement
+*/
+const querySelectorAll = (selector) => [...document.querySelectorAll(selector)];
+/**
+* 根据选择器查找元素，若存在则返回点击该元素的函数
+*
+* 调用时（而非返回的点击函数被调用时）立即查找一次元素；
+* 若元素不存在则返回 \`undefined\`
+*
+* \`selector\` 支持两种形式：
+* - 字符串：作为 CSS 选择器查找
+* - 函数：延迟返回元素（适合元素尚未渲染、需要动态获取的场景）
+*   \`\`\`ts
+*   querySelectorClick(() => document.querySelector('.page')?.querySelector('a'));
+*   \`\`\`
+*
+* 传入字符串选择器时，还可通过 \`textContent\` 匹配文本内容，会从所有匹配元素中
+* 找出文本包含 \`textContent\` 的第一个元素（相当于 \`:has-text()\`）：
+* \`\`\`ts
+* querySelectorClick('.tab', '我的收藏')?.();
+* \`\`\`
+*/
+const querySelectorClick = (selector, textContent) => {
+	let getDom;
+	if (typeof selector === "function") getDom = selector;
+	else if (textContent) getDom = () => querySelectorAll(selector).find((e) => e.textContent?.includes(textContent));
+	else getDom = () => querySelector(selector);
+	if (getDom()) return () => getDom()?.click();
+};
+/** 滚动页面到指定元素的所在位置 */
+const scrollIntoView = (selector, behavior = "instant") => querySelector(selector)?.scrollIntoView({ behavior });
+/** 将 HTML 字符串转换为 DOM 对象 */
+const domParse = (html) => new DOMParser().parseFromString(html, "text/html");
+//#endregion
+//#region src/helper/faviconProgress.ts
+var FaviconProgress = class {
+	initLink;
+	color;
+	canvas;
+	ctx;
+	link;
+	constructor(color = "#607D8B") {
+		this.color = color;
+		this.canvas = document.createElement("canvas");
+		this.canvas.width = 32;
+		this.canvas.height = 32;
+		this.ctx = this.canvas.getContext("2d");
+		const existingLink = document.querySelector("link[rel~='icon']");
+		if (existingLink) this.link = existingLink;
+		else {
+			const link = document.createElement("link");
+			link.type = "image/x-icon";
+			link.rel = "icon";
+			document.head.append(link);
+			this.link = link;
+		}
+		this.initLink = this.link.href || "/favicon.ico";
+	}
+	update(progress) {
+		this.ctx.clearRect(0, 0, 32, 32);
+		this.ctx.beginPath();
+		this.ctx.arc(16, 16, 16, 0, Math.PI * 2);
+		this.ctx.fillStyle = "#FAFAFA";
+		this.ctx.fill();
+		const startAngle = -Math.PI / 2;
+		const endAngle = Math.PI * 2 * progress + startAngle;
+		this.ctx.beginPath();
+		this.ctx.moveTo(16, 16);
+		this.ctx.arc(16, 16, 16, startAngle, endAngle);
+		this.ctx.fillStyle = this.color;
+		this.ctx.fill();
+		this.updateFavicon();
+	}
+	updateFavicon() {
+		if (!this.link || !this.canvas) return;
+		this.link.href = this.canvas.toDataURL("image/png");
+	}
+	/** 恢复默认图标 */
+	recover() {
+		if (!this.link || !this.initLink) return;
+		this.link.href = this.initLink;
+	}
+};
+const useFaviconProgress = () => {};
+//#endregion
+//#region src/helper/range.ts
+function range(a, b, c) {
+	switch (typeof b) {
+		case "undefined": return [...Array.from({ length: a }).keys()];
+		case "number": {
+			const list = [];
+			for (let i = a; i < b; i++) list.push(c ? c(i) : i);
+			return list;
+		}
+		case "function": return Array.from({ length: a }, (_, i) => b(i));
+		case "string": return Array.from({ length: a }, () => b);
+	}
+}
+/** 根据范围文本提取指定范围的元素的 index */
+const extractRange = (rangeText, length) => {
+	const list = /* @__PURE__ */ new Set();
+	for (const text of rangeText.replaceAll(/[^\\d,-]/gu, "").split(",")) if (/^\\d+$/u.test(text)) list.add(Number(text) - 1);
+	else if (/^\\d*-\\d*$/u.test(text)) {
+		let [start, end] = text.split("-").map(Number);
+		end ||= length;
+		for (start--, end--; start <= end; start++) list.add(start);
+	}
+	return list;
+};
+/** extractRange 的逆向，按照相同的语法表述一个结果数组 */
+const descRange = (list, length) => {
+	let text = "";
+	const nowRange = [];
+	const pushRange = (newIndex) => {
+		if (nowRange.length === 0) return;
+		if (text.length > 0) text += ", ";
+		if (nowRange.length === 1) text += nowRange[0] + 1;
+		else {
+			const end = newIndex === void 0 && nowRange[1] === length - 1 ? "" : nowRange[1] + 1;
+			text += \`\${nowRange[0] + 1}-\${end}\`;
+		}
+		nowRange.length = 0;
+		if (newIndex !== void 0) nowRange[0] = newIndex;
+	};
+	for (const i of list) switch (nowRange.length) {
+		case 0:
+			nowRange[0] = i;
+			break;
+		case 1:
+			if (i === nowRange[0] + 1) nowRange[1] = i;
+			else pushRange(i);
+			break;
+		case 2: if (i === nowRange[1] + 1) nowRange[1] = i;
+		else pushRange(i);
+	}
+	pushRange();
+	return text;
+};
+//#endregion
+//#region src/helper/other.ts
+/** 将调试变量挂到全局 CRSD 对象上 */
+const exposeToGlobal = (obj) => {};
+const getFileName = (url) => /.+\\/(?<name>[^?]+)/u.exec(url)?.groups?.name;
+/** 找出数组中出现最多次的元素 */
+const getMostItem = (list) => {
+	const counts = /* @__PURE__ */ new Map();
+	for (const val of list) counts.set(val, (counts.get(val) ?? 0) + 1);
+	return [...counts.entries()].reduce((maxItem, item) => maxItem[1] > item[1] ? maxItem : item)[0];
+};
+/** 判断字符串是否为 URL */
+const isUrl = (text) => {
+	try {
+		return Boolean(new URL(text));
+	} catch {
+		return false;
+	}
+};
+/** 将 blob 数据作为文件保存至本地 */
+const saveAs = (blob, name = "download") => {
+	const a = document.createElementNS("http://www.w3.org/1999/xhtml", "a");
+	a.download = name;
+	a.rel = "noopener";
+	a.href = URL.createObjectURL(blob);
+	setTimeout(() => a.dispatchEvent(new MouseEvent("click")));
+};
+/**
+* 判断使用参数颜色作为默认值时是否需要切换为黑暗模式
+* @param hexColor 十六进制颜色。例如 #112233
+*/
+const needDarkMode = (hexColor) => {
+	const r = Number.parseInt(hexColor.slice(1, 3), 16);
+	const g = Number.parseInt(hexColor.slice(3, 5), 16);
+	const b = Number.parseInt(hexColor.slice(5, 7), 16);
+	return (r * 299 + g * 587 + b * 114) / 1e3 < 128;
+};
+const clamp = (min, val, max) => Math.max(Math.min(max, val), min);
+const inRange = (min, val, max) => val >= min && val <= max;
+/** 判断两个数是否在指定误差范围内相等 */
+const approx = (val, target, range = 1) => Math.abs(target - val) <= range;
+function waitDom(selector, count = 1, timeout) {
+	return wait(() => {
+		const elements = document.querySelectorAll(selector);
+		return elements.length >= count ? [...elements] : void 0;
+	}, timeout);
+}
+/** 将指定的布尔值转换为字符串或未定义 */
+const boolDataVal = (val) => val ? "" : void 0;
+const requestIdleCallback$1 = (callback, timeout) => {
+	if (Reflect.has(window, "requestIdleCallback")) return window.requestIdleCallback(callback, { timeout });
+	return window.setTimeout(callback, 16);
+};
+/** 获取键盘事件的编码 */
+const getKeyboardCode = (e) => {
+	let { key } = e;
+	switch (key) {
+		case "Shift":
+		case "Control":
+		case "Alt": return key;
+	}
+	key = key.replaceAll(/\\b[A-Z]\\b/gu, (match) => match.toLowerCase());
+	if (e.ctrlKey) key = \`Ctrl + \${key}\`;
+	if (e.altKey) key = \`Alt + \${key}\`;
+	if (e.shiftKey) key = \`Shift + \${key}\`;
+	return key;
+};
+/** 将快捷键的编码转换成更易读的形式 */
+const keyboardCodeToText = (code) => code.replace("Control", "Ctrl").replace("ArrowUp", "↑").replace("ArrowDown", "↓").replace("ArrowLeft", "←").replace("ArrowRight", "→").replace(/^\\s$/u, "Space");
+/**
+* 劫持修改原网页上的函数
+*
+* 如果传入函数的所需参数为零，将在原函数执行完后自动调用
+*/
+const hijackFn = (fnName, fn) => {
+	const rawFn = unsafeWindow[fnName];
+	unsafeWindow[fnName] = fn.length === 0 ? (...args) => {
+		const res = rawFn(...args);
+		fn();
+		return res;
+	} : (...args) => fn(rawFn, args);
+};
+/**
+* 确保指定 key 的值一定存在
+* 如果对应值不存在，则使用 defaultValue 来设置值，然后返回该值
+* defaultValue 可以是默认值，或者返回默认值的函数
+* 也可以是使用了 GM.setValue 来设置默认值的函数（此时也会返回被设置的值）
+*/
+const ensureGmValue = async (name, defaultValue) => {
+	const value = await GM.getValue(name);
+	if (value !== void 0) return value;
+	if (typeof defaultValue !== "function") {
+		await GM.setValue(name, defaultValue);
+		return defaultValue;
+	}
+	const fnRes = await defaultValue();
+	if (fnRes !== void 0) {
+		await GM.setValue(name, fnRes);
+		return fnRes;
+	}
+	return await GM.getValue(name);
+};
+/** 监听 url 变化 */
+const onUrlChange = (fn, handleUrl = (location) => location.href) => {
+	let lastUrl = "";
+	const refresh = singleThreaded(async () => {
+		if (!await wait(() => handleUrl(location) !== lastUrl, 5e3)) return;
+		const nowUrl = handleUrl(location);
+		await fn(lastUrl, nowUrl);
+		lastUrl = nowUrl;
+	});
+	const controller = new AbortController();
+	for (const eventName of ["click", "popstate"]) window.addEventListener(eventName, refresh, {
+		capture: true,
+		signal: controller.signal
+	});
+	refresh();
+	return () => controller.abort();
+};
+/** wait，但是只在 url 变化时判断 */
+const waitUrlChange = (isValidUrl) => new Promise((resolve) => {
+	const abort = onUrlChange(async () => {
+		const res = await isValidUrl();
+		if (!res) return;
+		resolve(res);
+		abort();
+	});
+});
+var AnimationFrame = class {
+	animationId = 0;
+	call = (force) => {
+		if (!force && this.animationId) return;
+		this.animationId = requestAnimationFrame(this.frame);
+	};
+	cancel = () => {
+		if (!this.animationId) return;
+		cancelAnimationFrame(this.animationId);
+		this.animationId = 0;
+	};
+};
+/** 锁定屏幕禁止自动熄屏 */
+var WakeLock = class {
+	isSupported = false;
+	lock = null;
+	constructor() {
+		if (!("wakeLock" in navigator)) return;
+		this.isSupported = true;
+	}
+	on = async () => {
+		if (!this.isSupported) return null;
+		try {
+			this.lock = await navigator.wakeLock.request("screen");
+			return this.lock.released;
+		} catch {
+			return false;
+		}
+	};
+	off = async () => {
+		if (!this.lock) return;
+		await this.lock.release();
+		this.lock = null;
+	};
+};
+const withEventStop = (handler) => (e) => {
+	e.stopPropagation();
+	e.preventDefault();
+	if (handler) handler(e);
+};
+/** 判断版本号1是否小于版本号2 */
+const versionLt = (version1, version2) => {
+	const v1 = version1.split(".").map(Number);
+	const v2 = version2.split(".").map(Number);
+	for (let i = 0; i < 3; i++) {
+		const num1 = v1[i] ?? 0;
+		const num2 = v2[i] ?? 0;
+		if (num1 !== num2) return num1 < num2;
+	}
+	return false;
+};
+/**
+* 用于书写 GraphQL 查询的模板标签函数
+*
+* 变量值应通过 GraphQL 变量语法（$varName）与 variables 传递
+*/
+const gql = (strings, ...values) => strings.reduce((acc, str, i) => acc + str + (values[i] ?? ""), "");
+/** 尽量模拟 Windows 资源管理器的默认文件名排序行为 */
+const getNaturalCollator = () => new Intl.Collator("ja-JP", {
+	numeric: true,
+	sensitivity: "base"
+});
+//#endregion
 //#region node_modules/.pnpm/@solid-primitives+scheduled@1.5.3_solid-js@1.9.14/node_modules/@solid-primitives/scheduled/dist/index.js
 /**
 * Creates a callback that is debounced and cancellable. The debounced callback is called on **trailing** edge.
@@ -1506,628 +2143,9 @@ function createScheduled(schedule) {
 	};
 }
 //#endregion
-//#region node_modules/.pnpm/dequal@2.0.3/node_modules/dequal/dist/index.mjs
-var has = Object.prototype.hasOwnProperty;
-function find(iter, tar, key) {
-	for (key of iter.keys()) if (dequal(key, tar)) return key;
-}
-function dequal(foo, bar) {
-	var ctor, len, tmp;
-	if (foo === bar) return true;
-	if (foo && bar && (ctor = foo.constructor) === bar.constructor) {
-		if (ctor === Date) return foo.getTime() === bar.getTime();
-		if (ctor === RegExp) return foo.toString() === bar.toString();
-		if (ctor === Array) {
-			if ((len = foo.length) === bar.length) while (len-- && dequal(foo[len], bar[len]));
-			return len === -1;
-		}
-		if (ctor === Set) {
-			if (foo.size !== bar.size) return false;
-			for (len of foo) {
-				tmp = len;
-				if (tmp && typeof tmp === "object") {
-					tmp = find(bar, tmp);
-					if (!tmp) return false;
-				}
-				if (!bar.has(tmp)) return false;
-			}
-			return true;
-		}
-		if (ctor === Map) {
-			if (foo.size !== bar.size) return false;
-			for (len of foo) {
-				tmp = len[0];
-				if (tmp && typeof tmp === "object") {
-					tmp = find(bar, tmp);
-					if (!tmp) return false;
-				}
-				if (!dequal(len[1], bar.get(tmp))) return false;
-			}
-			return true;
-		}
-		if (ctor === ArrayBuffer) {
-			foo = new Uint8Array(foo);
-			bar = new Uint8Array(bar);
-		} else if (ctor === DataView) {
-			if ((len = foo.byteLength) === bar.byteLength) while (len-- && foo.getInt8(len) === bar.getInt8(len));
-			return len === -1;
-		}
-		if (ArrayBuffer.isView(foo)) {
-			if ((len = foo.byteLength) === bar.byteLength) while (len-- && foo[len] === bar[len]);
-			return len === -1;
-		}
-		if (!ctor || typeof foo === "object") {
-			len = 0;
-			for (ctor in foo) {
-				if (has.call(foo, ctor) && ++len && !has.call(bar, ctor)) return false;
-				if (!(ctor in bar) || !dequal(foo[ctor], bar[ctor])) return false;
-			}
-			return Object.keys(bar).length === len;
-		}
-	}
-	return foo !== foo && bar !== bar;
-}
-//#endregion
-//#region src/helper/other.ts
-/** 图片文件扩展名缩写 */
-const fileType = {
-	j: "jpg",
-	p: "png",
-	g: "gif",
-	w: "webp",
-	b: "bmp"
-};
-/** 将调试变量挂到全局 CRSD 对象上 */
-const exposeToGlobal = (obj) => {};
+//#region src/helper/throttleDebounce.ts
 const throttle = (fn, wait = 100) => leadingAndTrailing(throttle$1, fn, wait);
 const debounce = (fn, wait = 100) => debounce$1(fn, wait);
-const sleep = (ms) => new Promise((resolve) => {
-	setTimeout(resolve, ms);
-});
-const clamp = (min, val, max) => Math.max(Math.min(max, val), min);
-const inRange = (min, val, max) => val >= min && val <= max;
-const getFileName = (url) => /.+\\/(?<name>[^?]+)/u.exec(url)?.groups?.name;
-const isString = (val) => typeof val === "string";
-const isNumber = (val) => typeof val === "number";
-const isArray = (val) => Array.isArray(val);
-/** 判断两个数是否在指定误差范围内相等 */
-const approx = (val, target, range = 1) => Math.abs(target - val) <= range;
-/** 创建一个只会执行一次的函数，并缓存首次调用的返回值 */
-const once = (fn) => {
-	let wrapper = (...args) => {
-		const result = fn(...args);
-		wrapper = () => result;
-		return result;
-	};
-	return (...args) => wrapper(...args);
-};
-function range(a, b, c) {
-	switch (typeof b) {
-		case "undefined": return [...Array.from({ length: a }).keys()];
-		case "number": {
-			const list = [];
-			for (let i = a; i < b; i++) list.push(c ? c(i) : i);
-			return list;
-		}
-		case "function": return Array.from({ length: a }, (_, i) => b(i));
-		case "string": return Array.from({ length: a }, () => b);
-	}
-}
-/** 判断节点是否为元素节点 */
-const isHTMLElement = (node) => node.nodeType === Node.ELEMENT_NODE;
-/** 判断节点是否为图片元素节点 */
-const isImageElement = (node) => node.nodeName === "IMG";
-/**
-* 对 document.querySelector 的封装
-* 将默认返回类型改为 HTMLElement
-*/
-const querySelector = (selector) => document.querySelector(selector);
-/**
-* 对 document.querySelector 的封装
-* 将默认返回类型改为 HTMLElement
-*/
-const querySelectorAll = (selector) => [...document.querySelectorAll(selector)];
-/**
-* 根据选择器查找元素，若存在则返回点击该元素的函数
-*
-* 调用时（而非返回的点击函数被调用时）立即查找一次元素；
-* 若元素不存在则返回 \`undefined\`
-*
-* \`selector\` 支持两种形式：
-* - 字符串：作为 CSS 选择器查找
-* - 函数：延迟返回元素（适合元素尚未渲染、需要动态获取的场景）
-*   \`\`\`ts
-*   querySelectorClick(() => document.querySelector('.page')?.querySelector('a'));
-*   \`\`\`
-*
-* 传入字符串选择器时，还可通过 \`textContent\` 匹配文本内容，会从所有匹配元素中
-* 找出文本包含 \`textContent\` 的第一个元素（相当于 \`:has-text()\`）：
-* \`\`\`ts
-* querySelectorClick('.tab', '我的收藏')?.();
-* \`\`\`
-*/
-const querySelectorClick = (selector, textContent) => {
-	let getDom;
-	if (typeof selector === "function") getDom = selector;
-	else if (textContent) getDom = () => querySelectorAll(selector).find((e) => e.textContent?.includes(textContent));
-	else getDom = () => querySelector(selector);
-	if (getDom()) return () => getDom()?.click();
-};
-/** 找出数组中出现最多次的元素 */
-const getMostItem = (list) => {
-	const counts = /* @__PURE__ */ new Map();
-	for (const val of list) counts.set(val, (counts.get(val) ?? 0) + 1);
-	return [...counts.entries()].reduce((maxItem, item) => maxItem[1] > item[1] ? maxItem : item)[0];
-};
-/** 判断字符串是否为 URL */
-const isUrl = (text) => {
-	try {
-		return Boolean(new URL(text));
-	} catch {
-		return false;
-	}
-};
-/** 将 blob 数据作为文件保存至本地 */
-const saveAs = (blob, name = "download") => {
-	const a = document.createElementNS("http://www.w3.org/1999/xhtml", "a");
-	a.download = name;
-	a.rel = "noopener";
-	a.href = URL.createObjectURL(blob);
-	setTimeout(() => a.dispatchEvent(new MouseEvent("click")));
-};
-/** 滚动页面到指定元素的所在位置 */
-const scrollIntoView = (selector, behavior = "instant") => querySelector(selector)?.scrollIntoView({ behavior });
-/** 确保函数在同一时间下只有一个在运行 */
-const singleThreaded = (callback, initState) => {
-	const state = {
-		running: false,
-		argList: [],
-		continueRun: (...args) => state.argList.length > 0 || state.argList.push(args),
-		...initState
-	};
-	const work = async () => {
-		if (state.argList.length === 0) return;
-		const args = state.argList.shift();
-		try {
-			state.running = true;
-			await callback(state, ...args);
-		} catch (error) {
-			await sleep(100);
-			if (state.argList.length === 0) throw error;
-		} finally {
-			if (state.abandon) state.argList.length = 0;
-			if (state.argList.length > 0) setTimeout(work, state.timeout);
-			else state.running = false;
-		}
-	};
-	return (...args) => {
-		state.argList.push(args);
-		if (!state.running) return work();
-	};
-};
-/**
-* 限制 Promise 并发
-* @param fnList 任务函数列表
-* @param callBack 成功执行一个 Promise 后调用，主要用于显示进度
-* @param limit 限制数
-* @returns 所有 Promise 的返回值
-*/
-const plimit = async (fnList, callBack = void 0, limit = 10) => {
-	let doneNum = 0;
-	const totalNum = fnList.length;
-	const resList = [];
-	const execPool = /* @__PURE__ */ new Set();
-	const taskList = fnList.map((fn, i) => {
-		let p;
-		return () => {
-			p = (async () => {
-				resList[i] = await fn();
-				doneNum += 1;
-				execPool.delete(p);
-				callBack?.(doneNum, totalNum, resList, i);
-			})();
-			execPool.add(p);
-		};
-	});
-	while (doneNum !== totalNum) {
-		while (taskList.length > 0 && execPool.size < limit) taskList.shift()();
-		await Promise.race(execPool);
-	}
-	return resList;
-};
-/** Promise 并发队列 */
-var PQueue = class {
-	wait = /* @__PURE__ */ new Set();
-	running = /* @__PURE__ */ new Set();
-	done = /* @__PURE__ */ new Set();
-	handleTask;
-	concurrency;
-	constructor(handleTask, concurrency = 1) {
-		this.handleTask = handleTask;
-		this.concurrency = concurrency;
-	}
-	has = (item) => this.running.has(item) || this.done.has(item) || this.wait.has(item);
-	async processQueue() {
-		if (this.running.size >= this.concurrency || this.wait.size === 0) return;
-		const [item] = this.wait;
-		if (item === void 0) return;
-		this.wait.delete(item);
-		if (!this.running.has(item)) try {
-			this.running.add(item);
-			await this.handleTask(item);
-			this.done.add(item);
-		} catch (error) {
-			console.error(error);
-		} finally {
-			this.running.delete(item);
-		}
-		return this.processQueue();
-	}
-	add(item) {
-		if (this.has(item)) return;
-		this.wait.add(item);
-		this.processQueue();
-	}
-	set(...items) {
-		this.wait.clear();
-		this.wait = new Set(items.filter((item) => !this.has(item)));
-		this.processQueue();
-	}
-	clear() {
-		this.wait.clear();
-		this.done.clear();
-	}
-};
-/**
-* 判断使用参数颜色作为默认值时是否需要切换为黑暗模式
-* @param hexColor 十六进制颜色。例如 #112233
-*/
-const needDarkMode = (hexColor) => {
-	const r = Number.parseInt(hexColor.slice(1, 3), 16);
-	const g = Number.parseInt(hexColor.slice(3, 5), 16);
-	const b = Number.parseInt(hexColor.slice(5, 7), 16);
-	return (r * 299 + g * 587 + b * 114) / 1e3 < 128;
-};
-async function wait(fn, timeout = Infinity, waitTime = 100) {
-	let res = await fn();
-	let _timeout = timeout;
-	while (_timeout > 0 && !res) {
-		await sleep(waitTime);
-		_timeout -= waitTime;
-		res = await fn();
-	}
-	return res;
-}
-function waitDom(selector, count = 1, timeout) {
-	return wait(() => {
-		const elements = document.querySelectorAll(selector);
-		return elements.length >= count ? [...elements] : void 0;
-	}, timeout);
-}
-/** 等待指定的图片元素加载完成 */
-const waitImgLoad = (target, timeout) => new Promise((resolve, reject) => {
-	const img = typeof target === "string" ? new Image() : target;
-	if (img.complete && img.naturalHeight) resolve(img);
-	const id = timeout ? window.setTimeout(() => reject(/* @__PURE__ */ new Error("timeout")), timeout) : void 0;
-	const handleError = (e) => {
-		window.clearTimeout(id);
-		reject(new Error(e.message));
-	};
-	const handleLoad = () => {
-		window.clearTimeout(id);
-		img.removeEventListener("error", handleError);
-		resolve(img);
-	};
-	img.addEventListener("load", handleLoad, { once: true });
-	img.addEventListener("error", handleError, { once: true });
-	if (typeof target === "string") img.src = target;
-});
-/** 将指定的布尔值转换为字符串或未定义 */
-const boolDataVal = (val) => val ? "" : void 0;
-/** 测试图片 url 能否正确加载 */
-const testImgUrl = (url) => new Promise((resolve) => {
-	const img = new Image();
-	img.onload = () => resolve(true);
-	img.onerror = () => resolve(false);
-	img.src = url;
-});
-const canvasToBlob = (canvas, type, quality = 1) => {
-	if (canvas instanceof OffscreenCanvas) return canvas.convertToBlob({
-		type,
-		quality
-	});
-	return new Promise((resolve, reject) => {
-		canvas.toBlob((blob) => blob ? resolve(blob) : reject(/* @__PURE__ */ new Error("Canvas toBlob failed")), type, quality);
-	});
-};
-const canvasToBlobUrl = async (canvas, type, quality = 1) => {
-	const blob = await canvasToBlob(canvas, type, quality);
-	return URL.createObjectURL(blob);
-};
-/**
-* 求 a 和 b 的差集，相当于从 a 中删去和 b 相同的属性
-*
-* 不会修改参数对象，返回的是新对象
-*/
-const difference = (a, b) => {
-	const res = {};
-	const keys = Object.keys(a);
-	for (const key of keys) if (typeof a[key] === "object" && typeof b[key] === "object") {
-		const _res = difference(a[key], b[key]);
-		if (Object.keys(_res).length > 0) res[key] = _res;
-	} else if (a[key] !== b?.[key]) res[key] = a[key];
-	return res;
-};
-const _assign = (a, b) => {
-	const res = JSON.parse(JSON.stringify(a));
-	const keys = Object.keys(b);
-	for (const key of keys) if (res[key] === void 0) res[key] = b[key];
-	else if (typeof b[key] === "object") {
-		const _res = _assign(res[key], b[key]);
-		if (Object.keys(_res).length > 0) res[key] = _res;
-	} else if (res[key] !== b[key]) res[key] = b[key];
-	return res;
-};
-/**
-* Object.assign 的深拷贝版，不会导致子对象属性的缺失
-*
-* 不会修改参数对象，返回的是新对象
-*/
-const assign = (target, ...sources) => {
-	let res = target;
-	for (const source of sources) if (typeof source === "object") res = _assign(res, source);
-	return res;
-};
-/** 根据路径获取对象下的指定值 */
-const byPath = (obj, path, handleVal) => {
-	const keys = typeof path === "string" ? path.split(".") : path;
-	let target = obj;
-	for (let i = 0; i < keys.length; i++) {
-		let key = keys[i];
-		while (!Reflect.has(target, key) && i < keys.length) {
-			i += 1;
-			if (keys[i] === void 0) break;
-			key += \`.\${keys[i]}\`;
-		}
-		if (handleVal && i > keys.length - 2 && Reflect.has(target, key)) {
-			const res = handleVal(target, key);
-			while (i < keys.length - 1) {
-				target = target[key];
-				i += 1;
-				key = keys[i];
-			}
-			if (res !== void 0) target[key] = res;
-			break;
-		}
-		target = target[key];
-	}
-	if (target === obj) return null;
-	return target;
-};
-const requestIdleCallback$1 = (callback, timeout) => {
-	if (Reflect.has(window, "requestIdleCallback")) return window.requestIdleCallback(callback, { timeout });
-	return window.setTimeout(callback, 16);
-};
-/** 获取键盘事件的编码 */
-const getKeyboardCode = (e) => {
-	let { key } = e;
-	switch (key) {
-		case "Shift":
-		case "Control":
-		case "Alt": return key;
-	}
-	key = key.replaceAll(/\\b[A-Z]\\b/gu, (match) => match.toLowerCase());
-	if (e.ctrlKey) key = \`Ctrl + \${key}\`;
-	if (e.altKey) key = \`Alt + \${key}\`;
-	if (e.shiftKey) key = \`Shift + \${key}\`;
-	return key;
-};
-/** 将快捷键的编码转换成更易读的形式 */
-const keyboardCodeToText = (code) => code.replace("Control", "Ctrl").replace("ArrowUp", "↑").replace("ArrowDown", "↓").replace("ArrowLeft", "←").replace("ArrowRight", "→").replace(/^\\s$/u, "Space");
-/** 将 HTML 字符串转换为 DOM 对象 */
-const domParse = (html) => new DOMParser().parseFromString(html, "text/html");
-/**
-* 劫持修改原网页上的函数
-*
-* 如果传入函数的所需参数为零，将在原函数执行完后自动调用
-*/
-const hijackFn = (fnName, fn) => {
-	const rawFn = unsafeWindow[fnName];
-	unsafeWindow[fnName] = fn.length === 0 ? (...args) => {
-		const res = rawFn(...args);
-		fn();
-		return res;
-	} : (...args) => fn(rawFn, args);
-};
-/**
-* 确保指定 key 的值一定存在
-* 如果对应值不存在，则使用 defaultValue 来设置值，然后返回该值
-* defaultValue 可以是默认值，或者返回默认值的函数
-* 也可以是使用了 GM.setValue 来设置默认值的函数（此时也会返回被设置的值）
-*/
-const ensureGmValue = async (name, defaultValue) => {
-	const value = await GM.getValue(name);
-	if (value !== void 0) return value;
-	if (typeof defaultValue !== "function") {
-		await GM.setValue(name, defaultValue);
-		return defaultValue;
-	}
-	const fnRes = await defaultValue();
-	if (fnRes !== void 0) {
-		await GM.setValue(name, fnRes);
-		return fnRes;
-	}
-	return await GM.getValue(name);
-};
-/** 根据范围文本提取指定范围的元素的 index */
-const extractRange = (rangeText, length) => {
-	const list = /* @__PURE__ */ new Set();
-	for (const text of rangeText.replaceAll(/[^\\d,-]/gu, "").split(",")) if (/^\\d+$/u.test(text)) list.add(Number(text) - 1);
-	else if (/^\\d*-\\d*$/u.test(text)) {
-		let [start, end] = text.split("-").map(Number);
-		end ||= length;
-		for (start--, end--; start <= end; start++) list.add(start);
-	}
-	return list;
-};
-/** extractRange 的逆向，按照相同的语法表述一个结果数组 */
-const descRange = (list, length) => {
-	let text = "";
-	const nowRange = [];
-	const pushRange = (newIndex) => {
-		if (nowRange.length === 0) return;
-		if (text.length > 0) text += ", ";
-		if (nowRange.length === 1) text += nowRange[0] + 1;
-		else {
-			const end = newIndex === void 0 && nowRange[1] === length - 1 ? "" : nowRange[1] + 1;
-			text += \`\${nowRange[0] + 1}-\${end}\`;
-		}
-		nowRange.length = 0;
-		if (newIndex !== void 0) nowRange[0] = newIndex;
-	};
-	for (const i of list) switch (nowRange.length) {
-		case 0:
-			nowRange[0] = i;
-			break;
-		case 1:
-			if (i === nowRange[0] + 1) nowRange[1] = i;
-			else pushRange(i);
-			break;
-		case 2: if (i === nowRange[1] + 1) nowRange[1] = i;
-		else pushRange(i);
-	}
-	pushRange();
-	return text;
-};
-/** 监听 url 变化 */
-const onUrlChange = (fn, handleUrl = (location) => location.href) => {
-	let lastUrl = "";
-	const refresh = singleThreaded(async () => {
-		if (!await wait(() => handleUrl(location) !== lastUrl, 5e3)) return;
-		const nowUrl = handleUrl(location);
-		await fn(lastUrl, nowUrl);
-		lastUrl = nowUrl;
-	});
-	const controller = new AbortController();
-	for (const eventName of ["click", "popstate"]) window.addEventListener(eventName, refresh, {
-		capture: true,
-		signal: controller.signal
-	});
-	refresh();
-	return () => controller.abort();
-};
-/** wait，但是只在 url 变化时判断 */
-const waitUrlChange = (isValidUrl) => new Promise((resolve) => {
-	const abort = onUrlChange(async () => {
-		const res = await isValidUrl();
-		if (!res) return;
-		resolve(res);
-		abort();
-	});
-});
-var AnimationFrame = class {
-	animationId = 0;
-	call = (force) => {
-		if (!force && this.animationId) return;
-		this.animationId = requestAnimationFrame(this.frame);
-	};
-	cancel = () => {
-		if (!this.animationId) return;
-		cancelAnimationFrame(this.animationId);
-		this.animationId = 0;
-	};
-};
-/** 锁定屏幕禁止自动熄屏 */
-var WakeLock = class {
-	isSupported = false;
-	lock = null;
-	constructor() {
-		if (!("wakeLock" in navigator)) return;
-		this.isSupported = true;
-	}
-	on = async () => {
-		if (!this.isSupported) return null;
-		try {
-			this.lock = await navigator.wakeLock.request("screen");
-			return this.lock.released;
-		} catch {
-			return false;
-		}
-	};
-	off = async () => {
-		if (!this.lock) return;
-		await this.lock.release();
-		this.lock = null;
-	};
-};
-/**
-* 获取图片像素数据
-*
-* 传入 maxSize 时按最长边缩放到该尺寸内
-*/
-const getImageData = (img, maxSize) => {
-	const { naturalWidth: width, naturalHeight: height } = img;
-	if (!width || !height) throw new Error(\`图片未加载完成: \${img.src}\`);
-	const scale = maxSize && maxSize > 0 ? Math.min(maxSize / width, maxSize / height) : 1;
-	const w = Math.max(1, Math.floor(width * scale));
-	const h = Math.max(1, Math.floor(height * scale));
-	const ctx = new OffscreenCanvas(w, h).getContext("2d", { willReadFrequently: true });
-	if (scale !== 1) ctx.imageSmoothingEnabled = false;
-	ctx.drawImage(img, 0, 0, w, h);
-	return ctx.getImageData(0, 0, w, h);
-};
-const withEventStop = (handler) => (e) => {
-	e.stopPropagation();
-	e.preventDefault();
-	if (handler) handler(e);
-};
-/** 判断版本号1是否小于版本号2 */
-const versionLt = (version1, version2) => {
-	const v1 = version1.split(".").map(Number);
-	const v2 = version2.split(".").map(Number);
-	for (let i = 0; i < 3; i++) {
-		const num1 = v1[i] ?? 0;
-		const num2 = v2[i] ?? 0;
-		if (num1 !== num2) return num1 < num2;
-	}
-	return false;
-};
-/**
-* 用于书写 GraphQL 查询的模板标签函数
-*
-* 变量值应通过 GraphQL 变量语法（$varName）与 variables 传递
-*/
-const gql = (strings, ...values) => strings.reduce((acc, str, i) => acc + str + (values[i] ?? ""), "");
-/** 尽量模拟 Windows 资源管理器的默认文件名排序行为 */
-const getNaturalCollator = () => new Intl.Collator("ja-JP", {
-	numeric: true,
-	sensitivity: "base"
-});
-//#endregion
-//#region src/helper/i18n.ts
-const [lang, setLang] = solid_js.createSignal("zh");
-const setInitLang = async () => setLang(await helper_languages.getInitLang());
-const t = solid_js.createRoot(() => {
-	solid_js.createEffect(solid_js.on(lang, () => helper_languages.setSaveLang(lang()), { defer: true }));
-	const locales = solid_js.createMemo(() => {
-		switch (lang()) {
-			case "en": return en_default;
-			case "ru": return ru_default;
-			default: return zh_default;
-		}
-	});
-	return (keys, variables) => {
-		let text = byPath(locales(), keys) ?? "";
-		if (variables) for (const [k, v] of Object.entries(variables)) text = text.replaceAll(\`{{\${k}}}\`, String(v));
-		return text;
-	};
-});
-//#endregion
-//#region src/helper/logger.ts
-const prefix = ["%cComicRead", "background-color: #607d8b; color: white; padding: 2px 4px; border-radius: 4px;"];
-const log = (...args) => console.log(...prefix, ...args);
-log.warn = (...args) => console.warn(...prefix, ...args);
-log.error = (...args) => console.error(...prefix, ...args);
 //#endregion
 //#region node_modules/.pnpm/@solid-primitives+trigger@1.2.4_solid-js@1.9.14/node_modules/@solid-primitives/trigger/dist/index.js
 const triggerOptions = !solid_js_web.isServer && solid_js.DEV ? {
@@ -2386,6 +2404,27 @@ const onAutoMount = (fn) => {
 		if (cleanFn) solid_js.onCleanup(cleanFn);
 	});
 };
+/** 对 solid-js/store 的 createStore 包装，setState 支持传入 produce 函数 */
+const useStore = (initState) => {
+	const [store, _setState] = solid_js_store.createStore(initState);
+	const setState = (...args) => {
+		if (args.length === 1 && typeof args[0] === "function") return _setState(solid_js_store.produce(args[0]));
+		return _setState(...args);
+	};
+	return {
+		store,
+		setState
+	};
+};
+//#endregion
+//#region src/helper/typeGuard.ts
+const isString = (val) => typeof val === "string";
+const isNumber = (val) => typeof val === "number";
+const isArray = (val) => Array.isArray(val);
+/** 判断节点是否为元素节点 */
+const isHTMLElement = (node) => node.nodeType === Node.ELEMENT_NODE;
+/** 判断节点是否为图片元素节点 */
+const isImageElement = (node) => node.nodeName === "IMG";
 //#endregion
 //#region src/helper/useCache.ts
 const promisifyRequest = (request) => new Promise((resolve, reject) => {
@@ -2509,19 +2548,6 @@ const useDrag = ({ ref, handleDrag, easyMode, handleClick, skip, setCapture, tou
 		}, { capture: true });
 		return () => controller.abort();
 	});
-};
-//#endregion
-//#region src/helper/useStore.ts
-const useStore = (initState) => {
-	const [store, _setState] = solid_js_store.createStore(initState);
-	const setState = (...args) => {
-		if (args.length === 1 && typeof args[0] === "function") return _setState(solid_js_store.produce(args[0]));
-		return _setState(...args);
-	};
-	return {
-		store,
-		setState
-	};
 };
 //#endregion
 //#region src/helper/useStyle.ts
@@ -2872,6 +2898,7 @@ comlink = __toESM(comlink, 1);
 let worker_ImageRecognition = require("worker/ImageRecognition");
 worker_ImageRecognition = __toESM(worker_ImageRecognition, 1);
 let components_Toast = require("components/Toast");
+let components_InputDialog = require("components/InputDialog");
 let worker_ImageUpscale = require("worker/ImageUpscale");
 worker_ImageUpscale = __toESM(worker_ImageUpscale, 1);
 let components_IconButton = require("components/IconButton");
@@ -3484,22 +3511,8 @@ const abreastShowColumn = helper.createThrottleMemo(() => {
 const abreastContentWidth = helper.createRootMemo(() => abreastArea().columns.length * abreastColumnWidth() + (abreastArea().columns.length - 1) * store.option.scrollMode.spacing * 7);
 /** 并排卷轴模式下的最大滚动距离 */
 const abreastScrollWidth = helper.createRootMemo(() => abreastContentWidth() - store.rootSize.width);
-/** 并排卷轴模式下每个图片所在位置的样式 */
-const imgAreaStyle = helper.createRootMemo(() => {
-	if (!isAbreastMode()) return "";
-	let styleText = "";
-	for (const index of store.imgList.keys()) {
-		let imgNum = 0;
-		for (const { column, top } of abreastArea().position[index] ?? []) {
-			const itemStyle = \`grid-area: _\${column} !important; transform: translateY(\${top}px);\`;
-			styleText += \`#_\${index}_\${imgNum} { \${itemStyle} }\\n\`;
-			imgNum += 1;
-		}
-	}
-	return styleText;
-});
 //#endregion
-//#region src/components/Manga/actions/image.ts
+//#region src/components/Manga/actions/pageData.ts
 /** 重新计算图片排列 */
 const updatePageData = (state) => {
 	const lastActiveImgIndex = activeImgIndex();
@@ -3575,14 +3588,14 @@ const scrollPageList = helper.createRootMemo(() => {
 	return rows;
 });
 /** 卷轴模式下每行高度 */
-const pageHeightList = helper.createRootMemo(() => {
+const pageHeightList = helper.createThrottleMemo(() => {
 	if (!isScrollMode()) return [];
 	if (!isDoubleMode()) return imgList().map((img) => img.size.height ?? 0);
 	const { pageColumns } = store.option.scrollMode;
 	const doubleWidth = store.rootSize.width / pageColumns / 2;
 	const imgDisplayHeight = ({ width, height }) => width < doubleWidth && store.option.scrollMode.adjustToWidth === "disable" ? height : height * (doubleWidth / width);
 	return scrollPageList().map((row) => Math.max(...row.flatMap((indexs) => indexs.filter((i) => i !== -1).map((i) => imgDisplayHeight(getImg(i).size)))));
-});
+}, 100);
 /** 卷轴模式下每页位置 */
 const pageTopList = helper.createRootMemo(() => {
 	if (!isScrollMode()) return [];
@@ -3847,7 +3860,6 @@ const updateImgSize = withOptionalState((url, width, height, state) => {
 	if (img.size.width !== size.width || img.size.height !== size.height) Object.assign(img.size, size);
 });
 helper.createEffectOn([
-	placeholderSize,
 	() => store.rootSize,
 	() => store.option.scrollMode.enabled,
 	() => store.option.scrollMode.imgScale,
@@ -3859,6 +3871,16 @@ helper.createEffectOn([
 	setState((state) => {
 		for (const url of state.imgList) {
 			const img = state.imgMap[url];
+			Object.assign(img.size, getImgDisplaySize(state, img));
+		}
+	});
+});
+helper.createEffectOn(placeholderSize, () => {
+	setState((state) => {
+		const skipLoaded = !isAbreastMode();
+		for (const url of state.imgList) {
+			const img = state.imgMap[url];
+			if (skipLoaded && img.width !== void 0) continue;
 			Object.assign(img.size, getImgDisplaySize(state, img));
 		}
 	});
@@ -3940,6 +3962,21 @@ helper.createEffectOn(showImgList, (showImgs) => {
 	if (showImgs.size === 0) return;
 	store.prop.onShowImgsChange?.(showImgs, imgList());
 }, { defer: true });
+/** 将页面移回原位 */
+const resetPage = (state, animation = false) => {
+	updateShowRange(state);
+	state.page.offset.x.pct = 0;
+	state.page.offset.y.pct = 0;
+	if (state.option.scrollMode.enabled) {
+		state.page.anima = "";
+		return;
+	}
+	let i = -1;
+	if (helper.inRange(state.renderRange[0], state.activePageIndex, state.renderRange[1])) i = state.activePageIndex - state.renderRange[0];
+	if (store.page.vertical) state.page.offset.y.pct = i === -1 ? 0 : -i;
+	else state.page.offset.x.pct = i === -1 ? 0 : i;
+	state.page.anima = animation ? "page" : "";
+};
 //#endregion
 //#region src/components/Manga/actions/imageLoad/scheduler.ts
 /** 获取指定页数下的头/尾图片 */
@@ -4548,16 +4585,18 @@ const classes$2 = {
 	"scrollbarPoper": "scrollbarPoper___XK5Rk",
 	"touchAreaRoot": "touchAreaRoot___UN-W1",
 	"touchArea": "touchArea___F6Hkh",
+	"loadingMask": "loadingMask___jIxGF",
+	"loadingMaskFadeIn": "loadingMaskFadeIn___abNXH",
 	"hidden": "hidden___rxU-6",
 	"invisible": "invisible___cO-hs",
 	"beautifyScrollbar": "beautifyScrollbar___lb6kJ"
 };
 //#endregion
 //#region src/components/Manga/components/SettingsItem.tsx
-var _tmpl$$44 = /*#__PURE__*/ solid_js_web.template(\`<div><div> <!> \`);
+var _tmpl$$45 = /*#__PURE__*/ solid_js_web.template(\`<div><div> <!> \`);
 /** 设置菜单项 */
 const SettingsItem = (props) => (() => {
-	var _el$ = _tmpl$$44(), _el$2 = _el$.firstChild, _el$5 = _el$2.firstChild.nextSibling;
+	var _el$ = _tmpl$$45(), _el$2 = _el$.firstChild, _el$5 = _el$2.firstChild.nextSibling;
 	_el$5.nextSibling;
 	solid_js_web.insert(_el$2, () => props.name, _el$5);
 	solid_js_web.insert(_el$, () => props.children, null);
@@ -4583,7 +4622,7 @@ const SettingsItem = (props) => (() => {
 })();
 //#endregion
 //#region src/components/Manga/components/SettingsItemSelect.tsx
-var _tmpl$$43 = /*#__PURE__*/ solid_js_web.template(\`<select>\`);
+var _tmpl$$44 = /*#__PURE__*/ solid_js_web.template(\`<select>\`);
 var _tmpl$2$9 = /*#__PURE__*/ solid_js_web.template(\`<option>\`);
 /** 选择器式菜单项 */
 const SettingsItemSelect = (props) => {
@@ -4602,7 +4641,7 @@ const SettingsItemSelect = (props) => {
 			return props.classList;
 		},
 		get children() {
-			var _el$ = _tmpl$$43();
+			var _el$ = _tmpl$$44();
 			solid_js_web.addEventListener(_el$, "click", () => props.onClick?.());
 			_el$.addEventListener("change", (e) => props.onChange(e.target.value));
 			var _ref$ = ref;
@@ -4625,12 +4664,12 @@ const SettingsItemSelect = (props) => {
 };
 //#endregion
 //#region src/components/Manga/actions/translation/translator/Cotrans/settings.tsx
-var _tmpl$$42 = /*#__PURE__*/ solid_js_web.template(\`<blockquote>\`);
+var _tmpl$$43 = /*#__PURE__*/ solid_js_web.template(\`<blockquote>\`);
 const bindOption$3 = (...args) => bindOption("translation", "cotrans", ...args);
 /** Cotrans 设置组件 */
 const cotransSettings = () => [
 	(() => {
-		var _el$ = _tmpl$$42();
+		var _el$ = _tmpl$$43();
 		solid_js_web.effect(() => _el$.innerHTML = helper.t("setting.translation.cotrans_tip"));
 		return _el$;
 	})(),
@@ -4680,7 +4719,7 @@ const cotransSettings = () => [
 ];
 //#endregion
 //#region src/components/NumberInput.tsx
-var _tmpl$$41 = /*#__PURE__*/ solid_js_web.template(\`<span contenteditable data-only-number>\`);
+var _tmpl$$42 = /*#__PURE__*/ solid_js_web.template(\`<span contenteditable data-only-number>\`);
 /** 数值输入框 */
 const NumberInput = (props) => {
 	const handleInput = (e) => {
@@ -4697,7 +4736,7 @@ const NumberInput = (props) => {
 		}
 	};
 	return [(() => {
-		var _el$ = _tmpl$$41();
+		var _el$ = _tmpl$$42();
 		_el$.addEventListener("blur", (e) => {
 			try {
 				props.onChange(Number(e.currentTarget.textContent) || 0);
@@ -4720,7 +4759,7 @@ const NumberInput = (props) => {
 };
 //#endregion
 //#region src/components/Manga/components/SettingsItemNumber.tsx
-var _tmpl$$40 = /*#__PURE__*/ solid_js_web.template(\`<div>\`);
+var _tmpl$$41 = /*#__PURE__*/ solid_js_web.template(\`<div>\`);
 /** 数值输入框菜单项 */
 const SettingsItemNumber = (props) => solid_js_web.createComponent(SettingsItem, {
 	get name() {
@@ -4733,7 +4772,7 @@ const SettingsItemNumber = (props) => solid_js_web.createComponent(SettingsItem,
 		return props.classList;
 	},
 	get children() {
-		var _el$ = _tmpl$$40();
+		var _el$ = _tmpl$$41();
 		solid_js_web.insert(_el$, solid_js_web.createComponent(NumberInput, props));
 		solid_js_web.effect((_$p) => solid_js_web.setStyleProperty(_el$, "margin-right", props.suffix ? ".3em" : ".6em"));
 		return _el$;
@@ -4741,7 +4780,7 @@ const SettingsItemNumber = (props) => solid_js_web.createComponent(SettingsItem,
 });
 //#endregion
 //#region src/components/Manga/components/SettingsItemSwitch.tsx
-var _tmpl$$39 = /*#__PURE__*/ solid_js_web.template(\`<button type=button><div>\`);
+var _tmpl$$40 = /*#__PURE__*/ solid_js_web.template(\`<button type=button><div>\`);
 /** 开关式菜单项 */
 const SettingsItemSwitch = (props) => {
 	const handleClick = () => props.onChange(!props.value);
@@ -4759,7 +4798,7 @@ const SettingsItemSwitch = (props) => {
 			return props.disabled;
 		},
 		get children() {
-			var _el$ = _tmpl$$39(), _el$2 = _el$.firstChild;
+			var _el$ = _tmpl$$40(), _el$2 = _el$.firstChild;
 			solid_js_web.addEventListener(_el$, "click", handleClick);
 			solid_js_web.effect((_p$) => {
 				var _v$ = classes$2.SettingsItemSwitch, _v$2 = props.value, _v$3 = classes$2.SettingsItemSwitchRound;
@@ -4781,7 +4820,7 @@ const SettingsItemSwitch = (props) => {
 /**
 * MangaImageTranslator 翻译服务设置界面
 */
-var _tmpl$$38 = /*#__PURE__*/ solid_js_web.template(\`<input type=url>\`);
+var _tmpl$$39 = /*#__PURE__*/ solid_js_web.template(\`<input type=url>\`);
 const bindOption$2 = (...args) => bindOption("translation", "mit", ...args);
 /** MangaImageTranslator 设置组件 */
 const mitSettings = () => [
@@ -4884,7 +4923,7 @@ const mitSettings = () => [
 			return store.option.translation.mit.localUrl !== void 0;
 		},
 		get children() {
-			var _el$ = _tmpl$$38();
+			var _el$ = _tmpl$$39();
 			_el$.addEventListener("change", (e) => {
 				const url = e.target.value.replace(/\\/$/u, "");
 				setOption("translation", "mit", "localUrl", url);
@@ -5009,6 +5048,7 @@ const handleTimeReload = (url) => {
 const handleImgLoaded = (url, e) => {
 	loadState.imgErrorMap.delete(url);
 	const img = store.imgMap[url];
+	if (!img) return;
 	if (img.translationType === "show") return;
 	if (img.loadType !== "loaded") {
 		setState("imgMap", url, "loadType", "loaded");
@@ -5072,11 +5112,13 @@ helper.createEffectOn(() => new Set(loadState.loadingUrlSet), (downImgList, prev
 			headers: request.downloadImgHeaders,
 			onerror: () => handleImgError(url),
 			onprogress({ loaded, total }) {
+				if (!Reflect.has(store.imgMap, url)) return;
 				setState("imgMap", url, "progress", loaded / total * 100);
 				handleTimeout();
 			},
 			onload({ response }) {
 				loadState.abortMap.delete(url);
+				if (!Reflect.has(store.imgMap, url)) return;
 				setState("imgMap", url, {
 					blobUrl: URL.createObjectURL(response),
 					progress: void 0
@@ -5373,6 +5415,73 @@ const jumpToImg = (index) => {
 	setState("activePageIndex", pageNum);
 };
 //#endregion
+//#region src/components/Manga/actions/readProgress.ts
+let cache = void 0;
+const initCache = async () => {
+	cache ||= await helper.useCache({ progress: "id" }, "ReadProgress");
+};
+let lastIndex = -1;
+/** 保存阅读进度 */
+const saveReadProgress = helper.throttle(async () => {
+	await initCache();
+	const index = activeImgIndex();
+	if (index === lastIndex) return;
+	lastIndex = index;
+	if (store.imgList.length < 50 || index >= store.imgList.length - 5) return await cache.del("progress", location.pathname);
+	const imgSize = {};
+	for (const [i, img] of imgList().entries()) if (img.width && img.height) imgSize[i] = [img.width, img.height];
+	await cache.set("progress", {
+		id: location.pathname,
+		time: Date.now(),
+		index,
+		imgSize,
+		fillEffect: solid_js_store.unwrap(store.fillEffect)
+	});
+}, 1e3);
+/** 恢复阅读进度 */
+const resumeReadProgress = async (state) => {
+	await initCache();
+	const progress = await cache.get("progress", location.pathname);
+	if (!progress) return;
+	let i = state.imgList.length;
+	while (i--) {
+		const imgSize = progress.imgSize[i];
+		if (imgSize) updateImgSize(state.imgList[i], ...imgSize, state);
+	}
+	state.fillEffect = progress.fillEffect;
+	updatePageData(state);
+	if (state.option.scrollMode.enabled) setTimeout(scrollViewImg, 500, progress.index);
+	else jumpToImg(progress.index);
+	const nowTime = Date.now();
+	cache.each("progress", async (data, cursor) => {
+		if (nowTime - data.time < 25056e5) return;
+		await helper.promisifyRequest(cursor.delete());
+	});
+};
+//#endregion
+//#region src/components/Manga/actions/jumpToPage.ts
+/** 弹窗跳转到指定页数（页数按图片序号计算，范围为 1 ~ imgList.length） */
+const jumpToPage = async () => {
+	const total = store.imgList.length;
+	if (total === 0) return;
+	const input = await components_InputDialog.askInput({
+		message: helper.t("other.jump_page_message"),
+		tip: helper.t("other.range_tip", { total }),
+		defaultValue: \`\${activeImgIndex() + 1}\`,
+		type: "number"
+	});
+	if (input === null) return;
+	const index = Number(input.trim()) - 1;
+	if (!helper.inRange(0, index, total - 1)) {
+		components_Toast.toast.error(helper.t("other.jump_page_invalid"));
+		await helper.sleep(200);
+		return jumpToPage();
+	}
+	if (index === activeImgIndex()) return;
+	jumpToImg(index);
+	setTimeout(() => saveReadProgress());
+};
+//#endregion
 //#region src/components/Manga/actions/switch.ts
 /** 切换页面填充 */
 const switchFillEffect = () => {
@@ -5437,94 +5546,6 @@ const switchImgRecognition = (...path) => {
 		if (path.includes("enabled")) updateImgLoadType();
 	});
 	if (!onlyUpscale) invalidateRecognition();
-};
-//#endregion
-//#region src/components/Manga/actions/show.ts
-/** 将页面移回原位 */
-const resetPage = (state, animation = false) => {
-	updateShowRange(state);
-	state.page.offset.x.pct = 0;
-	state.page.offset.y.pct = 0;
-	if (state.option.scrollMode.enabled) {
-		state.page.anima = "";
-		return;
-	}
-	let i = -1;
-	if (helper.inRange(state.renderRange[0], state.activePageIndex, state.renderRange[1])) i = state.activePageIndex - state.renderRange[0];
-	if (store.page.vertical) state.page.offset.y.pct = i === -1 ? 0 : -i;
-	else state.page.offset.x.pct = i === -1 ? 0 : i;
-	state.page.anima = animation ? "page" : "";
-};
-/** 获取指定图片的提示文本 */
-const getImgTip = (i) => {
-	if (i === -1) return helper.t("other.fill_page");
-	const img = getImg(i);
-	if (img.loadType !== "loaded") return \`\${i + 1} (\${helper.t(\`img_status.\${img.loadType}\`)})\`;
-	if (img.translationType && img.translationType !== "hide" && img.translationMessage) return \`\${i + 1}：\${img.translationMessage}\`;
-	if (isUpscale() && img.upscaleUrl !== void 0) return \`\${i + 1} (\${img.upscaleUrl ? helper.t("upscale.upscaled") : helper.t("upscale.upscaling")})\`;
-	return \`\${i + 1}\`;
-};
-/** 获取指定页面的提示文本 */
-const getPageTip = (pageIndex) => {
-	const page = store.pageList[pageIndex];
-	if (!page) return "null";
-	const pageIndexText = page.map((index) => index === -1 ? helper.t("other.fill_page") : \`\${index + 1}\`);
-	if (pageIndexText.length === 1) return pageIndexText[0];
-	if (store.option.dir === "rtl") pageIndexText.reverse();
-	return pageIndexText.join(" | ");
-};
-helper.createEffectOn(() => store.activePageIndex, () => store.show.endPage && setState("show", "endPage", void 0), { defer: true });
-helper.createEffectOn(activePage, helper.throttle(() => store.isDragMode || store.isTurnAnimating || setState(resetPage)));
-helper.createEffectOn(() => store.show.toolbar, () => {
-	if (store.show.toolbar) return;
-	setState((state) => {
-		state.show.scrollbar = false;
-		state.show.pageTip = false;
-	});
-}, { defer: true });
-//#endregion
-//#region src/components/Manga/actions/readProgress.ts
-let cache = void 0;
-const initCache = async () => {
-	cache ||= await helper.useCache({ progress: "id" }, "ReadProgress");
-};
-let lastIndex = -1;
-/** 保存阅读进度 */
-const saveReadProgress = helper.throttle(async () => {
-	await initCache();
-	const index = activeImgIndex();
-	if (index === lastIndex) return;
-	lastIndex = index;
-	if (store.imgList.length < 50 || index >= store.imgList.length - 5) return await cache.del("progress", location.pathname);
-	const imgSize = {};
-	for (const [i, img] of imgList().entries()) if (img.width && img.height) imgSize[i] = [img.width, img.height];
-	await cache.set("progress", {
-		id: location.pathname,
-		time: Date.now(),
-		index,
-		imgSize,
-		fillEffect: solid_js_store.unwrap(store.fillEffect)
-	});
-}, 1e3);
-/** 恢复阅读进度 */
-const resumeReadProgress = async (state) => {
-	await initCache();
-	const progress = await cache.get("progress", location.pathname);
-	if (!progress) return;
-	let i = state.imgList.length;
-	while (i--) {
-		const imgSize = progress.imgSize[i];
-		if (imgSize) updateImgSize(state.imgList[i], ...imgSize, state);
-	}
-	state.fillEffect = progress.fillEffect;
-	updatePageData(state);
-	if (state.option.scrollMode.enabled) setTimeout(scrollViewImg, 500, progress.index);
-	else jumpToImg(progress.index);
-	const nowTime = Date.now();
-	cache.each("progress", async (data, cursor) => {
-		if (nowTime - data.time < 25056e5) return;
-		await helper.promisifyRequest(cursor.delete());
-	});
 };
 //#endregion
 //#region src/components/Manga/actions/turnPage.ts
@@ -5793,6 +5814,7 @@ const handleSwapPageTurnKey = (nextPage) => {
 	return (store.option.swapPageTurnKey ? !nextPage : nextPage) ? "next" : "prev";
 };
 const handleHotkey = (hotkey, e) => {
+	if (store.imgList.length === 0 && hotkey !== "exit") return;
 	stopAutoScroll();
 	finishTurnAnimation();
 	if (isAbreastMode()) switch (hotkey) {
@@ -5828,6 +5850,9 @@ const handleHotkey = (hotkey, e) => {
 		case "scroll_right": return turnPageAnimation(handleSwapPageTurnKey(store.option.dir !== "rtl"));
 		case "jump_to_home": return setState("activePageIndex", 0);
 		case "jump_to_end": return setState("activePageIndex", Math.max(0, store.pageList.length - 1));
+		case "jump_to_page":
+			jumpToPage();
+			return;
 		case "switch_page_fill": return switchFillEffect();
 		case "switch_scroll_mode": return switchScrollMode();
 		case "switch_single_double_page_mode": return switchOnePageMode();
@@ -5874,6 +5899,7 @@ const [defaultHotkeys, setDefaultHotkeys] = solid_js.createSignal({
 	],
 	jump_to_home: ["Home"],
 	jump_to_end: ["End"],
+	jump_to_page: ["g"],
 	exit: ["Escape"],
 	switch_page_fill: [
 		"/",
@@ -6058,6 +6084,7 @@ const handleKeyDown = (e) => {
 			return setState("show", "endPage", void 0);
 		}
 	}
+	if (store.imgList.length === 0) return;
 	if (e.target.dataset.onlyNumber !== void 0) {
 		if (/^(?:Shift \\+ )?[a-zA-Z]$/u.test(code)) {
 			e.stopPropagation();
@@ -6374,6 +6401,35 @@ const handleScrollbarSlider = ({ type, xy, initial }, e) => {
 	}
 };
 //#endregion
+//#region src/components/Manga/actions/show.ts
+/** 获取指定图片的提示文本 */
+const getImgTip = (i) => {
+	if (i === -1) return helper.t("other.fill_page");
+	const img = getImg(i);
+	if (img.loadType !== "loaded") return \`\${i + 1} (\${helper.t(\`img_status.\${img.loadType}\`)})\`;
+	if (img.translationType && img.translationType !== "hide" && img.translationMessage) return \`\${i + 1}：\${img.translationMessage}\`;
+	if (isUpscale() && img.upscaleUrl !== void 0) return \`\${i + 1} (\${img.upscaleUrl ? helper.t("upscale.upscaled") : helper.t("upscale.upscaling")})\`;
+	return \`\${i + 1}\`;
+};
+/** 获取指定页面的提示文本 */
+const getPageTip = (pageIndex) => {
+	const page = store.pageList[pageIndex];
+	if (!page) return "null";
+	const pageIndexText = page.map((index) => index === -1 ? helper.t("other.fill_page") : \`\${index + 1}\`);
+	if (pageIndexText.length === 1) return pageIndexText[0];
+	if (store.option.dir === "rtl") pageIndexText.reverse();
+	return pageIndexText.join(" | ");
+};
+helper.createEffectOn(() => store.activePageIndex, () => store.show.endPage && setState("show", "endPage", void 0), { defer: true });
+helper.createEffectOn(activePage, helper.throttle(() => store.isDragMode || store.isTurnAnimating || setState(resetPage)));
+helper.createEffectOn(() => store.show.toolbar, () => {
+	if (store.show.toolbar) return;
+	setState((state) => {
+		state.show.scrollbar = false;
+		state.show.pageTip = false;
+	});
+}, { defer: true });
+//#endregion
 //#region src/components/Manga/actions/wheel/scrollDevice.ts
 /** 判断两个数值是否成整数倍 */
 const isMultipleOf = (a, b) => (a < b ? b % a : a % b) === 0;
@@ -6570,7 +6626,7 @@ function css$1(arg1, arg2, ...rest) {
 }
 //#endregion
 //#region src/components/Manga/components/ComicImg.tsx
-var _tmpl$$37 = /*#__PURE__*/ solid_js_web.template(\`<img draggable=false decoding=async>\`);
+var _tmpl$$38 = /*#__PURE__*/ solid_js_web.template(\`<img draggable=false decoding=async>\`);
 var _tmpl$2$8 = /*#__PURE__*/ solid_js_web.template(\`<div><picture><div>\`);
 const ComicImg = (img) => {
 	const showState = () => store.imgShowState[img.index];
@@ -6585,11 +6641,12 @@ const ComicImg = (img) => {
 		if (img.src.startsWith("blob:")) return img.src.replace(/#\\..+/u, "");
 		return img.src;
 	};
+	/** 并排卷轴模式下图片在各列中的位置 */
+	const abreastPosition = solid_js.createMemo(() => isAbreastMode() ? abreastArea().position[img.index] : void 0);
 	/** 并排卷轴模式下需要复制的图片数量 */
 	const cloneNum = solid_js.createMemo(() => {
-		if (!isAbreastMode()) return 0;
-		const imgPosition = abreastArea().position[img.index];
-		return imgPosition ? imgPosition.length - 1 : 0;
+		const positions = abreastPosition();
+		return positions ? positions.length - 1 : 0;
 	});
 	/** 打开「边缘裁切」后使用的样式 */
 	const cropStyle = solid_js.createMemo(() => {
@@ -6641,65 +6698,76 @@ const ComicImg = (img) => {
 			...cropStyle()?.picture
 		}
 	}));
-	const ComicImgBase = (props) => (() => {
-		var _el$ = _tmpl$2$8(), _el$2 = _el$.firstChild, _el$4 = _el$2.firstChild;
-		solid_js_web.insert(_el$2, solid_js_web.createComponent(solid_js.Show, {
-			get when() {
-				return src();
-			},
-			get children() {
-				var _el$3 = _tmpl$$37();
-				_el$3.addEventListener("error", (e) => handleImgError(img.src, e.currentTarget));
-				_el$3.addEventListener("load", (e) => handleImgLoaded(img.src, e.currentTarget));
-				solid_js_web.use((el) => {
-					refs.imgEleMap[img.src] ??= /* @__PURE__ */ new Set();
-					const set = refs.imgEleMap[img.src];
-					set.add(el);
-					solid_js.onCleanup(() => {
-						set.delete(el);
-						if (set.size === 0) delete refs.imgEleMap[img.src];
-					});
-				}, _el$3);
-				solid_js_web.effect((_p$) => {
-					var _v$ = styles().imgEle, _v$2 = src(), _v$3 = \`\${img.index}\`, _v$4 = img.src;
-					_p$.e = solid_js_web.style(_el$3, _v$, _p$.e);
-					_v$2 !== _p$.t && solid_js_web.setAttribute(_el$3, "src", _p$.t = _v$2);
-					_v$3 !== _p$.a && solid_js_web.setAttribute(_el$3, "alt", _p$.a = _v$3);
-					_v$4 !== _p$.o && solid_js_web.setAttribute(_el$3, "data-src", _p$.o = _v$4);
-					return _p$;
-				}, {
-					e: void 0,
-					t: void 0,
-					a: void 0,
-					o: void 0
-				});
-				return _el$3;
-			}
-		}), _el$4);
-		solid_js_web.insert(_el$4, () => getImgTip(img.index));
-		solid_js_web.effect((_p$) => {
-			var _v$5 = classes$2.img, _v$6 = \`_\${img.index}_\${props.cloneIndex ?? 0}\`, _v$7 = styles().img, _v$8 = showState(), _v$9 = img.type ?? store.defaultImgType, _v$0 = img.loadType === "loaded" ? void 0 : img.loadType, _v$1 = styles().picture, _v$10 = classes$2.pageTip;
-			_v$5 !== _p$.e && solid_js_web.className(_el$, _p$.e = _v$5);
-			_v$6 !== _p$.t && solid_js_web.setAttribute(_el$, "id", _p$.t = _v$6);
-			_p$.a = solid_js_web.style(_el$, _v$7, _p$.a);
-			_v$8 !== _p$.o && solid_js_web.setAttribute(_el$, "data-show", _p$.o = _v$8);
-			_v$9 !== _p$.i && solid_js_web.setAttribute(_el$, "data-type", _p$.i = _v$9);
-			_v$0 !== _p$.n && solid_js_web.setAttribute(_el$, "data-load-type", _p$.n = _v$0);
-			_p$.s = solid_js_web.style(_el$2, _v$1, _p$.s);
-			_v$10 !== _p$.h && solid_js_web.className(_el$4, _p$.h = _v$10);
-			return _p$;
-		}, {
-			e: void 0,
-			t: void 0,
-			a: void 0,
-			o: void 0,
-			i: void 0,
-			n: void 0,
-			s: void 0,
-			h: void 0
+	const ComicImgBase = (props) => {
+		const imgStyle = solid_js.createMemo(() => {
+			const position = abreastPosition()?.[props.cloneIndex ?? 0];
+			if (!position) return styles().img;
+			return {
+				...styles().img,
+				"grid-area": \`_\${position.column}\`,
+				transform: \`translateY(\${position.top}px)\`
+			};
 		});
-		return _el$;
-	})();
+		return (() => {
+			var _el$ = _tmpl$2$8(), _el$2 = _el$.firstChild, _el$4 = _el$2.firstChild;
+			solid_js_web.insert(_el$2, solid_js_web.createComponent(solid_js.Show, {
+				get when() {
+					return src();
+				},
+				get children() {
+					var _el$3 = _tmpl$$38();
+					_el$3.addEventListener("error", (e) => handleImgError(img.src, e.currentTarget));
+					_el$3.addEventListener("load", (e) => handleImgLoaded(img.src, e.currentTarget));
+					solid_js_web.use((el) => {
+						refs.imgEleMap[img.src] ??= /* @__PURE__ */ new Set();
+						const set = refs.imgEleMap[img.src];
+						set.add(el);
+						solid_js.onCleanup(() => {
+							set.delete(el);
+							if (set.size === 0) delete refs.imgEleMap[img.src];
+						});
+					}, _el$3);
+					solid_js_web.effect((_p$) => {
+						var _v$ = styles().imgEle, _v$2 = src(), _v$3 = \`\${img.index}\`, _v$4 = img.src;
+						_p$.e = solid_js_web.style(_el$3, _v$, _p$.e);
+						_v$2 !== _p$.t && solid_js_web.setAttribute(_el$3, "src", _p$.t = _v$2);
+						_v$3 !== _p$.a && solid_js_web.setAttribute(_el$3, "alt", _p$.a = _v$3);
+						_v$4 !== _p$.o && solid_js_web.setAttribute(_el$3, "data-src", _p$.o = _v$4);
+						return _p$;
+					}, {
+						e: void 0,
+						t: void 0,
+						a: void 0,
+						o: void 0
+					});
+					return _el$3;
+				}
+			}), _el$4);
+			solid_js_web.insert(_el$4, () => getImgTip(img.index));
+			solid_js_web.effect((_p$) => {
+				var _v$5 = classes$2.img, _v$6 = imgStyle(), _v$7 = showState(), _v$8 = img.type ?? store.defaultImgType, _v$9 = img.loadType === "loaded" ? void 0 : img.loadType, _v$0 = styles().picture, _v$1 = img.src, _v$10 = classes$2.pageTip;
+				_v$5 !== _p$.e && solid_js_web.className(_el$, _p$.e = _v$5);
+				_p$.t = solid_js_web.style(_el$, _v$6, _p$.t);
+				_v$7 !== _p$.a && solid_js_web.setAttribute(_el$, "data-show", _p$.a = _v$7);
+				_v$8 !== _p$.o && solid_js_web.setAttribute(_el$, "data-type", _p$.o = _v$8);
+				_v$9 !== _p$.i && solid_js_web.setAttribute(_el$, "data-load-type", _p$.i = _v$9);
+				_p$.n = solid_js_web.style(_el$2, _v$0, _p$.n);
+				_v$1 !== _p$.s && solid_js_web.setAttribute(_el$2, "data-src", _p$.s = _v$1);
+				_v$10 !== _p$.h && solid_js_web.className(_el$4, _p$.h = _v$10);
+				return _p$;
+			}, {
+				e: void 0,
+				t: void 0,
+				a: void 0,
+				o: void 0,
+				i: void 0,
+				n: void 0,
+				s: void 0,
+				h: void 0
+			});
+			return _el$;
+		})();
+	};
 	return [solid_js_web.createComponent(ComicImgBase, {}), solid_js_web.createComponent(solid_js.Show, {
 		get when() {
 			return cloneNum() > 0;
@@ -6718,7 +6786,7 @@ const ComicImg = (img) => {
 };
 //#endregion
 //#region src/components/Manga/components/EmptyTip.tsx
-var _tmpl$$36 = /*#__PURE__*/ solid_js_web.template(\`<h1 style=opacity:0>\`);
+var _tmpl$$37 = /*#__PURE__*/ solid_js_web.template(\`<h1 style=opacity:0>\`);
 const EmptyTip = () => {
 	let ref;
 	helper.onAutoMount(() => {
@@ -6737,7 +6805,7 @@ const EmptyTip = () => {
 		};
 	});
 	return (() => {
-		var _el$ = _tmpl$$36();
+		var _el$ = _tmpl$$37();
 		var _ref$ = ref;
 		typeof _ref$ === "function" ? solid_js_web.use(_ref$, _el$) : ref = _el$;
 		_el$.textContent = "NULL";
@@ -6746,7 +6814,7 @@ const EmptyTip = () => {
 };
 //#endregion
 //#region src/components/Manga/components/ComicImgFlow.tsx
-var _tmpl$$35 = /*#__PURE__*/ solid_js_web.template(\`<div tabindex=-1><div tabindex=-1>\`);
+var _tmpl$$36 = /*#__PURE__*/ solid_js_web.template(\`<div tabindex=-1><div tabindex=-1>\`);
 const ComicImgFlow = () => {
 	const hiddenMouse = useHiddenMouse(() => refs.mangaFlow);
 	const handleDrag = (state, e) => {
@@ -6833,7 +6901,6 @@ const ComicImgFlow = () => {
 		},
 		"background-color": () => isEnableBg() ? getImg(activeImgIndex())?.background ?? void 0 : void 0
 	});
-	css$1(imgAreaStyle);
 	const renderList = solid_js.createMemo(() => {
 		const list = new Set(renderImgList());
 		for (const url of loadState.loadingUrlSet) {
@@ -6845,7 +6912,7 @@ const ComicImgFlow = () => {
 		return [...list].toSorted((a, b) => a - b);
 	});
 	return (() => {
-		var _el$ = _tmpl$$35(), _el$2 = _el$.firstChild;
+		var _el$ = _tmpl$$36(), _el$2 = _el$.firstChild;
 		solid_js_web.addEventListener(_el$, "scrollend", focus);
 		_el$.addEventListener("transitionend", handleTransitionEnd);
 		var _ref$ = bindRef("mangaBox");
@@ -6892,7 +6959,7 @@ const ComicImgFlow = () => {
 };
 //#endregion
 //#region src/components/Manga/components/TouchArea.tsx
-var _tmpl$$34 = /*#__PURE__*/ solid_js_web.template(\`<div>\`);
+var _tmpl$$35 = /*#__PURE__*/ solid_js_web.template(\`<div>\`);
 var _tmpl$2$7 = /*#__PURE__*/ solid_js_web.template(\`<div role=button tabindex=-1>\`);
 const areaArrayMap = {
 	left_right: [
@@ -6970,7 +7037,7 @@ const dir = helper.createRootMemo(() => {
 	return store.option.dir === "rtl" ? "ltr" : "rtl";
 });
 const TouchArea = () => (() => {
-	var _el$ = _tmpl$$34();
+	var _el$ = _tmpl$$35();
 	var _ref$ = bindRef("touchArea");
 	typeof _ref$ === "function" && solid_js_web.use(_ref$, _el$);
 	solid_js_web.insert(_el$, solid_js_web.createComponent(solid_js.For, {
@@ -7008,7 +7075,7 @@ const TouchArea = () => (() => {
 })();
 //#endregion
 //#region src/components/Manga/components/EndPage.tsx
-var _tmpl$$33 = /*#__PURE__*/ solid_js_web.template(\`<div>\`);
+var _tmpl$$34 = /*#__PURE__*/ solid_js_web.template(\`<div>\`);
 var _tmpl$2$6 = /*#__PURE__*/ solid_js_web.template(\`<div role=button tabindex=-1><div><p></p><button type=button></button><button type=button data-is-end></button><button type=button>\`);
 var _tmpl$3$2 = /*#__PURE__*/ solid_js_web.template(\`<p>\`);
 let delayTypeTimer = 0;
@@ -7080,7 +7147,7 @@ const EndPage = () => {
 				return solid_js_web.memo(() => !!(store.option.showComment && delayType() === "end"))() && store.commentList?.length;
 			},
 			get children() {
-				var _el$7 = _tmpl$$33();
+				var _el$7 = _tmpl$$34();
 				solid_js_web.addEventListener(_el$7, "wheel", stopPropagation);
 				solid_js_web.insert(_el$7, solid_js_web.createComponent(solid_js.For, {
 					get each() {
@@ -7130,6 +7197,19 @@ const EndPage = () => {
 		return _el$;
 	})();
 };
+//#endregion
+//#region src/components/Manga/components/LoadingMask.tsx
+var _tmpl$$33 = /*#__PURE__*/ solid_js_web.template(\`<div><p>\`);
+/** imgList 为空时显示的加载提示 */
+const LoadingMask = () => (() => {
+	var _el$ = _tmpl$$33(), _el$2 = _el$.firstChild;
+	solid_js_web.addEventListener(_el$, "wheel", stopPropagation);
+	solid_js_web.addEventListener(_el$, "mousedown", stopPropagation);
+	solid_js_web.addEventListener(_el$, "click", stopPropagation);
+	solid_js_web.insert(_el$2, () => helper.t("alert.repeat_load"));
+	solid_js_web.effect(() => solid_js_web.className(_el$, classes$2.loadingMask));
+	return _el$;
+})();
 //#endregion
 //#region src/components/Manga/hooks/useHover.ts
 const useHover = (ref) => {
@@ -9285,7 +9365,7 @@ const useInit = (props) => {
 };
 //#endregion
 //#region src/components/Manga/index.module.css?inline
-var index_module_default = ".img___7ajV4 img {\\n  display: block;\\n\\n  width: 100%;\\n  height: 100%;\\n\\n  object-fit: contain;\\n  filter: var(--img-filter, none);\\n}\\n\\n.img___7ajV4 {\\n  position: relative;\\n\\n  align-content: center;\\n\\n  width: 100%;\\n  height: 100%;\\n  margin-right: auto;\\n  margin-left: auto;\\n}\\n\\n.img___7ajV4 > picture {\\n    position: absolute;\\n    inset: 0;\\n\\n    width: auto;\\n    max-width: 100%;\\n    height: auto;\\n    max-height: 100%;\\n    margin-top: auto;\\n    margin-right: inherit;\\n    margin-bottom: auto;\\n    margin-left: inherit;\\n  }\\n\\n.img___7ajV4 > picture,.img___7ajV4 > picture::after {\\n    background-color: var(--hover-bg-color, #fff3);\\n    background-image: var(--md-photo);\\n    background-repeat: no-repeat;\\n    background-position: center;\\n    background-size: 30%;\\n  }\\n\\n/* 已加载完毕的图片不显示灰色背景和图标 */\\n\\n.img___7ajV4:not([data-load-type]) > picture,.img___7ajV4:not([data-load-type]) > picture::after {\\n    background: none;\\n  }\\n\\n/* 遮住默认的出错图片标识 */\\n\\n.img___7ajV4[data-load-type='error'] > picture::after {\\n    pointer-events: none;\\n    content: '';\\n\\n    position: absolute;\\n    top: 0;\\n    right: 0;\\n\\n    width: 100%;\\n    height: 100%;\\n\\n    background-color: #eee;\\n    background-image: var(--md-image-not-supported);\\n  }\\n\\n.img___7ajV4[data-load-type='loading'] > picture {\\n    background-image: var(--md-cloud-download);\\n\\n    /* 加载中的图片先隐藏一下，避免出错图片的元素被直接显示出来 */\\n  }\\n\\n:is(.img___7ajV4[data-load-type='loading'] > picture) img {\\n      animation: show___HzwUa 100ms forwards;\\n    }\\n\\n.img___7ajV4[data-load-type='error'] > picture {\\n    cursor: pointer;\\n  }\\n\\n.mangaFlow___jMZgq[dir='ltr'] .img___7ajV4[data-show='1'],\\n.mangaFlow___jMZgq[dir='rtl'] .img___7ajV4[data-show='0'] {\\n  margin-right: auto;\\n  margin-left: 0;\\n}\\n\\n.mangaFlow___jMZgq[dir='ltr'] .img___7ajV4[data-show='0'],\\n.mangaFlow___jMZgq[dir='rtl'] .img___7ajV4[data-show='1'] {\\n  margin-right: 0;\\n  margin-left: auto;\\n}\\n\\n.mangaFlow___jMZgq {\\n  touch-action: none;\\n  will-change: left, top;\\n  -webkit-user-select: none;\\n          user-select: none;\\n\\n  position: absolute;\\n  transform-origin: 0 0;\\n\\n  contain: layout;\\n  overflow: visible;\\n  display: grid;\\n  grid-auto-columns: 100%;\\n  grid-auto-flow: column;\\n  grid-auto-rows: 100%;\\n  row-gap: 0;\\n  place-items: center;\\n\\n  width: 100%;\\n  height: 100%;\\n\\n  color: var(--text);\\n\\n  backface-visibility: hidden;\\n}\\n\\n.mangaFlow___jMZgq[data-disable-zoom] .img___7ajV4 > picture {\\n    width: fit-content;\\n    height: fit-content;\\n  }\\n\\n.mangaFlow___jMZgq[data-hidden-mouse='true'] {\\n    cursor: none;\\n  }\\n\\n.mangaFlow___jMZgq[data-vertical] {\\n    grid-auto-flow: row;\\n  }\\n\\n.mangaBox___48Jek {\\n  transform-origin: 0 0;\\n\\n  contain: layout style;\\n\\n  width: 100%;\\n  height: 100%;\\n\\n  transition-duration: 0ms;\\n}\\n\\n.mangaBox___48Jek[data-animation='page'] .mangaFlow___jMZgq,.mangaBox___48Jek[data-animation='zoom'] {\\n    transition-duration: 300ms;\\n  }\\n\\n.root___Hf5H2 .mangaBox___48Jek {\\n  /* 隐藏滚动条但不影响滚动 */\\n  scrollbar-width: none;\\n\\n  /* 隐藏滚动条但不影响滚动 */\\n}\\n\\n:is(.root___Hf5H2 .mangaBox___48Jek)::-webkit-scrollbar {\\n    display: none;\\n  }\\n\\n.root___Hf5H2[data-scroll-mode] .mangaBox___48Jek {\\n  overflow: auto;\\n}\\n\\n:is(.root___Hf5H2[data-scroll-mode] .mangaBox___48Jek) .mangaFlow___jMZgq {\\n    touch-action: pan-y;\\n    row-gap: calc(var(--scroll-mode-spacing) * 7px);\\n    height: fit-content;\\n  }\\n\\n[data-abreast-scroll]:is(.root___Hf5H2[data-scroll-mode] .mangaBox___48Jek) {\\n    touch-action: none;\\n    overflow: hidden;\\n  }\\n\\n[data-abreast-scroll]:is(.root___Hf5H2[data-scroll-mode] .mangaBox___48Jek) .mangaFlow___jMZgq {\\n      column-gap: calc(var(--scroll-mode-spacing) * 7px);\\n      align-items: start;\\n      height: 100%;\\n    }\\n\\n:is([data-abreast-scroll]:is(.root___Hf5H2[data-scroll-mode] .mangaBox___48Jek) .mangaFlow___jMZgq) .img___7ajV4 {\\n        width: 100%;\\n        height: auto;\\n      }\\n\\n[data-show]:is(:is([data-abreast-scroll]:is(.root___Hf5H2[data-scroll-mode] .mangaBox___48Jek) .mangaFlow___jMZgq) .img___7ajV4) {\\n          will-change: transform;\\n        }\\n\\n:is(:is([data-abreast-scroll]:is(.root___Hf5H2[data-scroll-mode] .mangaBox___48Jek) .mangaFlow___jMZgq) .img___7ajV4) > picture {\\n          position: relative;\\n        }\\n\\n.pageTip___P7thU {\\n  pointer-events: none;\\n\\n  position: absolute;\\n  z-index: 1;\\n  right: 0.4em;\\n  bottom: 0.4em;\\n\\n  padding: 0.1em 0.4em;\\n  border-radius: 0.25em;\\n\\n  font-size: 1.5em;\\n  line-height: 1.5;\\n  color: var(--text);\\n\\n  opacity: 0;\\n  background-color: color-mix(in srgb, var(--text-bg) 80%, transparent);\\n\\n  transition: opacity 150ms;\\n}\\n\\n.root___Hf5H2[data-page-tip] .pageTip___P7thU {\\n  opacity: 1;\\n}\\n\\n@keyframes show___HzwUa {\\n  0% {\\n    opacity: 0;\\n  }\\n\\n  90% {\\n    opacity: 0;\\n  }\\n\\n  100% {\\n    opacity: 1;\\n  }\\n}\\n\\n.endPage___iOZmk,\\n.endPageBody___g-dz- {\\n  z-index: 10;\\n\\n  display: flex;\\n  align-items: center;\\n  justify-content: center;\\n\\n  width: 100%;\\n  height: 100%;\\n}\\n\\n.endPage___iOZmk {\\n  pointer-events: none;\\n\\n  position: absolute;\\n  top: 0;\\n  left: 0;\\n\\n  color: white;\\n\\n  opacity: 0;\\n  background-color: #333d;\\n\\n  transition: opacity 500ms;\\n}\\n\\n.endPage___iOZmk[data-show] {\\n    pointer-events: all;\\n    opacity: 1;\\n  }\\n\\n.endPage___iOZmk[data-type='start'] .tip___fyxqg {\\n    transform: translateY(-10em);\\n  }\\n\\n.endPage___iOZmk[data-type='end'] .tip___fyxqg {\\n    transform: translateY(10em);\\n  }\\n\\n.endPage___iOZmk .endPageBody___g-dz- {\\n    transform: translate(0, var(--drag-y, 0));\\n    transition: transform 200ms;\\n  }\\n\\n:is(.endPage___iOZmk .endPageBody___g-dz-) button {\\n      cursor: pointer;\\n\\n      transform-origin: center;\\n\\n      font-size: 1.2em;\\n      color: inherit;\\n\\n      background-color: transparent;\\n\\n      animation: jello___wXBLg 0.3s forwards;\\n    }\\n\\n[data-is-end]:is(:is(.endPage___iOZmk .endPageBody___g-dz-) button) {\\n        margin: 2em;\\n        font-size: 3em;\\n      }\\n\\n:is(.endPage___iOZmk .endPageBody___g-dz-) .tip___fyxqg {\\n      position: absolute;\\n      margin: auto;\\n    }\\n\\n.endPage___iOZmk[data-drag] .endPageBody___g-dz- {\\n    transition: transform 00ms;\\n  }\\n\\n.root___Hf5H2[data-mobile] .endPage___iOZmk > button {\\n  width: 1em;\\n}\\n\\n.comments___9ITQv {\\n  position: absolute;\\n  right: 1em;\\n\\n  overflow: auto;\\n  display: flex;\\n  flex-direction: column;\\n  align-items: flex-end;\\n\\n  width: 20em;\\n  max-height: 80%;\\n  padding-right: 0.5em;\\n\\n  opacity: 0.3;\\n}\\n\\n.comments___9ITQv > p {\\n    margin: 0.5em 0.1em;\\n    padding: 0.2em 0.5em;\\n    border-radius: 0.5em;\\n    background-color: #333b;\\n  }\\n\\n.comments___9ITQv:hover {\\n    opacity: 1;\\n  }\\n\\n.root___Hf5H2[data-mobile] .comments___9ITQv {\\n  bottom: 0;\\n  max-height: 15em;\\n  opacity: 0.8;\\n}\\n\\n@keyframes jello___wXBLg {\\n  0%,\\n  11.1%,\\n  100% {\\n    transform: translate3d(0, 0, 0);\\n  }\\n\\n  22.2% {\\n    transform: skewX(-12.5deg) skewY(-12.5deg);\\n  }\\n\\n  33.3% {\\n    transform: skewX(6.25deg) skewY(6.25deg);\\n  }\\n\\n  44.4% {\\n    transform: skewX(-3.125deg) skewY(-3.125deg);\\n  }\\n\\n  55.5% {\\n    transform: skewX(1.5625deg) skewY(1.5625deg);\\n  }\\n\\n  66.6% {\\n    transform: skewX(-0.7812deg) skewY(-0.7812deg);\\n  }\\n\\n  77.7% {\\n    transform: skewX(0.3906deg) skewY(0.3906deg);\\n  }\\n\\n  88.8% {\\n    transform: skewX(-0.1953deg) skewY(-0.1953deg);\\n  }\\n}\\n\\n.toolbar___RMjHL {\\n  position: fixed;\\n  z-index: 9;\\n  top: 0;\\n\\n  display: flex;\\n  align-items: center;\\n  justify-content: flex-start;\\n\\n  height: 100%;\\n}\\n\\n/* 工具栏面板 */\\n.toolbarPanel___XYjgc {\\n  position: relative;\\n  transform: translateX(-100%);\\n\\n  display: flex;\\n  flex-direction: column;\\n\\n  padding: 0.5em;\\n\\n  transition: transform 200ms;\\n}\\n.toolbarPanel___XYjgc > hr {\\n    height: 1em;\\n    margin: 0;\\n    border: none;\\n    visibility: hidden;\\n  }\\n\\n:is(.toolbar___RMjHL[data-show], .toolbar___RMjHL:hover) .toolbarPanel___XYjgc {\\n  transform: none;\\n}\\n\\n.toolbarBg___i4oTA {\\n  position: absolute;\\n  top: 0;\\n  right: 0;\\n\\n  width: 100%;\\n  height: 100%;\\n  border-top-right-radius: 1em;\\n  border-bottom-right-radius: 1em;\\n\\n  background-color: var(--page-bg);\\n  filter: opacity(0.8);\\n}\\n\\n/* 移动端优化 */\\n/* 调大样式 */\\n.root___Hf5H2[data-mobile] .toolbar___RMjHL {\\n    font-size: 1.3em;\\n  }\\n/* 只能通过点击中心来唤出工具栏，防止误触 */\\n.root___Hf5H2[data-mobile] .toolbar___RMjHL:not([data-show]) {\\n    pointer-events: none;\\n  }\\n/* 减少背景的透明度，方便辨识 */\\n.root___Hf5H2[data-mobile] .toolbarBg___i4oTA {\\n    filter: opacity(0.8);\\n  }\\n/* 设置面板所在的悬浮框样式 */\\n.SettingPanelPopper___uEBz3 {\\n  pointer-events: unset !important;\\n  transform: none !important;\\n  height: 0 !important;\\n  padding: 0 !important;\\n}\\n\\n.SettingPanel___ZRvFB {\\n  -webkit-user-select: text;\\n          user-select: text;\\n\\n  position: fixed;\\n  z-index: 1;\\n  top: 0;\\n  bottom: 0;\\n\\n  overflow: auto;\\n\\n  max-width: calc(100% - 5em);\\n  height: fit-content;\\n  max-height: 95%;\\n  margin: auto;\\n  border-radius: 0.3em;\\n\\n  font-size: 1.2em;\\n  color: var(--text);\\n\\n  background-color: var(--page-bg);\\n  box-shadow:\\n    rgb(0 0 0 / 20%) 0 3px 1px -2px,\\n    rgb(0 0 0 / 14%) 0 2px 2px 0,\\n    rgb(0 0 0 / 12%) 0 1px 5px 0;\\n}\\n\\n.SettingPanel___ZRvFB hr {\\n    margin: 0.5em 0;\\n    color: white;\\n  }\\n\\n.SettingPanel___ZRvFB > hr {\\n    margin: 0;\\n  }\\n\\n.SettingBlock___qxNyt {\\n  display: grid;\\n  grid-template-rows: max-content 1fr;\\n  transition: grid-template-rows 200ms ease-out;\\n}\\n\\n.SettingBlock___qxNyt .SettingBlockBody___Wirnd {\\n    z-index: 0;\\n    overflow: hidden;\\n    padding: 0 0.5em;\\n    padding-bottom: 1em;\\n  }\\n\\n:is(.SettingBlock___qxNyt .SettingBlockBody___Wirnd) > div + :is(.SettingBlock___qxNyt .SettingBlockBody___Wirnd) > div {\\n      margin-top: 1em;\\n    }\\n\\n:is(.SettingBlock___qxNyt .SettingBlockBody___Wirnd) input,:is(.SettingBlock___qxNyt .SettingBlockBody___Wirnd) textarea {\\n      width: 97%;\\n      margin-top: 0.3em;\\n    }\\n\\n.SettingBlock___qxNyt[data-show='false'] {\\n    grid-template-rows: max-content 0fr;\\n    padding-bottom: unset;\\n  }\\n\\n.SettingBlock___qxNyt[data-show='false'] .SettingBlockBody___Wirnd {\\n      padding: unset;\\n    }\\n\\n.SettingBlockSubtitle___cv0Ji {\\n  cursor: pointer;\\n\\n  position: sticky;\\n  z-index: 1;\\n  top: 0;\\n\\n  height: 3em;\\n  margin-bottom: 0.1em;\\n\\n  font-size: 0.7em;\\n  line-height: 3em;\\n  color: var(--text-secondary);\\n  text-align: center;\\n\\n  background-color: var(--page-bg);\\n}\\n\\n.SettingBlockBody___Wirnd .SettingBlockSubtitle___cv0Ji {\\n  position: unset;\\n  height: 1em;\\n  line-height: 1em;\\n}\\n\\n.SettingsItem___aJhRD {\\n  position: relative;\\n  display: flex;\\n  align-items: center;\\n  justify-content: space-between;\\n}\\n\\n:is(.SettingsItem___aJhRD,.SettingsShowItem___l-D2E) + .SettingsItem___aJhRD {\\n    margin-top: 1em;\\n  }\\n\\n.SettingsItem___aJhRD[data-disabled] {\\n    opacity: 0.5;\\n  }\\n\\n.SettingsItem___aJhRD[data-disabled] button {\\n      cursor: not-allowed;\\n    }\\n\\n.SettingsItemName___UP6zJ {\\n  max-width: calc(100% - 4em);\\n\\n  font-size: 0.9em;\\n  text-align: start;\\n  overflow-wrap: anywhere;\\n  white-space: pre-wrap;\\n}\\n\\n/* 开关式设置项 */\\n.SettingsItemSwitch___LVGr9 {\\n  cursor: pointer;\\n\\n  display: inline-flex;\\n  align-items: center;\\n\\n  width: 2.3em;\\n  height: 0.8em;\\n  margin: 0.3em;\\n  padding: 0;\\n  border: 0;\\n  border-radius: 1em;\\n\\n  background-color: var(--switch-bg);\\n}\\n\\n/* 开关里的圆形按钮 */\\n.SettingsItemSwitchRound___Ds0B8 {\\n  transform: translateX(-10%);\\n\\n  width: 1.15em;\\n  height: 1.15em;\\n  border-radius: 100%;\\n\\n  background: var(--switch);\\n  box-shadow:\\n    0 2px 1px -1px rgb(0 0 0 / 20%),\\n    0 1px 1px 0 rgb(0 0 0 / 14%),\\n    0 1px 3px 0 rgb(0 0 0 / 12%);\\n\\n  transition: transform 100ms;\\n}\\n\\n.SettingsItemSwitch___LVGr9[data-checked='true'] {\\n  background: var(--secondary-bg);\\n}\\n\\n.SettingsItemSwitch___LVGr9[data-checked='true'] .SettingsItemSwitchRound___Ds0B8 {\\n    transform: translateX(110%);\\n    background: var(--secondary);\\n  }\\n\\n/* 图标按钮式设置项 */\\n.SettingsItemIconButton___Cs7BQ {\\n  cursor: pointer;\\n\\n  position: absolute;\\n  right: 0;\\n\\n  height: 1em;\\n  border: none;\\n\\n  font-size: 1.5em;\\n  color: var(--text);\\n\\n  background-color: transparent;\\n}\\n\\n/* 选择器设置项 */\\n.SettingsItemSelect___CvFKx {\\n  cursor: pointer;\\n\\n  max-width: 6.5em;\\n  margin: 0;\\n  padding: 0.3em;\\n  border: none;\\n  border-radius: 5px;\\n\\n  font-size: 0.9em;\\n  color: var(--text);\\n\\n  background-color: var(--hover-bg-color);\\n  outline: none;\\n}\\n.SettingsItemSelect___CvFKx::picker(select) {\\n    color: var(--text);\\n    background-color: var(--page-bg);\\n  }\\n.SettingsItemSelect___CvFKx option {\\n    color: var(--text);\\n    background-color: var(--page-bg);\\n  }\\n\\n/* 关闭设置弹窗的遮罩 */\\n.closeCover___qLIp5 {\\n  position: fixed;\\n  top: 0;\\n  left: 0;\\n\\n  width: 100%;\\n  height: 100%;\\n}\\n\\n.SettingsShowItem___l-D2E {\\n  display: grid;\\n  transition: grid-template-rows 200ms ease-out;\\n}\\n\\n.SettingsShowItem___l-D2E > .SettingsShowItemBody___bgxxq {\\n    overflow: hidden;\\n    display: flex;\\n    flex-direction: column;\\n  }\\n\\n:is(.SettingsShowItem___l-D2E > .SettingsShowItemBody___bgxxq) > .SettingsItem___aJhRD {\\n      margin-top: 1em;\\n    }\\n\\n:is(.SettingsShowItem___l-D2E > .SettingsShowItemBody___bgxxq) > :is(textarea,input) {\\n      margin: 0.4em 0.2em 0;\\n      line-height: 1.2;\\n    }\\n\\n[data-only-number] {\\n  padding: 0 0.2em;\\n}\\n\\n[data-only-number] + span {\\n    margin-left: -0.1em;\\n  }\\n\\n.hotkeys___uu-Xe {\\n  position: relative;\\n  z-index: 1;\\n\\n  display: flex;\\n  flex-grow: 1;\\n  flex-wrap: wrap;\\n  align-items: center;\\n\\n  padding: 0.2em;\\n  padding-top: 2em;\\n  border-bottom: 1px solid var(--secondary-bg);\\n\\n  font-size: 0.9em;\\n  color: var(--text);\\n}\\n\\n.hotkeys___uu-Xe + .hotkeys___uu-Xe {\\n    margin-top: 0.5em;\\n  }\\n\\n.hotkeys___uu-Xe:last-child {\\n    border-bottom: none;\\n  }\\n\\n.hotkeysItem___d9IKS {\\n  cursor: pointer;\\n\\n  display: flex;\\n  align-items: center;\\n\\n  box-sizing: content-box;\\n  height: 1em;\\n  margin: 0.3em;\\n  padding: 0.2em 1.2em;\\n  border-radius: 0.3em;\\n\\n  font-family: serif;\\n\\n  outline: 1px solid;\\n  outline-color: var(--secondary-bg);\\n}\\n\\n.hotkeysItem___d9IKS > svg {\\n    display: none;\\n\\n    height: 1em;\\n    margin-left: 0.4em;\\n    border-radius: 1em;\\n\\n    color: var(--page-bg);\\n\\n    opacity: 0.5;\\n    background-color: var(--text);\\n  }\\n\\n:is(.hotkeysItem___d9IKS > svg):hover {\\n      opacity: 0.9;\\n    }\\n\\n.hotkeysItem___d9IKS:hover {\\n    padding: 0.2em 0.5em;\\n  }\\n\\n.hotkeysItem___d9IKS:hover > svg {\\n      display: unset;\\n    }\\n\\n.hotkeysItem___d9IKS:focus,.hotkeysItem___d9IKS:focus-visible {\\n    outline: var(--text) solid 2px;\\n  }\\n\\n.hotkeysHeader___jU7vr {\\n  position: absolute;\\n  top: 0;\\n  left: 0;\\n\\n  display: flex;\\n  align-items: center;\\n\\n  box-sizing: border-box;\\n  width: 100%;\\n  padding: 0 0.5em;\\n}\\n\\n.hotkeysHeader___jU7vr > p {\\n    line-height: 1em;\\n    text-align: start;\\n    overflow-wrap: anywhere;\\n    white-space: pre-wrap;\\n\\n    background-color: var(--page-bg);\\n  }\\n\\n.hotkeysHeader___jU7vr > div[title] {\\n    cursor: pointer;\\n\\n    transform: scale(0);\\n\\n    display: flex;\\n\\n    background-color: var(--page-bg);\\n\\n    transition: transform 100ms;\\n  }\\n\\n:is(.hotkeysHeader___jU7vr > div[title]) > svg {\\n      width: 1.6em;\\n    }\\n\\n.hotkeys___uu-Xe:hover div[title] {\\n  transform: scale(1);\\n}\\n\\n.scrollbar___hLToV {\\n  --arrow-y: clamp(\\n    0.45em,\\n    calc(var(--slider-midpoint)),\\n    calc(var(--scroll-length) - 0.45em)\\n  );\\n\\n  touch-action: none;\\n  -webkit-user-select: none;\\n          user-select: none;\\n\\n  position: absolute;\\n  z-index: 9;\\n  top: 1%;\\n  right: 3px;\\n\\n  display: flex;\\n  flex-direction: column;\\n\\n  width: 5px;\\n  height: 98%;\\n\\n  /* 扩大触发范围 */\\n  border-left: max(6vw, 1em) solid transparent;\\n}\\n\\n.scrollbar___hLToV > div {\\n    pointer-events: none;\\n\\n    display: flex;\\n    flex-direction: column;\\n    flex-grow: 1;\\n    align-items: center;\\n    justify-content: center;\\n  }\\n\\n.scrollbarPage___qghUs {\\n  transform-origin: bottom;\\n  transform: scaleY(1);\\n\\n  flex-grow: 1;\\n\\n  width: 100%;\\n  height: 100%;\\n\\n  background-color: var(--secondary);\\n\\n  transition: transform 1s;\\n}\\n\\n.scrollbarPage___qghUs[data-type='loaded'] {\\n    transform: scaleY(0);\\n  }\\n\\n.scrollbarPage___qghUs[data-upscale] {\\n    transform: scaleY(1);\\n    background-color: #b39ddb;\\n  }\\n\\n.scrollbarPage___qghUs[data-upscale='loading'] {\\n    background-color: #d1c4e9;\\n  }\\n\\n.scrollbarPage___qghUs[data-translation-type] {\\n    transform-origin: top;\\n    transform: scaleY(1);\\n    background-color: transparent;\\n  }\\n\\n.scrollbarPage___qghUs[data-translation-type='wait'] {\\n    background-color: #81c784;\\n  }\\n\\n.scrollbarPage___qghUs[data-translation-type='show'] {\\n    background-color: #4caf50;\\n  }\\n\\n.scrollbarPage___qghUs[data-translation-type='error'] {\\n    background-color: #f005;\\n  }\\n\\n.scrollbarPage___qghUs[data-type='wait'] {\\n    opacity: 0.4;\\n  }\\n\\n.scrollbarPage___qghUs[data-type='error'] {\\n    background-color: #f005;\\n  }\\n\\n/* 滚动条滑块 */\\n.scrollbarSlider___r1fWf {\\n  position: absolute;\\n  z-index: 1;\\n  transform: translateY(var(--slider-top));\\n\\n  justify-content: center;\\n\\n  width: 100%;\\n  height: var(--slider-height);\\n  border-radius: 1em;\\n\\n  opacity: 1;\\n  background-color: #fff5;\\n\\n  transition:\\n    transform 150ms,\\n    opacity 150ms;\\n}\\n\\n/* 悬浮框 */\\n.scrollbarPoper___XK5Rk {\\n  --poper-top: clamp(\\n    0%,\\n    calc(var(--slider-midpoint) - 50%),\\n    calc(var(--scroll-length) - 100%)\\n  );\\n\\n  position: absolute;\\n  right: 2em;\\n  transform: translateY(var(--poper-top));\\n\\n  width: fit-content;\\n  min-width: 1em;\\n  min-height: 1.5em;\\n  padding: 0.2em 0.5em;\\n  border-radius: 0.3em;\\n\\n  font-size: 0.8em;\\n  line-height: 1.5em;\\n  color: white;\\n  text-align: center;\\n  white-space: pre;\\n\\n  background-color: #303030;\\n}\\n\\n/* 悬浮框箭头 */\\n.scrollbar___hLToV::before {\\n  content: '';\\n\\n  position: absolute;\\n  right: 2em;\\n  transform: translate(140%, calc(var(--arrow-y) - 50%));\\n\\n  border: 0.4em solid transparent;\\n  border-left: 0.5em solid #303030;\\n\\n  background-color: transparent;\\n}\\n\\n/*\\n * 滚动条部件的显隐\\n */\\n\\n/* 悬浮提示默认隐藏 */\\n.scrollbar___hLToV::before,\\n.scrollbarPoper___XK5Rk {\\n  opacity: 0;\\n  transition:\\n    opacity 150ms,\\n    transform 150ms;\\n}\\n\\n/* 控制滚动条悬浮提示的显示 */\\n:is(.scrollbar___hLToV:hover,.scrollbar___hLToV[data-force-show]) .scrollbarPoper___XK5Rk,:is(.scrollbar___hLToV:hover,.scrollbar___hLToV[data-force-show]) .scrollbarSlider___r1fWf,:is(.scrollbar___hLToV:hover,.scrollbar___hLToV[data-force-show])::before {\\n    opacity: 1;\\n  }\\n\\n/* 拖动滚动条时取消移动过渡动画，确保跟手 */\\n.scrollbar___hLToV[data-drag]::before,.scrollbar___hLToV[data-drag] .scrollbarPoper___XK5Rk,.scrollbar___hLToV[data-drag] .scrollbarSlider___r1fWf {\\n    transition: opacity 150ms;\\n  }\\n\\n/* 实现自动隐藏 */\\n.scrollbar___hLToV[data-auto-hidden]:not([data-force-show]) .scrollbarSlider___r1fWf {\\n    opacity: 0;\\n  }\\n.scrollbar___hLToV[data-auto-hidden]:not([data-force-show]):hover .scrollbarSlider___r1fWf {\\n    opacity: 1;\\n  }\\n\\n/*\\n * 滚动条位置\\n */\\n\\n.scrollbar___hLToV[data-position='hidden'] {\\n  display: none;\\n}\\n\\n.scrollbar___hLToV[data-position='top'] {\\n  top: 1px;\\n\\n  /* 扩大触发范围 */\\n  border-bottom: max(6vh, 1em) solid transparent;\\n}\\n\\n.scrollbar___hLToV[data-position='top']::before {\\n    top: 1.2em;\\n    right: 0;\\n    transform: translate(var(--arrow-x), -120%);\\n    border-bottom: 0.5em solid #303030;\\n  }\\n\\n.scrollbar___hLToV[data-position='top'] .scrollbarPoper___XK5Rk {\\n    top: 1.2em;\\n  }\\n\\n.scrollbar___hLToV[data-position='bottom'] {\\n  top: unset;\\n  bottom: 1px;\\n\\n  /* 扩大触发范围 */\\n  border-top: max(6vh, 1em) solid transparent;\\n}\\n\\n.scrollbar___hLToV[data-position='bottom']::before {\\n    right: 0;\\n    bottom: 1.2em;\\n    transform: translate(var(--arrow-x), 120%);\\n    border-top: 0.5em solid #303030;\\n  }\\n\\n.scrollbar___hLToV[data-position='bottom'] .scrollbarPoper___XK5Rk {\\n    bottom: 1.2em;\\n  }\\n\\n.scrollbar___hLToV[data-position='top'],\\n.scrollbar___hLToV[data-position='bottom'] {\\n  --arrow-x: calc(var(--arrow-y) * -1 + 50%);\\n\\n  right: 1%;\\n\\n  flex-direction: row-reverse;\\n\\n  width: 98%;\\n  height: 5px;\\n  border-left: none;\\n}\\n\\n:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom'])::before {\\n    border-left: 0.4em solid transparent;\\n  }\\n\\n/* stylelint-disable-next-line no-descending-specificity */\\n\\n:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom']) .scrollbarSlider___r1fWf {\\n    transform: translateX(calc(var(--slider-top) * -1));\\n    width: var(--slider-height);\\n    height: 100%;\\n  }\\n\\n:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom']) .scrollbarPoper___XK5Rk {\\n    right: unset;\\n    transform: translateX(calc(var(--poper-top) * -1));\\n    padding: 0.1em 0.3em;\\n  }\\n\\n[data-dir='ltr']:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom']) {\\n    --arrow-x: calc(var(--arrow-y) - 50%);\\n\\n    flex-direction: row;\\n  }\\n\\n[data-dir='ltr']:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom'])::before {\\n      right: unset;\\n      left: 0;\\n    }\\n\\n/* stylelint-disable-next-line no-descending-specificity */\\n\\n[data-dir='ltr']:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom']) .scrollbarSlider___r1fWf {\\n      transform: translateX(var(--top));\\n    }\\n\\n[data-dir='ltr']:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom']) .scrollbarPoper___XK5Rk {\\n      transform: translateX(var(--poper-top));\\n    }\\n\\n/* 将 scaleY 改成 scaleX */\\n\\n:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom']) .scrollbarPage___qghUs {\\n    transform: scaleX(1);\\n  }\\n\\n[data-type='loaded']:is(:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom']) .scrollbarPage___qghUs) {\\n      transform: scaleX(0);\\n    }\\n\\n[data-translation-type]:is(:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom']) .scrollbarPage___qghUs) {\\n      transform: scaleX(1);\\n    }\\n\\n/* stylelint-disable-next-line no-descending-specificity */\\n\\n.scrollbar___hLToV[data-is-abreast-mode] .scrollbarPoper___XK5Rk {\\n    writing-mode: vertical-rl;\\n    line-height: 1.5em;\\n    text-orientation: upright;\\n  }\\n\\n.scrollbar___hLToV[data-is-abreast-mode][data-dir='ltr'] .scrollbarPoper___XK5Rk {\\n    writing-mode: vertical-lr;\\n  }\\n\\n/* 卷轴模式下取消滚动条的位移动画 */\\n.root___Hf5H2[data-scroll-mode] .scrollbar___hLToV::before,\\n.root___Hf5H2[data-scroll-mode] :is(.scrollbarSlider___r1fWf, .scrollbarPoper___XK5Rk) {\\n  transition: opacity 150ms;\\n}\\n\\n/* 移动端下禁用悬浮显示 */\\n:is(.root___Hf5H2[data-mobile] .scrollbar___hLToV:hover)::before,:is(.root___Hf5H2[data-mobile] .scrollbar___hLToV:hover) .scrollbarPoper___XK5Rk {\\n      opacity: 0;\\n    }\\n.touchAreaRoot___UN-W1 {\\n  pointer-events: none;\\n  -webkit-user-select: none;\\n          user-select: none;\\n\\n  position: absolute;\\n  top: 0;\\n\\n  display: grid;\\n  grid-template-columns: 1fr min(30%, 10em) 1fr;\\n  grid-template-rows: 1fr min(20%, 10em) 1fr;\\n\\n  width: 100%;\\n  height: 100%;\\n\\n  font-size: 3em;\\n  color: white;\\n  letter-spacing: 0.5em;\\n\\n  opacity: 0;\\n\\n  transition: opacity 400ms;\\n}\\n.touchAreaRoot___UN-W1[data-show] {\\n    opacity: 1;\\n  }\\n.touchAreaRoot___UN-W1 .touchArea___F6Hkh {\\n    display: flex;\\n    align-items: center;\\n    justify-content: center;\\n    text-align: center;\\n  }\\n[data-area='prev']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh),[data-area='PREV']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh) {\\n      background-color: #95e1d3e6;\\n    }\\n[data-area='menu']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh),[data-area='MENU']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh) {\\n      background-color: #fce38ae6;\\n    }\\n[data-area='next']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh),[data-area='NEXT']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh) {\\n      background-color: #f38181e6;\\n    }\\n[data-area='PREV']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh)::after {\\n      content: var(--i18n-touch-area-prev);\\n    }\\n[data-area='MENU']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh)::after {\\n      content: var(--i18n-touch-area-menu);\\n    }\\n[data-area='NEXT']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh)::after {\\n      content: var(--i18n-touch-area-next);\\n    }\\n.touchAreaRoot___UN-W1[data-vert='true'] {\\n    flex-direction: column !important;\\n  }\\n.touchAreaRoot___UN-W1:not([data-turn-page]) .touchArea___F6Hkh[data-area='next'],.touchAreaRoot___UN-W1:not([data-turn-page]) .touchArea___F6Hkh[data-area='NEXT'],.touchAreaRoot___UN-W1:not([data-turn-page]) .touchArea___F6Hkh[data-area='prev'],.touchAreaRoot___UN-W1:not([data-turn-page]) .touchArea___F6Hkh[data-area='PREV'] {\\n      visibility: hidden;\\n    }\\n.touchAreaRoot___UN-W1[data-shrink-menu] {\\n    grid-template-columns: 1fr 2em 1fr;\\n  }\\n.touchAreaRoot___UN-W1[data-shrink-menu] .touchArea___F6Hkh[data-area='MENU'] {\\n      letter-spacing: 0;\\n    }\\n\\n.root___Hf5H2[data-mobile] .touchAreaRoot___UN-W1 {\\n    flex-direction: column !important;\\n    letter-spacing: 0;\\n  }\\n\\n.root___Hf5H2[data-mobile] [data-area]::after {\\n    font-size: 0.8em;\\n  }\\n\\n.root___Hf5H2 {\\n  position: relative;\\n\\n  overflow: hidden;\\n\\n  width: 100%;\\n  height: 100%;\\n\\n  font-size: 1em;\\n\\n  background-color: var(--bg);\\n  outline: 0;\\n}\\n\\n.root___Hf5H2 a {\\n    color: var(--text-secondary);\\n  }\\n\\n.root___Hf5H2[data-mobile] {\\n    font-size: 0.8em;\\n  }\\n\\n.hidden___rxU-6 {\\n  display: none !important;\\n}\\n\\n.invisible___cO-hs {\\n  visibility: hidden !important;\\n}\\n\\n.beautifyScrollbar___lb6kJ {\\n  /* 火狐的滚动条样式 */\\n  scrollbar-color: var(--scrollbar-slider) transparent;\\n  scrollbar-width: thin;\\n\\n  /* chrome 的滚动条样式 */\\n}\\n\\n.beautifyScrollbar___lb6kJ::-webkit-scrollbar {\\n    width: 5px;\\n    height: 10px;\\n  }\\n\\n.beautifyScrollbar___lb6kJ::-webkit-scrollbar-track {\\n    background: transparent;\\n  }\\n\\n.beautifyScrollbar___lb6kJ::-webkit-scrollbar-thumb {\\n    background: var(--scrollbar-slider);\\n  }\\n\\np,\\nimg {\\n  margin: 0;\\n}\\n\\n:where(div, div:focus, div:focus-within, div:focus-visible, button) {\\n  border: none;\\n  outline: none;\\n}\\n\\nblockquote {\\n  margin: 0.5em 0;\\n  padding: 0;\\n  padding-left: 1em;\\n  border-left: 0.25em solid var(--text-secondary, #607d8b);\\n\\n  font-size: 0.9em;\\n  font-style: italic;\\n  line-height: 1.2em;\\n  color: var(--text-secondary);\\n  text-align: start;\\n  overflow-wrap: anywhere;\\n  white-space: pre-wrap;\\n}\\n\\nsvg {\\n  width: 1em;\\n}\\n";
+var index_module_default = ".img___7ajV4 img {\\n  display: block;\\n\\n  width: 100%;\\n  height: 100%;\\n\\n  object-fit: contain;\\n  filter: var(--img-filter, none);\\n}\\n\\n.img___7ajV4 {\\n  position: relative;\\n\\n  align-content: center;\\n\\n  width: 100%;\\n  height: 100%;\\n  margin-right: auto;\\n  margin-left: auto;\\n}\\n\\n.img___7ajV4 > picture {\\n    position: absolute;\\n    inset: 0;\\n\\n    width: auto;\\n    max-width: 100%;\\n    height: auto;\\n    max-height: 100%;\\n    margin-top: auto;\\n    margin-right: inherit;\\n    margin-bottom: auto;\\n    margin-left: inherit;\\n  }\\n\\n.img___7ajV4 > picture,.img___7ajV4 > picture::after {\\n    background-color: var(--hover-bg-color, #fff3);\\n    background-image: var(--md-photo);\\n    background-repeat: no-repeat;\\n    background-position: center;\\n    background-size: 30%;\\n  }\\n\\n/* 已加载完毕的图片不显示灰色背景和图标 */\\n\\n.img___7ajV4:not([data-load-type]) > picture,.img___7ajV4:not([data-load-type]) > picture::after {\\n    background: none;\\n  }\\n\\n/* 遮住默认的出错图片标识 */\\n\\n.img___7ajV4[data-load-type='error'] > picture::after {\\n    pointer-events: none;\\n    content: '';\\n\\n    position: absolute;\\n    top: 0;\\n    right: 0;\\n\\n    width: 100%;\\n    height: 100%;\\n\\n    background-color: #eee;\\n    background-image: var(--md-image-not-supported);\\n  }\\n\\n.img___7ajV4[data-load-type='loading'] > picture {\\n    background-image: var(--md-cloud-download);\\n\\n    /* 加载中的图片先隐藏一下，避免出错图片的元素被直接显示出来 */\\n  }\\n\\n:is(.img___7ajV4[data-load-type='loading'] > picture) img {\\n      animation: show___HzwUa 100ms forwards;\\n    }\\n\\n.img___7ajV4[data-load-type='error'] > picture {\\n    cursor: pointer;\\n  }\\n\\n.mangaFlow___jMZgq[dir='ltr'] .img___7ajV4[data-show='1'],\\n.mangaFlow___jMZgq[dir='rtl'] .img___7ajV4[data-show='0'] {\\n  margin-right: auto;\\n  margin-left: 0;\\n}\\n\\n.mangaFlow___jMZgq[dir='ltr'] .img___7ajV4[data-show='0'],\\n.mangaFlow___jMZgq[dir='rtl'] .img___7ajV4[data-show='1'] {\\n  margin-right: 0;\\n  margin-left: auto;\\n}\\n\\n.mangaFlow___jMZgq {\\n  touch-action: none;\\n  will-change: left, top;\\n  -webkit-user-select: none;\\n          user-select: none;\\n\\n  position: absolute;\\n  transform-origin: 0 0;\\n\\n  contain: layout;\\n  overflow: visible;\\n  display: grid;\\n  grid-auto-columns: 100%;\\n  grid-auto-flow: column;\\n  grid-auto-rows: 100%;\\n  row-gap: 0;\\n  place-items: center;\\n\\n  width: 100%;\\n  height: 100%;\\n\\n  color: var(--text);\\n\\n  backface-visibility: hidden;\\n}\\n\\n.mangaFlow___jMZgq[data-disable-zoom] .img___7ajV4 > picture {\\n    width: fit-content;\\n    height: fit-content;\\n  }\\n\\n.mangaFlow___jMZgq[data-hidden-mouse='true'] {\\n    cursor: none;\\n  }\\n\\n.mangaFlow___jMZgq[data-vertical] {\\n    grid-auto-flow: row;\\n  }\\n\\n.mangaBox___48Jek {\\n  transform-origin: 0 0;\\n\\n  contain: layout style;\\n\\n  width: 100%;\\n  height: 100%;\\n\\n  transition-duration: 0ms;\\n}\\n\\n.mangaBox___48Jek[data-animation='page'] .mangaFlow___jMZgq,.mangaBox___48Jek[data-animation='zoom'] {\\n    transition-duration: 300ms;\\n  }\\n\\n.root___Hf5H2 .mangaBox___48Jek {\\n  /* 隐藏滚动条但不影响滚动 */\\n  scrollbar-width: none;\\n\\n  /* 隐藏滚动条但不影响滚动 */\\n}\\n\\n:is(.root___Hf5H2 .mangaBox___48Jek)::-webkit-scrollbar {\\n    display: none;\\n  }\\n\\n.root___Hf5H2[data-scroll-mode] .mangaBox___48Jek {\\n  overflow: auto;\\n}\\n\\n:is(.root___Hf5H2[data-scroll-mode] .mangaBox___48Jek) .mangaFlow___jMZgq {\\n    touch-action: pan-y;\\n    row-gap: calc(var(--scroll-mode-spacing) * 7px);\\n    height: fit-content;\\n  }\\n\\n[data-abreast-scroll]:is(.root___Hf5H2[data-scroll-mode] .mangaBox___48Jek) {\\n    touch-action: none;\\n    overflow: hidden;\\n  }\\n\\n[data-abreast-scroll]:is(.root___Hf5H2[data-scroll-mode] .mangaBox___48Jek) .mangaFlow___jMZgq {\\n      column-gap: calc(var(--scroll-mode-spacing) * 7px);\\n      align-items: start;\\n      height: 100%;\\n    }\\n\\n:is([data-abreast-scroll]:is(.root___Hf5H2[data-scroll-mode] .mangaBox___48Jek) .mangaFlow___jMZgq) .img___7ajV4 {\\n        width: 100%;\\n        height: auto;\\n      }\\n\\n[data-show]:is(:is([data-abreast-scroll]:is(.root___Hf5H2[data-scroll-mode] .mangaBox___48Jek) .mangaFlow___jMZgq) .img___7ajV4) {\\n          will-change: transform;\\n        }\\n\\n:is(:is([data-abreast-scroll]:is(.root___Hf5H2[data-scroll-mode] .mangaBox___48Jek) .mangaFlow___jMZgq) .img___7ajV4) > picture {\\n          position: relative;\\n        }\\n\\n.pageTip___P7thU {\\n  pointer-events: none;\\n\\n  position: absolute;\\n  z-index: 1;\\n  right: 0.4em;\\n  bottom: 0.4em;\\n\\n  padding: 0.1em 0.4em;\\n  border-radius: 0.25em;\\n\\n  font-size: 1.5em;\\n  line-height: 1.5;\\n  color: var(--text);\\n\\n  opacity: 0;\\n  background-color: color-mix(in srgb, var(--text-bg) 80%, transparent);\\n\\n  transition: opacity 150ms;\\n}\\n\\n.root___Hf5H2[data-page-tip] .pageTip___P7thU {\\n  opacity: 1;\\n}\\n\\n@keyframes show___HzwUa {\\n  0% {\\n    opacity: 0;\\n  }\\n\\n  90% {\\n    opacity: 0;\\n  }\\n\\n  100% {\\n    opacity: 1;\\n  }\\n}\\n\\n.endPage___iOZmk,\\n.endPageBody___g-dz- {\\n  z-index: 10;\\n\\n  display: flex;\\n  align-items: center;\\n  justify-content: center;\\n\\n  width: 100%;\\n  height: 100%;\\n}\\n\\n.endPage___iOZmk {\\n  pointer-events: none;\\n\\n  position: absolute;\\n  top: 0;\\n  left: 0;\\n\\n  color: white;\\n\\n  opacity: 0;\\n  background-color: #333d;\\n\\n  transition: opacity 500ms;\\n}\\n\\n.endPage___iOZmk[data-show] {\\n    pointer-events: all;\\n    opacity: 1;\\n  }\\n\\n.endPage___iOZmk[data-type='start'] .tip___fyxqg {\\n    transform: translateY(-10em);\\n  }\\n\\n.endPage___iOZmk[data-type='end'] .tip___fyxqg {\\n    transform: translateY(10em);\\n  }\\n\\n.endPage___iOZmk .endPageBody___g-dz- {\\n    transform: translate(0, var(--drag-y, 0));\\n    transition: transform 200ms;\\n  }\\n\\n:is(.endPage___iOZmk .endPageBody___g-dz-) button {\\n      cursor: pointer;\\n\\n      transform-origin: center;\\n\\n      font-size: 1.2em;\\n      color: inherit;\\n\\n      background-color: transparent;\\n\\n      animation: jello___wXBLg 0.3s forwards;\\n    }\\n\\n[data-is-end]:is(:is(.endPage___iOZmk .endPageBody___g-dz-) button) {\\n        margin: 2em;\\n        font-size: 3em;\\n      }\\n\\n:is(.endPage___iOZmk .endPageBody___g-dz-) .tip___fyxqg {\\n      position: absolute;\\n      margin: auto;\\n    }\\n\\n.endPage___iOZmk[data-drag] .endPageBody___g-dz- {\\n    transition: transform 00ms;\\n  }\\n\\n.root___Hf5H2[data-mobile] .endPage___iOZmk > button {\\n  width: 1em;\\n}\\n\\n.comments___9ITQv {\\n  position: absolute;\\n  right: 1em;\\n\\n  overflow: auto;\\n  display: flex;\\n  flex-direction: column;\\n  align-items: flex-end;\\n\\n  width: 20em;\\n  max-height: 80%;\\n  padding-right: 0.5em;\\n\\n  opacity: 0.3;\\n}\\n\\n.comments___9ITQv > p {\\n    margin: 0.5em 0.1em;\\n    padding: 0.2em 0.5em;\\n    border-radius: 0.5em;\\n    background-color: #333b;\\n  }\\n\\n.comments___9ITQv:hover {\\n    opacity: 1;\\n  }\\n\\n.root___Hf5H2[data-mobile] .comments___9ITQv {\\n  bottom: 0;\\n  max-height: 15em;\\n  opacity: 0.8;\\n}\\n\\n@keyframes jello___wXBLg {\\n  0%,\\n  11.1%,\\n  100% {\\n    transform: translate3d(0, 0, 0);\\n  }\\n\\n  22.2% {\\n    transform: skewX(-12.5deg) skewY(-12.5deg);\\n  }\\n\\n  33.3% {\\n    transform: skewX(6.25deg) skewY(6.25deg);\\n  }\\n\\n  44.4% {\\n    transform: skewX(-3.125deg) skewY(-3.125deg);\\n  }\\n\\n  55.5% {\\n    transform: skewX(1.5625deg) skewY(1.5625deg);\\n  }\\n\\n  66.6% {\\n    transform: skewX(-0.7812deg) skewY(-0.7812deg);\\n  }\\n\\n  77.7% {\\n    transform: skewX(0.3906deg) skewY(0.3906deg);\\n  }\\n\\n  88.8% {\\n    transform: skewX(-0.1953deg) skewY(-0.1953deg);\\n  }\\n}\\n\\n.toolbar___RMjHL {\\n  position: fixed;\\n  z-index: 9;\\n  top: 0;\\n\\n  display: flex;\\n  align-items: center;\\n  justify-content: flex-start;\\n\\n  height: 100%;\\n}\\n\\n/* 工具栏面板 */\\n.toolbarPanel___XYjgc {\\n  position: relative;\\n  transform: translateX(-100%);\\n\\n  display: flex;\\n  flex-direction: column;\\n\\n  padding: 0.5em;\\n\\n  transition: transform 200ms;\\n}\\n.toolbarPanel___XYjgc > hr {\\n    height: 1em;\\n    margin: 0;\\n    border: none;\\n    visibility: hidden;\\n  }\\n\\n:is(.toolbar___RMjHL[data-show], .toolbar___RMjHL:hover) .toolbarPanel___XYjgc {\\n  transform: none;\\n}\\n\\n.toolbarBg___i4oTA {\\n  position: absolute;\\n  top: 0;\\n  right: 0;\\n\\n  width: 100%;\\n  height: 100%;\\n  border-top-right-radius: 1em;\\n  border-bottom-right-radius: 1em;\\n\\n  background-color: var(--page-bg);\\n  filter: opacity(0.8);\\n}\\n\\n/* 移动端优化 */\\n/* 调大样式 */\\n.root___Hf5H2[data-mobile] .toolbar___RMjHL {\\n    font-size: 1.3em;\\n  }\\n/* 只能通过点击中心来唤出工具栏，防止误触 */\\n.root___Hf5H2[data-mobile] .toolbar___RMjHL:not([data-show]) {\\n    pointer-events: none;\\n  }\\n/* 减少背景的透明度，方便辨识 */\\n.root___Hf5H2[data-mobile] .toolbarBg___i4oTA {\\n    filter: opacity(0.8);\\n  }\\n/* 设置面板所在的悬浮框样式 */\\n.SettingPanelPopper___uEBz3 {\\n  pointer-events: unset !important;\\n  transform: none !important;\\n  height: 0 !important;\\n  padding: 0 !important;\\n}\\n\\n.SettingPanel___ZRvFB {\\n  -webkit-user-select: text;\\n          user-select: text;\\n\\n  position: fixed;\\n  z-index: 1;\\n  top: 0;\\n  bottom: 0;\\n\\n  overflow: auto;\\n\\n  max-width: calc(100% - 5em);\\n  height: fit-content;\\n  max-height: 95%;\\n  margin: auto;\\n  border-radius: 0.3em;\\n\\n  font-size: 1.2em;\\n  color: var(--text);\\n\\n  background-color: var(--page-bg);\\n  box-shadow:\\n    rgb(0 0 0 / 20%) 0 3px 1px -2px,\\n    rgb(0 0 0 / 14%) 0 2px 2px 0,\\n    rgb(0 0 0 / 12%) 0 1px 5px 0;\\n}\\n\\n.SettingPanel___ZRvFB hr {\\n    margin: 0.5em 0;\\n    color: white;\\n  }\\n\\n.SettingPanel___ZRvFB > hr {\\n    margin: 0;\\n  }\\n\\n.SettingBlock___qxNyt {\\n  display: grid;\\n  grid-template-rows: max-content 1fr;\\n  transition: grid-template-rows 200ms ease-out;\\n}\\n\\n.SettingBlock___qxNyt .SettingBlockBody___Wirnd {\\n    z-index: 0;\\n    overflow: hidden;\\n    padding: 0 0.5em;\\n    padding-bottom: 1em;\\n  }\\n\\n:is(.SettingBlock___qxNyt .SettingBlockBody___Wirnd) > div + :is(.SettingBlock___qxNyt .SettingBlockBody___Wirnd) > div {\\n      margin-top: 1em;\\n    }\\n\\n:is(.SettingBlock___qxNyt .SettingBlockBody___Wirnd) input,:is(.SettingBlock___qxNyt .SettingBlockBody___Wirnd) textarea {\\n      width: 97%;\\n      margin-top: 0.3em;\\n    }\\n\\n.SettingBlock___qxNyt[data-show='false'] {\\n    grid-template-rows: max-content 0fr;\\n    padding-bottom: unset;\\n  }\\n\\n.SettingBlock___qxNyt[data-show='false'] .SettingBlockBody___Wirnd {\\n      padding: unset;\\n    }\\n\\n.SettingBlockSubtitle___cv0Ji {\\n  cursor: pointer;\\n\\n  position: sticky;\\n  z-index: 1;\\n  top: 0;\\n\\n  height: 3em;\\n  margin-bottom: 0.1em;\\n\\n  font-size: 0.7em;\\n  line-height: 3em;\\n  color: var(--text-secondary);\\n  text-align: center;\\n\\n  background-color: var(--page-bg);\\n}\\n\\n.SettingBlockBody___Wirnd .SettingBlockSubtitle___cv0Ji {\\n  position: unset;\\n  height: 1em;\\n  line-height: 1em;\\n}\\n\\n.SettingsItem___aJhRD {\\n  position: relative;\\n  display: flex;\\n  align-items: center;\\n  justify-content: space-between;\\n}\\n\\n:is(.SettingsItem___aJhRD,.SettingsShowItem___l-D2E) + .SettingsItem___aJhRD {\\n    margin-top: 1em;\\n  }\\n\\n.SettingsItem___aJhRD[data-disabled] {\\n    opacity: 0.5;\\n  }\\n\\n.SettingsItem___aJhRD[data-disabled] button {\\n      cursor: not-allowed;\\n    }\\n\\n.SettingsItemName___UP6zJ {\\n  max-width: calc(100% - 4em);\\n\\n  font-size: 0.9em;\\n  text-align: start;\\n  overflow-wrap: anywhere;\\n  white-space: pre-wrap;\\n}\\n\\n/* 开关式设置项 */\\n.SettingsItemSwitch___LVGr9 {\\n  cursor: pointer;\\n\\n  display: inline-flex;\\n  align-items: center;\\n\\n  width: 2.3em;\\n  height: 0.8em;\\n  margin: 0.3em;\\n  padding: 0;\\n  border: 0;\\n  border-radius: 1em;\\n\\n  background-color: var(--switch-bg);\\n}\\n\\n/* 开关里的圆形按钮 */\\n.SettingsItemSwitchRound___Ds0B8 {\\n  transform: translateX(-10%);\\n\\n  width: 1.15em;\\n  height: 1.15em;\\n  border-radius: 100%;\\n\\n  background: var(--switch);\\n  box-shadow:\\n    0 2px 1px -1px rgb(0 0 0 / 20%),\\n    0 1px 1px 0 rgb(0 0 0 / 14%),\\n    0 1px 3px 0 rgb(0 0 0 / 12%);\\n\\n  transition: transform 100ms;\\n}\\n\\n.SettingsItemSwitch___LVGr9[data-checked='true'] {\\n  background: var(--secondary-bg);\\n}\\n\\n.SettingsItemSwitch___LVGr9[data-checked='true'] .SettingsItemSwitchRound___Ds0B8 {\\n    transform: translateX(110%);\\n    background: var(--secondary);\\n  }\\n\\n/* 图标按钮式设置项 */\\n.SettingsItemIconButton___Cs7BQ {\\n  cursor: pointer;\\n\\n  position: absolute;\\n  right: 0;\\n\\n  height: 1em;\\n  border: none;\\n\\n  font-size: 1.5em;\\n  color: var(--text);\\n\\n  background-color: transparent;\\n}\\n\\n/* 选择器设置项 */\\n.SettingsItemSelect___CvFKx {\\n  cursor: pointer;\\n\\n  max-width: 6.5em;\\n  margin: 0;\\n  padding: 0.3em;\\n  border: none;\\n  border-radius: 5px;\\n\\n  font-size: 0.9em;\\n  color: var(--text);\\n\\n  background-color: var(--hover-bg-color);\\n  outline: none;\\n}\\n.SettingsItemSelect___CvFKx::picker(select) {\\n    color: var(--text);\\n    background-color: var(--page-bg);\\n  }\\n.SettingsItemSelect___CvFKx option {\\n    color: var(--text);\\n    background-color: var(--page-bg);\\n  }\\n\\n/* 关闭设置弹窗的遮罩 */\\n.closeCover___qLIp5 {\\n  position: fixed;\\n  top: 0;\\n  left: 0;\\n\\n  width: 100%;\\n  height: 100%;\\n}\\n\\n.SettingsShowItem___l-D2E {\\n  display: grid;\\n  transition: grid-template-rows 200ms ease-out;\\n}\\n\\n.SettingsShowItem___l-D2E > .SettingsShowItemBody___bgxxq {\\n    overflow: hidden;\\n    display: flex;\\n    flex-direction: column;\\n  }\\n\\n:is(.SettingsShowItem___l-D2E > .SettingsShowItemBody___bgxxq) > .SettingsItem___aJhRD {\\n      margin-top: 1em;\\n    }\\n\\n:is(.SettingsShowItem___l-D2E > .SettingsShowItemBody___bgxxq) > :is(textarea,input) {\\n      margin: 0.4em 0.2em 0;\\n      line-height: 1.2;\\n    }\\n\\n[data-only-number] {\\n  padding: 0 0.2em;\\n}\\n\\n[data-only-number] + span {\\n    margin-left: -0.1em;\\n  }\\n\\n.hotkeys___uu-Xe {\\n  position: relative;\\n  z-index: 1;\\n\\n  display: flex;\\n  flex-grow: 1;\\n  flex-wrap: wrap;\\n  align-items: center;\\n\\n  padding: 0.2em;\\n  padding-top: 2em;\\n  border-bottom: 1px solid var(--secondary-bg);\\n\\n  font-size: 0.9em;\\n  color: var(--text);\\n}\\n\\n.hotkeys___uu-Xe + .hotkeys___uu-Xe {\\n    margin-top: 0.5em;\\n  }\\n\\n.hotkeys___uu-Xe:last-child {\\n    border-bottom: none;\\n  }\\n\\n.hotkeysItem___d9IKS {\\n  cursor: pointer;\\n\\n  display: flex;\\n  align-items: center;\\n\\n  box-sizing: content-box;\\n  height: 1em;\\n  margin: 0.3em;\\n  padding: 0.2em 1.2em;\\n  border-radius: 0.3em;\\n\\n  font-family: serif;\\n\\n  outline: 1px solid;\\n  outline-color: var(--secondary-bg);\\n}\\n\\n.hotkeysItem___d9IKS > svg {\\n    display: none;\\n\\n    height: 1em;\\n    margin-left: 0.4em;\\n    border-radius: 1em;\\n\\n    color: var(--page-bg);\\n\\n    opacity: 0.5;\\n    background-color: var(--text);\\n  }\\n\\n:is(.hotkeysItem___d9IKS > svg):hover {\\n      opacity: 0.9;\\n    }\\n\\n.hotkeysItem___d9IKS:hover {\\n    padding: 0.2em 0.5em;\\n  }\\n\\n.hotkeysItem___d9IKS:hover > svg {\\n      display: unset;\\n    }\\n\\n.hotkeysItem___d9IKS:focus,.hotkeysItem___d9IKS:focus-visible {\\n    outline: var(--text) solid 2px;\\n  }\\n\\n.hotkeysHeader___jU7vr {\\n  position: absolute;\\n  top: 0;\\n  left: 0;\\n\\n  display: flex;\\n  align-items: center;\\n\\n  box-sizing: border-box;\\n  width: 100%;\\n  padding: 0 0.5em;\\n}\\n\\n.hotkeysHeader___jU7vr > p {\\n    line-height: 1em;\\n    text-align: start;\\n    overflow-wrap: anywhere;\\n    white-space: pre-wrap;\\n\\n    background-color: var(--page-bg);\\n  }\\n\\n.hotkeysHeader___jU7vr > div[title] {\\n    cursor: pointer;\\n\\n    transform: scale(0);\\n\\n    display: flex;\\n\\n    background-color: var(--page-bg);\\n\\n    transition: transform 100ms;\\n  }\\n\\n:is(.hotkeysHeader___jU7vr > div[title]) > svg {\\n      width: 1.6em;\\n    }\\n\\n.hotkeys___uu-Xe:hover div[title] {\\n  transform: scale(1);\\n}\\n\\n.scrollbar___hLToV {\\n  --arrow-y: clamp(\\n    0.45em,\\n    calc(var(--slider-midpoint)),\\n    calc(var(--scroll-length) - 0.45em)\\n  );\\n\\n  touch-action: none;\\n  -webkit-user-select: none;\\n          user-select: none;\\n\\n  position: absolute;\\n  z-index: 9;\\n  top: 1%;\\n  right: 3px;\\n\\n  display: flex;\\n  flex-direction: column;\\n\\n  width: 5px;\\n  height: 98%;\\n\\n  /* 扩大触发范围 */\\n  border-left: max(6vw, 1em) solid transparent;\\n}\\n\\n.scrollbar___hLToV > div {\\n    pointer-events: none;\\n\\n    display: flex;\\n    flex-direction: column;\\n    flex-grow: 1;\\n    align-items: center;\\n    justify-content: center;\\n  }\\n\\n.scrollbarPage___qghUs {\\n  transform-origin: bottom;\\n  transform: scaleY(1);\\n\\n  flex-grow: 1;\\n\\n  width: 100%;\\n  height: 100%;\\n\\n  background-color: var(--secondary);\\n\\n  transition: transform 1s;\\n}\\n\\n.scrollbarPage___qghUs[data-type='loaded'] {\\n    transform: scaleY(0);\\n  }\\n\\n.scrollbarPage___qghUs[data-upscale] {\\n    transform: scaleY(1);\\n    background-color: #b39ddb;\\n  }\\n\\n.scrollbarPage___qghUs[data-upscale='loading'] {\\n    background-color: #d1c4e9;\\n  }\\n\\n.scrollbarPage___qghUs[data-translation-type] {\\n    transform-origin: top;\\n    transform: scaleY(1);\\n    background-color: transparent;\\n  }\\n\\n.scrollbarPage___qghUs[data-translation-type='wait'] {\\n    background-color: #81c784;\\n  }\\n\\n.scrollbarPage___qghUs[data-translation-type='show'] {\\n    background-color: #4caf50;\\n  }\\n\\n.scrollbarPage___qghUs[data-translation-type='error'] {\\n    background-color: #f005;\\n  }\\n\\n.scrollbarPage___qghUs[data-type='wait'] {\\n    opacity: 0.4;\\n  }\\n\\n.scrollbarPage___qghUs[data-type='error'] {\\n    background-color: #f005;\\n  }\\n\\n/* 滚动条滑块 */\\n.scrollbarSlider___r1fWf {\\n  position: absolute;\\n  z-index: 1;\\n  transform: translateY(var(--slider-top));\\n\\n  justify-content: center;\\n\\n  width: 100%;\\n  height: var(--slider-height);\\n  border-radius: 1em;\\n\\n  opacity: 1;\\n  background-color: #fff5;\\n\\n  transition:\\n    transform 150ms,\\n    opacity 150ms;\\n}\\n\\n/* 悬浮框 */\\n.scrollbarPoper___XK5Rk {\\n  --poper-top: clamp(\\n    0%,\\n    calc(var(--slider-midpoint) - 50%),\\n    calc(var(--scroll-length) - 100%)\\n  );\\n\\n  position: absolute;\\n  right: 2em;\\n  transform: translateY(var(--poper-top));\\n\\n  width: fit-content;\\n  min-width: 1em;\\n  min-height: 1.5em;\\n  padding: 0.2em 0.5em;\\n  border-radius: 0.3em;\\n\\n  font-size: 0.8em;\\n  line-height: 1.5em;\\n  color: white;\\n  text-align: center;\\n  white-space: pre;\\n\\n  background-color: #303030;\\n}\\n\\n/* 悬浮框箭头 */\\n.scrollbar___hLToV::before {\\n  content: '';\\n\\n  position: absolute;\\n  right: 2em;\\n  transform: translate(140%, calc(var(--arrow-y) - 50%));\\n\\n  border: 0.4em solid transparent;\\n  border-left: 0.5em solid #303030;\\n\\n  background-color: transparent;\\n}\\n\\n/*\\n * 滚动条部件的显隐\\n */\\n\\n/* 悬浮提示默认隐藏 */\\n.scrollbar___hLToV::before,\\n.scrollbarPoper___XK5Rk {\\n  opacity: 0;\\n  transition:\\n    opacity 150ms,\\n    transform 150ms;\\n}\\n\\n/* 控制滚动条悬浮提示的显示 */\\n:is(.scrollbar___hLToV:hover,.scrollbar___hLToV[data-force-show]) .scrollbarPoper___XK5Rk,:is(.scrollbar___hLToV:hover,.scrollbar___hLToV[data-force-show]) .scrollbarSlider___r1fWf,:is(.scrollbar___hLToV:hover,.scrollbar___hLToV[data-force-show])::before {\\n    opacity: 1;\\n  }\\n\\n/* 拖动滚动条时取消移动过渡动画，确保跟手 */\\n.scrollbar___hLToV[data-drag]::before,.scrollbar___hLToV[data-drag] .scrollbarPoper___XK5Rk,.scrollbar___hLToV[data-drag] .scrollbarSlider___r1fWf {\\n    transition: opacity 150ms;\\n  }\\n\\n/* 实现自动隐藏 */\\n.scrollbar___hLToV[data-auto-hidden]:not([data-force-show]) .scrollbarSlider___r1fWf {\\n    opacity: 0;\\n  }\\n.scrollbar___hLToV[data-auto-hidden]:not([data-force-show]):hover .scrollbarSlider___r1fWf {\\n    opacity: 1;\\n  }\\n\\n/*\\n * 滚动条位置\\n */\\n\\n.scrollbar___hLToV[data-position='hidden'] {\\n  display: none;\\n}\\n\\n.scrollbar___hLToV[data-position='top'] {\\n  top: 1px;\\n\\n  /* 扩大触发范围 */\\n  border-bottom: max(6vh, 1em) solid transparent;\\n}\\n\\n.scrollbar___hLToV[data-position='top']::before {\\n    top: 1.2em;\\n    right: 0;\\n    transform: translate(var(--arrow-x), -120%);\\n    border-bottom: 0.5em solid #303030;\\n  }\\n\\n.scrollbar___hLToV[data-position='top'] .scrollbarPoper___XK5Rk {\\n    top: 1.2em;\\n  }\\n\\n.scrollbar___hLToV[data-position='bottom'] {\\n  top: unset;\\n  bottom: 1px;\\n\\n  /* 扩大触发范围 */\\n  border-top: max(6vh, 1em) solid transparent;\\n}\\n\\n.scrollbar___hLToV[data-position='bottom']::before {\\n    right: 0;\\n    bottom: 1.2em;\\n    transform: translate(var(--arrow-x), 120%);\\n    border-top: 0.5em solid #303030;\\n  }\\n\\n.scrollbar___hLToV[data-position='bottom'] .scrollbarPoper___XK5Rk {\\n    bottom: 1.2em;\\n  }\\n\\n.scrollbar___hLToV[data-position='top'],\\n.scrollbar___hLToV[data-position='bottom'] {\\n  --arrow-x: calc(var(--arrow-y) * -1 + 50%);\\n\\n  right: 1%;\\n\\n  flex-direction: row-reverse;\\n\\n  width: 98%;\\n  height: 5px;\\n  border-left: none;\\n}\\n\\n:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom'])::before {\\n    border-left: 0.4em solid transparent;\\n  }\\n\\n/* stylelint-disable-next-line no-descending-specificity */\\n\\n:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom']) .scrollbarSlider___r1fWf {\\n    transform: translateX(calc(var(--slider-top) * -1));\\n    width: var(--slider-height);\\n    height: 100%;\\n  }\\n\\n:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom']) .scrollbarPoper___XK5Rk {\\n    right: unset;\\n    transform: translateX(calc(var(--poper-top) * -1));\\n    padding: 0.1em 0.3em;\\n  }\\n\\n[data-dir='ltr']:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom']) {\\n    --arrow-x: calc(var(--arrow-y) - 50%);\\n\\n    flex-direction: row;\\n  }\\n\\n[data-dir='ltr']:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom'])::before {\\n      right: unset;\\n      left: 0;\\n    }\\n\\n/* stylelint-disable-next-line no-descending-specificity */\\n\\n[data-dir='ltr']:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom']) .scrollbarSlider___r1fWf {\\n      transform: translateX(var(--top));\\n    }\\n\\n[data-dir='ltr']:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom']) .scrollbarPoper___XK5Rk {\\n      transform: translateX(var(--poper-top));\\n    }\\n\\n/* 将 scaleY 改成 scaleX */\\n\\n:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom']) .scrollbarPage___qghUs {\\n    transform: scaleX(1);\\n  }\\n\\n[data-type='loaded']:is(:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom']) .scrollbarPage___qghUs) {\\n      transform: scaleX(0);\\n    }\\n\\n[data-translation-type]:is(:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom']) .scrollbarPage___qghUs) {\\n      transform: scaleX(1);\\n    }\\n\\n/* stylelint-disable-next-line no-descending-specificity */\\n\\n.scrollbar___hLToV[data-is-abreast-mode] .scrollbarPoper___XK5Rk {\\n    writing-mode: vertical-rl;\\n    line-height: 1.5em;\\n    text-orientation: upright;\\n  }\\n\\n.scrollbar___hLToV[data-is-abreast-mode][data-dir='ltr'] .scrollbarPoper___XK5Rk {\\n    writing-mode: vertical-lr;\\n  }\\n\\n/* 卷轴模式下取消滚动条的位移动画 */\\n.root___Hf5H2[data-scroll-mode] .scrollbar___hLToV::before,\\n.root___Hf5H2[data-scroll-mode] :is(.scrollbarSlider___r1fWf, .scrollbarPoper___XK5Rk) {\\n  transition: opacity 150ms;\\n}\\n\\n/* 移动端下禁用悬浮显示 */\\n:is(.root___Hf5H2[data-mobile] .scrollbar___hLToV:hover)::before,:is(.root___Hf5H2[data-mobile] .scrollbar___hLToV:hover) .scrollbarPoper___XK5Rk {\\n      opacity: 0;\\n    }\\n.touchAreaRoot___UN-W1 {\\n  pointer-events: none;\\n  -webkit-user-select: none;\\n          user-select: none;\\n\\n  position: absolute;\\n  top: 0;\\n\\n  display: grid;\\n  grid-template-columns: 1fr min(30%, 10em) 1fr;\\n  grid-template-rows: 1fr min(20%, 10em) 1fr;\\n\\n  width: 100%;\\n  height: 100%;\\n\\n  font-size: 3em;\\n  color: white;\\n  letter-spacing: 0.5em;\\n\\n  opacity: 0;\\n\\n  transition: opacity 400ms;\\n}\\n.touchAreaRoot___UN-W1[data-show] {\\n    opacity: 1;\\n  }\\n.touchAreaRoot___UN-W1 .touchArea___F6Hkh {\\n    display: flex;\\n    align-items: center;\\n    justify-content: center;\\n    text-align: center;\\n  }\\n[data-area='prev']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh),[data-area='PREV']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh) {\\n      background-color: #95e1d3e6;\\n    }\\n[data-area='menu']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh),[data-area='MENU']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh) {\\n      background-color: #fce38ae6;\\n    }\\n[data-area='next']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh),[data-area='NEXT']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh) {\\n      background-color: #f38181e6;\\n    }\\n[data-area='PREV']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh)::after {\\n      content: var(--i18n-touch-area-prev);\\n    }\\n[data-area='MENU']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh)::after {\\n      content: var(--i18n-touch-area-menu);\\n    }\\n[data-area='NEXT']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh)::after {\\n      content: var(--i18n-touch-area-next);\\n    }\\n.touchAreaRoot___UN-W1[data-vert='true'] {\\n    flex-direction: column !important;\\n  }\\n.touchAreaRoot___UN-W1:not([data-turn-page]) .touchArea___F6Hkh[data-area='next'],.touchAreaRoot___UN-W1:not([data-turn-page]) .touchArea___F6Hkh[data-area='NEXT'],.touchAreaRoot___UN-W1:not([data-turn-page]) .touchArea___F6Hkh[data-area='prev'],.touchAreaRoot___UN-W1:not([data-turn-page]) .touchArea___F6Hkh[data-area='PREV'] {\\n      visibility: hidden;\\n    }\\n.touchAreaRoot___UN-W1[data-shrink-menu] {\\n    grid-template-columns: 1fr 2em 1fr;\\n  }\\n.touchAreaRoot___UN-W1[data-shrink-menu] .touchArea___F6Hkh[data-area='MENU'] {\\n      letter-spacing: 0;\\n    }\\n\\n.root___Hf5H2[data-mobile] .touchAreaRoot___UN-W1 {\\n    flex-direction: column !important;\\n    letter-spacing: 0;\\n  }\\n\\n.root___Hf5H2[data-mobile] [data-area]::after {\\n    font-size: 0.8em;\\n  }\\n\\n.loadingMask___jIxGF {\\n  position: absolute;\\n  z-index: 20;\\n  inset: 0;\\n\\n  display: flex;\\n  align-items: center;\\n  justify-content: center;\\n\\n  color: var(--text);\\n\\n  background-color: var(--bg);\\n\\n  animation: loadingMaskFadeIn___abNXH 300ms;\\n}\\n\\n.loadingMask___jIxGF p {\\n    font-size: 1.5em;\\n    opacity: 0.8;\\n  }\\n\\n@keyframes loadingMaskFadeIn___abNXH {\\n  from {\\n    opacity: 0;\\n  }\\n}\\n\\n.root___Hf5H2 {\\n  position: relative;\\n\\n  overflow: hidden;\\n\\n  width: 100%;\\n  height: 100%;\\n\\n  font-size: 1em;\\n\\n  background-color: var(--bg);\\n  outline: 0;\\n}\\n\\n.root___Hf5H2 a {\\n    color: var(--text-secondary);\\n  }\\n\\n.root___Hf5H2[data-mobile] {\\n    font-size: 0.8em;\\n  }\\n\\n.hidden___rxU-6 {\\n  display: none !important;\\n}\\n\\n.invisible___cO-hs {\\n  visibility: hidden !important;\\n}\\n\\n.beautifyScrollbar___lb6kJ {\\n  /* 火狐的滚动条样式 */\\n  scrollbar-color: var(--scrollbar-slider) transparent;\\n  scrollbar-width: thin;\\n\\n  /* chrome 的滚动条样式 */\\n}\\n\\n.beautifyScrollbar___lb6kJ::-webkit-scrollbar {\\n    width: 5px;\\n    height: 10px;\\n  }\\n\\n.beautifyScrollbar___lb6kJ::-webkit-scrollbar-track {\\n    background: transparent;\\n  }\\n\\n.beautifyScrollbar___lb6kJ::-webkit-scrollbar-thumb {\\n    background: var(--scrollbar-slider);\\n  }\\n\\np,\\nimg {\\n  margin: 0;\\n}\\n\\n:where(div, div:focus, div:focus-within, div:focus-visible, button) {\\n  border: none;\\n  outline: none;\\n}\\n\\nblockquote {\\n  margin: 0.5em 0;\\n  padding: 0;\\n  padding-left: 1em;\\n  border-left: 0.25em solid var(--text-secondary, #607d8b);\\n\\n  font-size: 0.9em;\\n  font-style: italic;\\n  line-height: 1.2em;\\n  color: var(--text-secondary);\\n  text-align: start;\\n  overflow-wrap: anywhere;\\n  white-space: pre-wrap;\\n}\\n\\nsvg {\\n  width: 1em;\\n}\\n";
 //#endregion
 //#region src/components/Manga/index.tsx
 var _tmpl$ = /*#__PURE__*/ solid_js_web.template(\`<div>\`);
@@ -9311,6 +9391,14 @@ const Manga = (props) => {
 		solid_js_web.insert(_el$, solid_js_web.createComponent(WheelProgress, {}), null);
 		solid_js_web.insert(_el$, solid_js_web.createComponent(EndPage, {}), null);
 		solid_js_web.insert(_el$, solid_js_web.createComponent(Toolbar, {}), null);
+		solid_js_web.insert(_el$, solid_js_web.createComponent(solid_js.Show, {
+			get when() {
+				return store.imgList.length === 0;
+			},
+			get children() {
+				return solid_js_web.createComponent(LoadingMask, {});
+			}
+		}), null);
 		solid_js_web.effect((_p$) => {
 			var _v$ = classes$2.root, _v$2 = {
 				[classes$2.hidden]: props.show === false,
@@ -9396,7 +9484,6 @@ exports.handleScrollbarSlider = handleScrollbarSlider;
 exports.handleWheel = handleWheel;
 exports.handleZoomDrag = handleZoomDrag;
 exports.hotkeysMap = hotkeysMap;
-exports.imgAreaStyle = imgAreaStyle;
 exports.imgIndexMap = imgIndexMap;
 exports.imgList = imgList;
 exports.imgPageMap = imgPageMap;
@@ -9417,6 +9504,7 @@ exports.isUpscale = isUpscale;
 exports.isUseAutoScale = isUseAutoScale;
 exports.isWideType = isWideType;
 exports.jumpToImg = jumpToImg;
+exports.jumpToPage = jumpToPage;
 exports.listenHotkey = listenHotkey;
 exports.loadState = loadState;
 exports.mitSettings = mitSettings;
@@ -9993,7 +10081,7 @@ var index_module_default = ".dialog___3dkwn {\\n  --pd-bg: #fff;\\n  --pd-text: 
 //#endregion
 //#region src/components/InputDialog/index.tsx
 var _tmpl$ = /*#__PURE__*/ solid_js_web.template(\`<p>\`);
-var _tmpl$2 = /*#__PURE__*/ solid_js_web.template(\`<dialog><form method=dialog><h2></h2><input type=text><button type=button></button><button type=submit>\`);
+var _tmpl$2 = /*#__PURE__*/ solid_js_web.template(\`<dialog><form method=dialog><h2></h2><input><button type=button></button><button type=submit>\`);
 const { store, setState } = helper.useStore({
 	queue: [],
 	password: "",
@@ -10046,7 +10134,7 @@ const InputDialog = () => {
 		solid_js_web.insert(_el$6, () => helper.t("other.cancel"));
 		solid_js_web.insert(_el$7, () => helper.t("other.confirm"));
 		solid_js_web.effect((_p$) => {
-			var _v$ = classes.dialog, _v$2 = classes.form, _v$3 = classes.message, _v$4 = classes.input, _v$5 = classes.button, _v$6 = {
+			var _v$ = classes.dialog, _v$2 = classes.form, _v$3 = classes.message, _v$4 = classes.input, _v$5 = store.queue[0]?.type ?? "text", _v$6 = classes.button, _v$7 = {
 				[classes.button]: true,
 				[classes.primary]: true
 			};
@@ -10054,8 +10142,9 @@ const InputDialog = () => {
 			_v$2 !== _p$.t && solid_js_web.className(_el$2, _p$.t = _v$2);
 			_v$3 !== _p$.a && solid_js_web.className(_el$3, _p$.a = _v$3);
 			_v$4 !== _p$.o && solid_js_web.className(_el$5, _p$.o = _v$4);
-			_v$5 !== _p$.i && solid_js_web.className(_el$6, _p$.i = _v$5);
-			_p$.n = solid_js_web.classList(_el$7, _v$6, _p$.n);
+			_v$5 !== _p$.i && solid_js_web.setAttribute(_el$5, "type", _p$.i = _v$5);
+			_v$6 !== _p$.n && solid_js_web.className(_el$6, _p$.n = _v$6);
+			_p$.s = solid_js_web.classList(_el$7, _v$7, _p$.s);
 			return _p$;
 		}, {
 			e: void 0,
@@ -10063,7 +10152,8 @@ const InputDialog = () => {
 			a: void 0,
 			o: void 0,
 			i: void 0,
-			n: void 0
+			n: void 0,
+			s: void 0
 		});
 		solid_js_web.effect(() => _el$5.value = store.password);
 		return _el$;
@@ -10074,18 +10164,20 @@ let dom;
 const init = () => {
 	if (dom || store.ref) return;
 	dom = helper.mountComponents("input-dialog", () => solid_js_web.createComponent(InputDialog, {}));
+	dom.classList.add("comicread-ignore");
 };
 /**
 * 弹出一个文本输入框，返回用户输入的内容；取消或关闭时返回 null。
 *
 * 同时打开多个输入请求时会在内部自动排队，逐个弹出。
 */
-const askInput = ({ message = helper.t("other.enter_password"), tip, defaultValue = "" } = {}) => new Promise((resolve) => {
+const askInput = ({ message = helper.t("other.enter_password"), tip, defaultValue = "", type } = {}) => new Promise((resolve) => {
 	init();
 	setState("queue", (queue) => [...queue, {
 		message,
 		tip,
 		defaultValue,
+		type,
 		resolve
 	}]);
 	if (store.queue.length === 1) openNow();
@@ -10118,11 +10210,11 @@ const mobileApi = new class {
 		...details
 	}, ...args);
 	eachGet = (url, details) => request.eachApi(url, [
+		"https://mapi.copy20.com",
+		"https://api.2026copy.com",
 		"https://api.copy4000.com",
 		"https://api.mangacopy.com",
-		"https://api.copy3000.com",
-		"https://mapi.copy20.com",
-		"https://api.2026copy.com"
+		"https://api.copy3000.com"
 	], {
 		responseType: "json",
 		headers: {
@@ -10151,16 +10243,16 @@ const pcApi = new class {
 		...details
 	}, ...args);
 	eachGet = (url, details) => request.eachApi(url, [
-		"https://mapi.elfgjfghkk.club",
-		"https://api.2024manga.com",
-		"https://mapi.hotmangasf.com",
 		"https://mapi.hotmangasg.com",
-		"https://mapi.fgjfghkk.club",
-		"https://www.manga2026.xyz",
-		"https://api.manga2025.com",
-		"https://mapi.hotmangasd.com",
-		"https://mapi.fgjfghkkcenter.club",
+		"https://api.2024manga.com",
 		"https://m.manga2025.com",
+		"https://api.manga2025.com",
+		"https://mapi.fgjfghkk.club",
+		"https://mapi.fgjfghkkcenter.club",
+		"https://mapi.elfgjfghkk.club",
+		"https://mapi.hotmangasd.com",
+		"https://mapi.hotmangasf.com",
+		"https://www.manga2026.xyz",
 		"https://www.manga2025.com"
 	], {
 		responseType: "json",
@@ -11030,7 +11122,7 @@ const useManga = ({ store, setState, options, setOptions }) => {
 	const htmlStyle = document.documentElement.style;
 	let lastOverflow = htmlStyle.overflow;
 	const wakeLock = new helper.WakeLock();
-	helper.createEffectOn(helper.createRootMemo(() => store.manga.show && store.manga.imgList.length > 0), (show) => {
+	helper.createEffectOn(helper.createRootMemo(() => store.manga.show), (show) => {
 		if (show) {
 			dom.setAttribute("show", "");
 			lastOverflow = htmlStyle.overflow;
@@ -11102,6 +11194,11 @@ const handleVersionUpdate = async () => {
 	if (helper.lang() === "zh") {
 		components_Toast.toast(() => {
 			const changes = Object.entries({
+				"12.14.0": {
+					"date": "2026-09-09",
+					"feat": ["增加跳转至指定页的快捷键「G」"],
+					"fix": ["修复 pixiv 失效", "在 SPA 网站上切换章节时不再退出阅读模式"]
+				},
 				"12.13.0": {
 					"date": "2026-09-07",
 					"feat": ["为 Pawchive、kemono 添加「根据文件名排序」功能"],
@@ -11411,14 +11508,18 @@ const setupSiteAdapter = async ({ name, options: initOptions, getPageContext, ha
 	const { store, setState, showComic, loadComic, init, options } = coreCtx;
 	const processPageContext = async (newPageCtx, force = false) => {
 		if (!force && helper.isEqual(pageCtx, newPageCtx)) return;
+		const wasMangaPage = pageCtx?.isManga ?? pageCtx?.type === "manga";
 		for (const cleanup of cleanupFns) await cleanup(newPageCtx);
 		cleanupFns.length = 0;
 		pageCtx = newPageCtx;
 		const isMangePage = newPageCtx?.isManga ?? newPageCtx?.type === "manga";
+		const keepShow = wasMangaPage && isMangePage && store.manga.show;
 		setState((state) => {
 			state.flag.hasPageHandler = Boolean(newPageCtx?.type) && Reflect.has(handlers, newPageCtx.type);
-			state.manga.show = false;
-			state.comicMap = { "": { getImgList: Object.assign(() => [], { type: "init" }) } };
+			if (!keepShow) {
+				state.manga.show = false;
+				state.comicMap = { "": { getImgList: Object.assign(() => [], { type: "init" }) } };
+			}
 		});
 		const allCleanup = await handlers.all?.(coreCtx, newPageCtx);
 		if (allCleanup) cleanupFns.push(allCleanup);
@@ -11434,6 +11535,14 @@ const setupSiteAdapter = async ({ name, options: initOptions, getPageContext, ha
 		init(isMangePage);
 		const handlerCleanup = await handlers[newPageCtx.type]?.(coreCtx, newPageCtx);
 		if (handlerCleanup) cleanupFns.push(handlerCleanup);
+		if (keepShow) {
+			try {
+				await loadComic();
+			} catch {
+				setState("manga", "show", false);
+			}
+			return;
+		}
 		if (!isMangePage || !store.options.autoShow) return;
 		const lastImg = store.comicMap[store.nowComic].imgList?.[0];
 		if (await helper.wait(async () => {
@@ -11591,6 +11700,8 @@ const sortElementsByDomOrder = (elements) => [...elements].sort((a, b) => {
 /** 处理 URL.createObjectURL 后马上 URL.revokeObjectURL 的图片 */
 var BlobUrlResolver = class {
 	blobUrlMap = /* @__PURE__ */ new Map();
+	pendingRevoke = /* @__PURE__ */ new Set();
+	revokeScheduled = false;
 	async resolve(e) {
 		if (this.blobUrlMap.has(e.src)) return this.blobUrlMap.get(e.src);
 		if (!e.src.startsWith("blob:")) return this.httpToHttps(e.src);
@@ -11598,11 +11709,25 @@ var BlobUrlResolver = class {
 		const canvas = new OffscreenCanvas(e.naturalWidth, e.naturalHeight);
 		canvas.getContext("2d").drawImage(e, 0, 0);
 		const url = await helper.canvasToBlobUrl(canvas);
+		const oldUrl = this.blobUrlMap.get(e.src);
+		if (oldUrl) this.scheduleRevoke(oldUrl);
 		this.blobUrlMap.set(e.src, url);
 		return url;
 	}
 	clear() {
+		for (const url of this.blobUrlMap.values()) this.scheduleRevoke(url);
 		this.blobUrlMap.clear();
+	}
+	/** 登记一个需要释放的 ObjectURL */
+	scheduleRevoke(url) {
+		this.pendingRevoke.add(url);
+		if (this.revokeScheduled) return;
+		this.revokeScheduled = true;
+		helper.requestIdleCallback(() => {
+			this.revokeScheduled = false;
+			for (const pendingUrl of this.pendingRevoke) URL.revokeObjectURL(pendingUrl);
+			this.pendingRevoke.clear();
+		});
 	}
 	/** 在 https 页面下将 http 图片地址升级为 https */
 	httpToHttps(url) {
@@ -11697,6 +11822,69 @@ var DwellWatcher = class {
 	}
 };
 //#endregion
+//#region src/userscript/autoImageScanner/sizeStandards.ts
+/**
+* 本模块所有「尺寸标准」的唯一汇集处。
+*
+* 每条标准由「私有常量（数值）+ 导出的判定函数（比较逻辑）」配套组成，
+* 调用方只接触判定函数，不接触具体比较细节。
+* 各标准分别作用于识别流程的不同阶段、过滤目标互不相同，
+* 数值相互独立，调整其中之一不影响也无需联动其他。
+*/
+/**
+* 图片进入合格图片集合的最小显示尺寸，宽高都需大于该值。
+*
+* 用于滤掉显然不可能是漫画图片的小图。
+*
+* 同时是集合内尺寸记录的更新条件：
+* 已进入集合的图片缩小到该值以下后，
+* 集合中的尺寸记录会停留在旧值、不再更新。
+*/
+const MIN_DISPLAY_SIZE = 100;
+/**
+* 图片进入合格图片集合的最小原图尺寸，宽高都需大于该值。
+*
+* 原图尺寸是最可靠的判断标准，用于排除被 CSS 拉大显示的小图（比如加载占位图），
+* 且原图尺寸在加载完成前为 0，尚未加载出内容的图片天然不通过。
+*/
+const MIN_NATURAL_SIZE = 500;
+/** 判断图片的显示尺寸是否满足进入合格图片集合的条件 */
+const hasQualifiedDisplaySize = (size) => size.width > MIN_DISPLAY_SIZE && size.height > MIN_DISPLAY_SIZE;
+/** 判断图片的原图尺寸是否满足进入合格图片集合的条件 */
+const hasQualifiedNaturalSize = (size) => size.width > MIN_NATURAL_SIZE && size.height > MIN_NATURAL_SIZE;
+/** 判断图片的显示尺寸是否已达到可参与成组识别的最小标准 */
+const hasPotentialMangaSize = (map, img) => {
+	const size = map.get(img)?.display;
+	return size !== void 0 && size.width >= 300 && size.height >= 300;
+};
+/**
+* 容器成为图片槽位所需的最小宽高，大于该值即通过。
+*
+* 成组识别在种子图片的祖先层级寻找「相似兄弟元素」，
+* 该值用于过滤相似兄弟元素里的小容器（如页数提示）。
+* 阈值较为宽松，是因为这里只做初步过滤，最终成组还有组内数量条件来判断过滤
+*/
+const MIN_SLOT_SIZE = 100;
+/** 判断容器的尺寸是否有资格作为图片槽位 */
+const hasValidSize = (element) => {
+	const { width, height } = element.getBoundingClientRect();
+	return width >= MIN_SLOT_SIZE && height >= MIN_SLOT_SIZE;
+};
+/** 视为「已加载出真实内容」的原图尺寸，宽或高任一维大于该值即算过 */
+const LAZY_LOADED_PROOF_SIZE = 500;
+/** 判断图片是否已加载出足够大的真实内容 */
+const hasLazyLoadProofSize = (img) => img.naturalWidth > LAZY_LOADED_PROOF_SIZE || img.naturalHeight > LAZY_LOADED_PROOF_SIZE;
+/**
+* 组间宽度过滤的保留比例：组宽中位数达到最宽组的该比例以上才保留。
+*
+* 用于过滤侧边、正文底部的「相关推荐」，
+* 侧边、正文底部的「相关推荐」中的图片同样会成组，
+* 因此要靠与最宽组（正文组）的相对宽度来过滤。
+*/
+const WIDTH_KEEP_RATIO = .8;
+/** 判断组的宽度是否与最宽组足够接近 */
+const hasComparableWidth = (width, baselineWidth) => width >= baselineWidth * WIDTH_KEEP_RATIO;
+//#endregion
 //#region src/userscript/autoImageScanner/triggerLazyLoad.ts
 /** 新元素短停留时间 */
 const SHORT_STAY_TIME = 310;
@@ -11737,7 +11925,7 @@ const isLazyLoaded = (e, oldSrc) => {
 		if (!e.src) return false;
 		if (!e.offsetParent) return false;
 		if (e.src.startsWith("data:image/svg")) return false;
-		if (e.naturalWidth > 500 || e.naturalHeight > 500) return true;
+		if (hasLazyLoadProofSize(e)) return true;
 		if (oldSrc !== void 0 && e.src !== oldSrc) return true;
 	} else {
 		const imgDomList = e.querySelectorAll("img");
@@ -11817,30 +12005,23 @@ var LazyLoadManager = class {
 		const now = Date.now();
 		return [...this.oldMap.entries()].filter(([, shortCompletedAt]) => now - shortCompletedAt >= OLD_TIMEOUT).map(([e]) => e);
 	}
-	/** 按 DOM 顺序排序 */
-	sortByDomOrder(list) {
-		return list.toSorted((a, b) => {
-			if (a === b) return 0;
-			return a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
-		});
-	}
 	/** 扫描所有新元素，让它们完成短停留 */
 	async sweepNew() {
 		this.prune();
-		const targets = this.sortByDomOrder([...this.newSet]);
+		const targets = sortByDomOrder([...this.newSet]);
 		for (const e of targets) {
 			if (!this.newSet.has(e)) continue;
-			this.scrollToElement(e);
+			scrollToElement(e);
 			await this.waitForBatch((target) => this.newSet.has(target), SHORT_STAY_TIME);
 		}
 	}
 	/** 扫描指定旧元素，让它们完成长停留 */
 	async sweepOld(targets) {
 		this.prune();
-		const sorted = this.sortByDomOrder(targets);
+		const sorted = sortByDomOrder(targets);
 		for (const e of sorted) {
 			if (!this.oldMap.has(e)) continue;
-			this.scrollToElement(e);
+			scrollToElement(e);
 			await this.waitForBatch((target) => this.oldMap.has(target), LONG_STAY_TIME);
 		}
 	}
@@ -11852,14 +12033,6 @@ var LazyLoadManager = class {
 	async waitForBatch(isPending, duration) {
 		await helper.sleep(20);
 		await helper.wait(() => [...this.dwellWatcher.visibleElements].some(isPending) ? void 0 : true, duration, 50);
-	}
-	/** 滚动到元素顶部并派发 scroll 事件，触发网站懒加载 */
-	scrollToElement(e) {
-		e.scrollIntoView({
-			behavior: "instant",
-			block: "start"
-		});
-		e.dispatchEvent(new Event("scroll", { bubbles: true }));
 	}
 	/** 触发网页底部翻页 */
 	triggerTurnPage = async () => {
@@ -11918,145 +12091,24 @@ helper.exposeToGlobal({ lazyLoadTrigger });
 const triggerLazyLoad = lazyLoadTrigger.trigger;
 const needTrigger = (e) => lazyLoadTrigger.needTrigger(e);
 const isLazyLoadFailed = (e) => lazyLoadTrigger.isLazyLoadFailed(e);
-//#endregion
-//#region src/userscript/autoImageScanner/imageSlot.ts
-/** 判断两个元素的 dataset 是否具有相同的键结构 */
-const hasSameDatasetStructure = (a, b) => {
-	const keysA = Object.keys(a.dataset);
-	const keysB = Object.keys(b.dataset);
-	if (keysA.length !== keysB.length) return false;
-	return keysA.every((key) => keysB.includes(key));
-};
-/** 判断两个元素是否相似 */
-const isSimilarElement = (a, b) => a === b || a.className && a.className === b.className || hasSameDatasetStructure(a, b);
-const SKIP_TAGS = /* @__PURE__ */ new Set([
-	"SCRIPT",
-	"STYLE",
-	"NOSCRIPT",
-	"IFRAME",
-	"HEAD",
-	"TEMPLATE"
-]);
-/** 判断元素是否为明显不可能是图片槽位 */
-const isImageHostIneligible = (element) => {
-	if (!element.checkVisibility()) return true;
-	if (helper.isImageElement(element)) return false;
-	if (SKIP_TAGS.has(element.tagName)) return true;
-	if (element.children.length === 0) return true;
-	if (isLazyLoadFailed(element)) return true;
-	return false;
-};
-/** 判断元素是否具有足够的尺寸 */
-const hasValidSize = (element) => {
-	const rect = element.getBoundingClientRect();
-	return rect.width >= 100 && rect.height >= 100;
-};
-/** 查找最近一层的「与当前元素相似」且数量足够的兄弟图片槽位 */
-const findSimilarImageSlots = (element, threshold) => {
-	let current = element;
-	while (current?.parentElement) {
-		const siblingList = current.parentElement.children;
-		if (siblingList.length >= threshold) {
-			const similarElements = [];
-			for (const sibling of siblingList) {
-				if (!(sibling instanceof HTMLElement) || !isSimilarElement(sibling, current) || isImageHostIneligible(sibling) || !helper.isImageElement(sibling) && !hasValidSize(sibling)) continue;
-				similarElements.push(sibling);
-			}
-			if (similarElements.length >= threshold) return similarElements;
-		}
-		current = current.parentElement;
-	}
-	return [];
-};
-/** 收集一个槽位内所有已通过 filterImg 的图片 */
-const addSlotImgs = (slot, rawImgSet, coveredImgs) => {
-	for (const innerImg of slot.querySelectorAll("img")) if (rawImgSet.has(innerImg)) coveredImgs.add(innerImg);
-};
-/** 从所有合格图片中找出所有图片槽位组 */
-const findImageSlotGroups = (map) => {
-	const rawImgs = [...map.keys()];
-	const rawImgSet = new Set(rawImgs);
-	const coveredImgSet = /* @__PURE__ */ new Set();
-	const groups = [];
-	for (const img of rawImgs) {
-		if (coveredImgSet.has(img)) continue;
-		const slots = findSimilarImageSlots(img, 5);
-		if (slots.length === 0) continue;
-		const parent = slots[0].parentElement;
-		if (!parent) continue;
-		let medianAreaCache;
-		const group = {
-			parent,
-			slots: new Set(slots),
-			coveredImgs: /* @__PURE__ */ new Set(),
-			get imgNum() {
-				return this.coveredImgs.size;
-			},
-			get medianArea() {
-				medianAreaCache ??= getGroupMedianArea(group, map);
-				return medianAreaCache;
-			}
-		};
-		for (const slot of slots) if (helper.isImageElement(slot)) {
-			if (rawImgSet.has(slot)) group.coveredImgs.add(slot);
-		} else addSlotImgs(slot, rawImgSet, group.coveredImgs);
-		for (const coveredImg of group.coveredImgs) coveredImgSet.add(coveredImg);
-		groups.push(group);
-	}
-	return groups;
-};
-/** 从多个图片槽位组中选择最可能属于正文的一组 */
-const pickBestGroup = (groups) => groups.reduce((best, current) => {
-	if (current.imgNum !== best.imgNum) return current.imgNum > best.imgNum ? current : best;
-	return current.medianArea > best.medianArea ? current : best;
+/** 按 DOM 顺序排序 */
+const sortByDomOrder = (list) => list.toSorted((a, b) => {
+	if (a === b) return 0;
+	return a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
 });
-/** 计算所有图片槽位组，并同时返回当前最优组 */
-const getImageSlotGroupResult = (map) => {
-	const groups = findImageSlotGroups(map);
-	return {
-		groups,
-		bestGroup: groups.length > 0 ? pickBestGroup(groups) : void 0
-	};
-};
-/** 计算组内图片显示面积的中位数 */
-const getGroupMedianArea = (group, map) => {
-	const areas = [...group.coveredImgs].map((img) => {
-		const info = map.get(img);
-		return info ? info.display.width * info.display.height : 0;
-	}).sort((a, b) => a - b);
-	if (areas.length === 0) return 0;
-	const mid = Math.floor(areas.length / 2);
-	return areas.length % 2 === 1 ? areas[mid] : (areas[mid - 1] + areas[mid]) / 2;
-};
-/** 将图片槽位组展开为展示用槽位列表 */
-const buildSlotElementsFromGroup = (group) => {
-	const slotElements = [];
-	const slotImgsMap = /* @__PURE__ */ new Map();
-	for (const img of group.coveredImgs) {
-		let node = img.parentElement;
-		while (node && node !== group.parent && node.parentElement !== group.parent) node = node.parentElement;
-		if (!node || node === group.parent) continue;
-		const imgs = slotImgsMap.get(node) ?? [];
-		imgs.push(img);
-		slotImgsMap.set(node, imgs);
-	}
-	for (const slot of group.slots) {
-		if (helper.isImageElement(slot)) {
-			if (group.coveredImgs.has(slot)) slotElements.push(slot);
-			continue;
-		}
-		const imgs = slotImgsMap.get(slot);
-		if (imgs && imgs.length > 0) slotElements.push(...imgs);
-		else slotElements.push(slot);
-	}
-	return slotElements;
+/** 滚动到元素顶部并派发 scroll 事件，触发网站懒加载 */
+const scrollToElement = (e) => {
+	e.scrollIntoView({
+		behavior: "instant",
+		block: "start"
+	});
+	e.dispatchEvent(new Event("scroll", { bubbles: true }));
 };
 //#endregion
 //#region src/userscript/autoImageScanner/imageListBuilder.ts
-/** 根据合格图片集合和最优图片槽位组，维护最终可用的 imgList */
+/** 根据传入的图片槽位列表，维护最终可用的 imgList */
 var ImageListBuilder = class {
 	enableSortImageByTop;
-	filterByContainer;
 	onImgListChange;
 	onEmpty;
 	blobUrlResolver = new BlobUrlResolver();
@@ -12065,33 +12117,41 @@ var ImageListBuilder = class {
 		this.placeholderImgList.update(imgList);
 	});
 	isUpdatingImgList = false;
+	/** AutoImageScanner 传入的代际标记，scanner 停止后作废过期的 update */
 	generation = 0;
+	/**
+	* update 的并发序号
+	*
+	* 新一次 update 开始时自增，旧 update 的异步闭包检测到序号落后即放弃写入
+	*/
 	updateSeq = 0;
-	/** 过滤后真正用于展示的图片槽位列表 */
-	_slotElements = [];
-	/** 找到的所有符合条件的图片 url */
-	_imgList = [];
 	constructor(options) {
 		this.enableSortImageByTop = options.enableSortImageByTop;
-		this.filterByContainer = options.filterByContainer;
 		this.onImgListChange = options.onImgListChange;
 		this.onEmpty = options.onEmpty;
 	}
-	/** 当前过滤后真正用于展示的图片槽位列表 */
+	/** 过滤后用于展示的图片槽位列表 */
+	_slotElements = [];
+	/** 过滤后用于展示的图片槽位列表 */
 	get slotElements() {
 		return this._slotElements;
 	}
 	/** 当前找到的所有符合条件的图片 url */
+	_imgList = [];
+	/** 当前找到的所有符合条件的图片 url */
 	get imgList() {
 		return this._imgList;
 	}
-	/** 根据最新合格图片集合和最优槽位组，更新 slotElements 与 imgList */
-	async update(qualifiedMap, bestGroup, generation) {
+	/** 根据最新图片槽位列表，更新 slotElements 与 imgList */
+	async update(selectedSlots, generation) {
 		const seq = ++this.updateSeq;
 		this.generation = generation;
-		const selectedSlots = this.filterByContainer && bestGroup ? buildSlotElementsFromGroup(bestGroup) : [...qualifiedMap.keys()];
 		this._slotElements = this.enableSortImageByTop ? sortElementsByTop(selectedSlots) : sortElementsByDomOrder(selectedSlots);
 		if (this._slotElements.length === 0) {
+			if (this._imgList.length > 0) {
+				this._imgList = [];
+				this.onImgListChange?.([]);
+			}
 			this.onEmpty?.();
 			return {
 				isEdited: false,
@@ -12107,18 +12167,20 @@ var ImageListBuilder = class {
 		try {
 			await helper.plimit(this._slotElements.map((e, i) => async () => {
 				if (seq !== this.updateSeq || generation !== this.generation) return;
-				if (!helper.isImageElement(e)) {
+				if (!helper.isImageElement(e)) return;
+				try {
+					let newUrl = await this.blobUrlResolver.resolve(e);
+					if (seq !== this.updateSeq || generation !== this.generation) return;
+					if (this.placeholderImgList.has(newUrl)) newUrl = getDatasetUrl(e) ?? "";
+					if (newUrl === this._imgList[i]) return;
+					isEdited ||= true;
+					this._imgList[i] = newUrl;
+				} catch {
+					if (seq !== this.updateSeq || generation !== this.generation) return;
 					if (this._imgList[i] === "") return;
 					isEdited ||= true;
 					this._imgList[i] = "";
-					return;
 				}
-				let newUrl = await this.blobUrlResolver.resolve(e);
-				if (seq !== this.updateSeq || generation !== this.generation) return;
-				if (this.placeholderImgList.has(newUrl)) newUrl = getDatasetUrl(e) ?? "";
-				if (newUrl === this._imgList[i]) return;
-				isEdited ||= true;
-				this._imgList[i] = newUrl;
 			}));
 		} finally {
 			if (seq === this.updateSeq) this.isUpdatingImgList = false;
@@ -12189,12 +12251,247 @@ var ImageListBuilder = class {
 	}
 };
 //#endregion
+//#region src/userscript/autoImageScanner/imageSlotGroups/similarity.ts
+/** 判断两个元素的 dataset 是否具有相同的键结构 */
+const hasSameDatasetStructure = (a, b) => {
+	const keysA = Object.keys(a.dataset);
+	const keysB = Object.keys(b.dataset);
+	if (keysA.length !== keysB.length) return false;
+	return keysA.every((key) => keysB.includes(key));
+};
+/** 判断两个元素是否相似 */
+const isSimilarElement = (a, b) => a === b || a.className && a.className === b.className || hasSameDatasetStructure(a, b);
+/** 明显不可能是图片槽位承载者的标签集合 */
+const SKIP_TAGS = /* @__PURE__ */ new Set([
+	"SCRIPT",
+	"STYLE",
+	"NOSCRIPT",
+	"IFRAME",
+	"HEAD",
+	"TEMPLATE"
+]);
+/** 判断元素是否为明显不可能是图片槽位 */
+const isImageHostIneligible = (element) => {
+	if (!element.checkVisibility()) return true;
+	if (helper.isImageElement(element)) return false;
+	if (SKIP_TAGS.has(element.tagName)) return true;
+	if (element.children.length === 0) return true;
+	if (isLazyLoadFailed(element)) return true;
+	return false;
+};
+/** 候选容器面积至少达到 MIN_GROUP_SIZE 张最小候选图显示面积之和 */
+const MIN_CONTAINER_AREA = 27e4;
+/** 计算一组数值的中位数，空数组返回 0 */
+const median = (numbers) => {
+	if (numbers.length === 0) return 0;
+	const sorted = numbers.toSorted((a, b) => a - b);
+	const mid = Math.floor(sorted.length / 2);
+	return sorted.length % 2 === 1 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+};
+/** 收集一个槽位内所有通过候选筛选的图片 */
+const addSlotImgs = (slot, rawImgSet, coveredImgs) => {
+	if (helper.isImageElement(slot)) {
+		if (rawImgSet.has(slot)) coveredImgs.add(slot);
+	} else for (const innerImg of slot.querySelectorAll("img")) if (rawImgSet.has(innerImg)) coveredImgs.add(innerImg);
+};
+/** 查找最近一层的「与当前元素相似」且数量足够的兄弟图片槽位 */
+const findSimilarImageSlots = (element, threshold) => {
+	let current = element;
+	while (current?.parentElement) {
+		const siblingList = current.parentElement.children;
+		if (siblingList.length >= threshold) {
+			const similarElements = [];
+			for (const sibling of siblingList) {
+				if (!(sibling instanceof HTMLElement) || !isSimilarElement(sibling, current) || isImageHostIneligible(sibling) || !helper.isImageElement(sibling) && !hasValidSize(sibling)) continue;
+				similarElements.push(sibling);
+			}
+			if (similarElements.length >= threshold) return similarElements;
+		}
+		current = current.parentElement;
+	}
+	return [];
+};
+/** 根据一组相似槽位构建 ImageSlotGroup，图片不足或缺少父元素时返回 undefined */
+const buildGroup = (slots, rawImgSet) => {
+	const parent = slots[0].parentElement;
+	if (!parent) return void 0;
+	const coveredImgs = /* @__PURE__ */ new Set();
+	for (const slot of slots) addSlotImgs(slot, rawImgSet, coveredImgs);
+	if (coveredImgs.size < 3) return void 0;
+	const widths = slots.map((slot) => slot.getBoundingClientRect().width);
+	return {
+		parent,
+		slots,
+		coveredImgs,
+		medianWidth: median(widths)
+	};
+};
+/** 找出包含足够图片、但尚未形成组的「最小候选容器」 */
+const findObservingCandidates = (rawImgs, groups) => {
+	if (rawImgs.length < 3) return [];
+	const countMap = /* @__PURE__ */ new Map();
+	for (const img of rawImgs) {
+		let node = img.parentElement;
+		while (node && node !== document.body) {
+			countMap.set(node, (countMap.get(node) ?? 0) + 1);
+			node = node.parentElement;
+		}
+	}
+	const groupParents = groups.map((group) => group.parent);
+	const hasOverlapWithGroup = (element) => groupParents.some((parent) => element === parent || parent.contains(element) || element.contains(parent));
+	const candidates = [];
+	for (const [element, count] of countMap) {
+		if (count < 3 || !element.isConnected || !element.checkVisibility() || hasOverlapWithGroup(element)) continue;
+		const rect = element.getBoundingClientRect();
+		if (rect.width * rect.height < MIN_CONTAINER_AREA) continue;
+		let hasChildCandidate = false;
+		for (const child of element.children) if ((countMap.get(child) ?? 0) >= 3) {
+			hasChildCandidate = true;
+			break;
+		}
+		if (hasChildCandidate) continue;
+		candidates.push(element);
+	}
+	return candidates;
+};
+/** 从一组种子图片开始寻找成组图片槽位 */
+const findGroupsFromSeeds = (seedImgs, rawImgSet) => {
+	const coveredImgSet = /* @__PURE__ */ new Set();
+	const groups = [];
+	for (const img of seedImgs) {
+		if (coveredImgSet.has(img)) continue;
+		const slots = findSimilarImageSlots(img, 3);
+		if (slots.length === 0) continue;
+		const group = buildGroup(slots, rawImgSet);
+		if (!group) continue;
+		for (const coveredImg of group.coveredImgs) coveredImgSet.add(coveredImg);
+		groups.push(group);
+	}
+	return {
+		groups,
+		observing: findObservingCandidates(seedImgs, groups)
+	};
+};
+/** 从合格图片集合中找出所有可能的成组图片槽位及待观察候选容器 */
+const findImageSlotGroupsAndObserving = (map, selector) => {
+	const rawImgs = [...map.keys()].filter((img) => hasPotentialMangaSize(map, img));
+	const rawImgSet = new Set(rawImgs);
+	if (selector) {
+		const selectorImgs = rawImgs.filter((img) => img.matches(selector));
+		if (selectorImgs.length > 0) {
+			const result = findGroupsFromSeeds(selectorImgs, rawImgSet);
+			if (result.groups.length > 0) return result;
+		}
+	}
+	return findGroupsFromSeeds(rawImgs, rawImgSet);
+};
+//#endregion
+//#region src/userscript/autoImageScanner/imageSlotGroups/helper.ts
+/** 保留图片槽位宽度接近最宽组的组，用于排除侧边/底部宽度明显较小的推荐图 */
+const filterGroupsByWidth = (groups) => {
+	if (groups.length === 0) return [];
+	const baseline = Math.max(...groups.map((group) => group.medianWidth));
+	if (baseline <= 0) return groups;
+	return groups.filter((group) => hasComparableWidth(group.medianWidth, baseline));
+};
+/** 判断两组槽位列表的元素引用是否完全一致 */
+const isSameSlotList = (a, b) => a.length === b.length && a.every((slot, index) => slot === b[index]);
+/** 判断两个组是否代表相同的可展示槽位集合 */
+const isSameGroup = (a, b) => a.parent === b.parent && isSameSlotList(a.slots, b.slots) && a.coveredImgs.size === b.coveredImgs.size && [...a.coveredImgs].every((img) => b.coveredImgs.has(img));
+/** 判断两组 groups 是否发生变化 */
+const isSameGroupList = (a, b) => a.length === b.length && a.every((group, index) => isSameGroup(group, b[index]));
+//#endregion
+//#region src/userscript/autoImageScanner/imageSlotGroups/index.ts
+/** 管理当前已确认的成组图片槽位，并在存在待观察候选时保留用于重扫的数据 */
+var ImageSlotGroupManager = class {
+	/** 最近一次成组扫描的输入快照与观察结果 */
+	lastScan;
+	/** 当前确认可输出的成组图片槽位 */
+	_groups = [];
+	/** 当前确认可输出的成组图片槽位 */
+	get groups() {
+		return this._groups;
+	}
+	/** 将当前所有成组图片槽位展开为去重后的展示用槽位/图片列表 */
+	buildSlotElements() {
+		const elements = /* @__PURE__ */ new Set();
+		for (const group of this._groups) {
+			const slotImgsMap = /* @__PURE__ */ new Map();
+			for (const img of group.coveredImgs) {
+				let node = img.parentElement;
+				while (node && node !== group.parent && node.parentElement !== group.parent) node = node.parentElement;
+				if (!node || node === group.parent) continue;
+				const imgs = slotImgsMap.get(node) ?? [];
+				imgs.push(img);
+				slotImgsMap.set(node, imgs);
+			}
+			for (const slot of group.slots) {
+				if (helper.isImageElement(slot)) {
+					if (group.coveredImgs.has(slot)) elements.add(slot);
+					continue;
+				}
+				const imgs = slotImgsMap.get(slot);
+				if (imgs && imgs.length > 0) for (const img of imgs) elements.add(img);
+				else elements.add(slot);
+			}
+		}
+		return [...elements];
+	}
+	/** 重新扫描内容区与成组图片槽位，返回本次扫描后 groups 是否发生变化 */
+	scan(map, selector) {
+		const oldGroups = this._groups;
+		const result = findImageSlotGroupsAndObserving(map, selector);
+		const newGroups = filterGroupsByWidth(result.groups);
+		this._groups = newGroups;
+		const observing = this.filterObservingCandidates(result.observing, this._groups);
+		this.lastScan = {
+			map,
+			selector,
+			imgSet: new Set(map.keys()),
+			observing
+		};
+		return !isSameGroupList(oldGroups, newGroups);
+	}
+	/** 当前 map 中是否有新合格图片落在未成组观察候选容器内 */
+	hasNewQualifiedImageInsideObserving(map) {
+		if (!this.lastScan || this.lastScan.observing.length === 0) return false;
+		for (const img of map.keys()) {
+			if (this.lastScan.imgSet.has(img)) continue;
+			if (this.lastScan.observing.some((element) => element.contains(img))) return true;
+		}
+		return false;
+	}
+	/** 对仍存在未成组候选的扫描结果做重试，返回扫描后 groups 是否发生变化 */
+	retryObserving() {
+		if (!this.lastScan || this.lastScan.observing.length === 0) return false;
+		return this.scan(this.lastScan.map, this.lastScan.selector);
+	}
+	/** 清空全部状态 */
+	clear() {
+		this._groups = [];
+		this.lastScan = void 0;
+	}
+	/** 过滤出仍有效且不与已确认组重叠的观察容器 */
+	filterObservingCandidates(candidates, groups) {
+		const groupParents = groups.map((group) => group.parent);
+		return candidates.filter((element) => {
+			if (!element.isConnected || !element.checkVisibility()) return false;
+			return !groupParents.some((parent) => element === parent || parent.contains(element) || element.contains(parent));
+		});
+	}
+};
+//#endregion
 //#region src/userscript/autoImageScanner/lazyLoadController.ts
 var LazyLoadController = class {
+	/** 当前生效的图片 selector */
 	getImgSelector;
+	/** 所有图片槽位组 */
 	getImageSlotGroups;
+	/** 页面上所有不在黑名单中的图片元素 */
 	getAllImg;
+	/** 当前是否允许触发懒加载 */
 	runCondition;
+	/** 懒加载失败后的回调 */
 	onLazyLoadFailed;
 	/** 懒加载触发 promise，用于避免重复触发 */
 	triggerPromise;
@@ -12209,6 +12506,7 @@ var LazyLoadController = class {
 	}
 	/** 手动触发一轮完整的懒加载 */
 	trigger() {
+		if (!this.runCondition()) return Promise.resolve();
 		if (this.triggerPromise) return this.triggerPromise;
 		this.triggerPromise = (async () => {
 			try {
@@ -12238,11 +12536,18 @@ var LazyLoadController = class {
 	/** 触发所有未收敛的 img 和图片容器 */
 	triggerAllRemainingLazyLoad = async () => {
 		if (!this.runCondition()) return;
-		const imgTargets = this.getAllImg().filter(needTrigger);
-		if (imgTargets.length > 0) await triggerLazyLoad(imgTargets);
-		const groupTargets = [];
-		for (const group of this.getImageSlotGroups()) for (const slot of group.slots) if (!helper.isImageElement(slot) && needTrigger(slot)) groupTargets.push(slot);
-		if (groupTargets.length > 0) await triggerLazyLoad(groupTargets);
+		/** 当前已确认的成组图片槽位列表 */
+		const activeGroups = this.getImageSlotGroups();
+		let targets;
+		if (activeGroups.length > 0) {
+			targets = [];
+			for (const group of activeGroups) {
+				for (const slot of group.slots) if (!helper.isImageElement(slot) && needTrigger(slot)) targets.push(slot);
+				for (const img of group.coveredImgs) if (needTrigger(img)) targets.push(img);
+			}
+		} else if (this.getImgSelector()) return;
+		else targets = this.getAllImg().filter(needTrigger);
+		if (targets.length > 0) await triggerLazyLoad(targets);
 	};
 };
 //#endregion
@@ -12258,6 +12563,7 @@ var ImageWatcher = class {
 	ro;
 	mo;
 	qualifiedMap = new helper.ReactiveMap();
+	observedImages = /* @__PURE__ */ new Set();
 	targetAttributes = [
 		"src",
 		"srcset",
@@ -12288,34 +12594,39 @@ var ImageWatcher = class {
 	stop() {
 		this.mo.disconnect();
 		this.ro.disconnect();
+		for (const img of this.observedImages) {
+			img.removeEventListener("load", this.handleImageLoad);
+			this.ro.unobserve(img);
+		}
+		this.observedImages.clear();
 		this.qualifiedMap.clear();
 	}
+	/** 图片 load 时的处理方法，保留引用以便在 stop/remove 时取消监听 */
+	handleImageLoad = (event) => {
+		const img = event.currentTarget;
+		if (this.tryQualify(img, void 0, true)) this.options.onChanged(this.qualifiedMap);
+	};
 	/** 使用 ResizeObserver 监测图片尺寸变化，并在图片加载完成后重新检查 */
 	observeImage = (img) => {
+		this.observedImages.add(img);
 		this.ro.observe(img);
 		if (img.complete) return;
-		img.addEventListener("load", () => {
-			if (this.tryQualify(img)) this.options.onChanged(this.qualifiedMap);
-		}, { once: true });
+		img.removeEventListener("load", this.handleImageLoad);
+		img.addEventListener("load", this.handleImageLoad, { once: true });
 	};
-	/** 构造图片尺寸信息 */
-	createImageInfo(img, display) {
-		return {
-			display,
-			natural: {
-				width: img.naturalWidth,
-				height: img.naturalHeight
-			}
-		};
-	}
-	/** 尝试将图片加入 qualifiedMap，成功返回 true */
-	tryQualify(img, display) {
-		if (this.qualifiedMap.has(img)) return false;
+	/**
+	* 将图片加入或更新 qualifiedMap。
+	* 返回 true 表示本次调用让 qualifiedMap 产生了变化；
+	* updateExisting 为 true 时，已存在的图片如果尺寸发生变化也会更新。
+	*/
+	tryQualify(img, display, updateExisting = false) {
+		const oldInfo = this.qualifiedMap.get(img);
+		if (oldInfo && !updateExisting) return false;
 		const rect = display ?? img.getBoundingClientRect();
-		const imageInfo = this.createImageInfo(img, rect);
+		const imageInfo = createImageInfo(img, rect);
 		if (!this.options.filterImg(imageInfo, img)) return false;
+		if (oldInfo && sameImageInfo(oldInfo, imageInfo)) return false;
 		this.qualifiedMap.set(img, imageInfo);
-		this.ro.unobserve(img);
 		return true;
 	}
 	/** 处理 ResizeObserver 的回调，只有在图片尺寸发生实际变化（或初始化）时才会触发 */
@@ -12323,10 +12634,7 @@ var ImageWatcher = class {
 		let changed = false;
 		for (const entry of entries) {
 			const img = entry.target;
-			if (this.tryQualify(img, {
-				width: entry.contentRect.width,
-				height: entry.contentRect.height
-			})) changed = true;
+			if (this.tryQualify(img, entry.contentRect, true)) changed = true;
 		}
 		if (changed) this.options.onChanged(this.qualifiedMap);
 	};
@@ -12335,6 +12643,12 @@ var ImageWatcher = class {
 		if (!this.qualifiedMap.has(img)) return false;
 		this.qualifiedMap.delete(img);
 		return true;
+	};
+	/** 取消对单张图片的 RO 与 load 监听 */
+	unobserveImage = (img) => {
+		img.removeEventListener("load", this.handleImageLoad);
+		this.ro.unobserve(img);
+		this.observedImages.delete(img);
 	};
 	/** 处理新增节点中的图片 */
 	handleAddedNodes(nodes) {
@@ -12349,6 +12663,7 @@ var ImageWatcher = class {
 	handleRemovedNodes(nodes) {
 		let changed = false;
 		forEachImage(nodes, (img) => {
+			this.unobserveImage(img);
 			if (this.deleteImg(img)) changed = true;
 		});
 		return changed;
@@ -12356,28 +12671,48 @@ var ImageWatcher = class {
 	/** 处理图片属性变化 */
 	handleAttributeMutation(node) {
 		if (!helper.isImageElement(node)) return false;
-		if (this.tryQualify(node)) return true;
-		let changed = false;
-		if (this.deleteImg(node)) changed = true;
+		const oldInfo = this.qualifiedMap.get(node);
+		const imageInfo = createImageInfo(node, node.getBoundingClientRect());
+		if (this.options.filterImg(imageInfo, node)) {
+			if (oldInfo && sameImageInfo(oldInfo, imageInfo)) return false;
+			this.qualifiedMap.set(node, imageInfo);
+			this.observeImage(node);
+			return true;
+		}
 		this.observeImage(node);
-		return changed;
+		return this.deleteImg(node);
 	}
 	/** 处理监听节点的增删改 */
 	handleMutation = (mutations) => {
 		let changed = false;
+		let structureChanged = false;
 		for (const mutation of mutations) switch (mutation.type) {
 			case "childList":
+				structureChanged = true;
 				changed = this.handleAddedNodes(mutation.addedNodes) || changed;
 				changed = this.handleRemovedNodes(mutation.removedNodes) || changed;
 				break;
 			case "attributes": changed = this.handleAttributeMutation(mutation.target) || changed;
 		}
+		if (structureChanged) this.options.onStructureChange?.();
 		if (changed) this.options.onChanged(this.qualifiedMap);
 	};
 };
+/** 构造图片尺寸信息 */
+const createImageInfo = (img, display) => ({
+	display,
+	natural: {
+		width: img.naturalWidth,
+		height: img.naturalHeight
+	}
+});
+/** 判断两张图片尺寸信息是否完全一致 */
+const sameImageInfo = (a, b) => a.display.width === b.display.width && a.display.height === b.display.height && a.natural.width === b.natural.width && a.natural.height === b.natural.height;
 //#endregion
 //#region src/userscript/autoImageScanner/qualifiedImageWatcher.ts
 const IMG_BLACK_LIST_SELECTOR = ["#pagetual-preload", "noscript"].join(",");
+/** 判断图片元素是否处于黑名单内 */
+const isInBlackList = (img) => Boolean(img.closest(IMG_BLACK_LIST_SELECTOR));
 /** 监听并获取网页上所有符合条件的图片元素 */
 var QualifiedImageWatcher = class {
 	getImgSelector;
@@ -12387,8 +12722,9 @@ var QualifiedImageWatcher = class {
 		this.getImgSelector = options.getImgSelector;
 		this.filterImg = options.filterImg;
 		this.imageWatcher = new ImageWatcher({
-			filterImg: (info, img) => this.filterImage(info, img),
-			onChanged: options.onChanged
+			filterImg: (info, img) => this.filterImage(info, img) && !isInBlackList(img),
+			onChanged: options.onChanged,
+			onStructureChange: options.onStructureChange
 		});
 	}
 	/** 开始监听网页图片 */
@@ -12405,25 +12741,34 @@ var QualifiedImageWatcher = class {
 	}
 	/** 判断图片是否符合扫描条件 */
 	filterImage = (info, img) => {
-		if (img.closest(IMG_BLACK_LIST_SELECTOR)) return false;
+		if (!hasQualifiedDisplaySize(info.display) || !hasQualifiedNaturalSize(info.natural)) return false;
 		const imgSelector = this.getImgSelector();
 		if (imgSelector && isEleSelector(img, imgSelector)) return true;
 		if (this.filterImg) return this.filterImg(info, img);
-		if (info.display.height <= 100 || info.display.width <= 100) return false;
-		return info.natural.height > 500 && info.natural.width > 500;
+		return true;
 	};
 };
 //#endregion
 //#region src/userscript/autoImageScanner/index.ts
 const SELECTOR_FALLBACK_TIMEOUT = 3e3;
-/** 自动发现网页上的所有漫画图片的通用扫描器 */
+/**
+* 自动发现网页上的所有漫画图片的通用扫描器
+*
+* 数据流（各步骤对应的文件见同目录）：
+* - QualifiedImageWatcher：监听全页图片的增删/属性/尺寸变化，过滤出合格图片
+* - ImageSlotGroupManager：将合格图片按「相似兄弟元素」识别成组
+* - ImageListBuilder：把组内槽位解析为最终 URL 列表，
+*   通过 onImgListChange / onChapterSwitchChange 回调交给阅读器
+* - LazyLoadController：在后台模拟滚动+停留，触发网站懒加载出新图
+*
+* 并发防护：用 generation（stop 时自增）作废过期异步回调，
+* 见各 async 方法中的 generation 检查
+*/
 var AutoImageScanner = class {
 	/** 能获取到所有图片的 selector */
 	initSelector;
 	/** 是否要按图片在页面中的垂直位置排序，否则将按文档顺序排序 */
 	enableSortImageByTop;
-	/** 是否只保留图片槽位组内的图片 */
-	filterByContainer;
 	/** 自定义图片过滤规则 */
 	filterImg;
 	/** 是否触发懒加载的条件 */
@@ -12440,15 +12785,22 @@ var AutoImageScanner = class {
 	started = false;
 	/** 当前生效的图片 selector */
 	imgSelector;
+	/** 上次执行成组扫描时使用的 selector，用于检测 selector 变化并触发重扫 */
+	lastScannedSelector;
 	/** 显式 selector 回退定时器 */
 	selectorFallbackTimer;
-	/** 代际标记，用于忽略 stop 后过期的 handleChanged 回调 */
+	/**
+	* 代际标记，用于作废 stop 之后的过期异步回调：
+	* stop() 时自增，旧回调闭包捕获的 generation 随之失效，
+	* 各 async 方法据此直接返回，避免污染新一轮扫描的状态
+	*/
 	generation = 0;
+	/** DOM 结构是否发生过增删，用于触发内容区重新识别 */
+	structureDirty = false;
 	imageWatcher;
 	imageListBuilder;
 	lazyLoadController;
-	/** 所有「相似、成组」的图片槽位组 */
-	imageSlotGroups = [];
+	imageSlotGroupManager = new ImageSlotGroupManager();
 	/** 当前识别到的章节切换按钮 */
 	chapterSwitch = {};
 	/**
@@ -12464,21 +12816,22 @@ var AutoImageScanner = class {
 		this.shouldTriggerLazyLoad = options.shouldTriggerLazyLoad;
 		this.imgSelector = options.selector ?? "";
 		this.enableSortImageByTop = options.sortImageByTop ?? false;
-		this.filterByContainer = options.filterByContainer ?? true;
 		this.imageWatcher = new QualifiedImageWatcher({
 			getImgSelector: () => this.imgSelector,
 			filterImg: this.filterImg,
-			onChanged: (map) => this.handleChanged(map, this.generation)
+			onChanged: (map) => this.handleChanged(map, this.generation),
+			onStructureChange: () => {
+				this.structureDirty = true;
+			}
 		});
 		this.imageListBuilder = new ImageListBuilder({
 			enableSortImageByTop: this.enableSortImageByTop,
-			filterByContainer: this.filterByContainer,
 			onImgListChange: (imgList) => this.onImgListChange?.(imgList),
 			onEmpty: () => this.onEmpty?.()
 		});
 		this.lazyLoadController = new LazyLoadController({
 			getImgSelector: () => this.imgSelector,
-			getImageSlotGroups: () => this.imageSlotGroups,
+			getImageSlotGroups: () => this.imageSlotGroupManager.groups,
 			getAllImg: () => this.imageWatcher.getAllImg(),
 			runCondition: () => this.shouldTriggerLazyLoad?.() ?? true,
 			onLazyLoadFailed: () => this.imageListBuilder.onLazyLoadFailed()
@@ -12497,6 +12850,7 @@ var AutoImageScanner = class {
 		if (this.started) return;
 		this.started = true;
 		this.imageWatcher.start();
+		this.lazyLoadController.trigger();
 		if (this.initSelector && this.imgSelector === this.initSelector) this.selectorFallbackTimer = window.setTimeout(() => {
 			if (helper.querySelectorAll(this.imgSelector).length > 0) return;
 			this.imgSelector = "";
@@ -12507,13 +12861,15 @@ var AutoImageScanner = class {
 	stop() {
 		this.started = false;
 		this.generation++;
+		this.structureDirty = false;
 		this.handleChanged.clear();
 		this.imageWatcher.stop();
 		this.imageListBuilder.clear();
+		this.imageSlotGroupManager.clear();
+		this.lastScannedSelector = void 0;
 		if (this.selectorFallbackTimer !== void 0) window.clearTimeout(this.selectorFallbackTimer);
 		this.selectorFallbackTimer = void 0;
 		this.lazyLoadController.clear();
-		this.imageSlotGroups = [];
 		this.chapterSwitch = {};
 	}
 	/** 等到发现首张图片 */
@@ -12527,6 +12883,24 @@ var AutoImageScanner = class {
 		this.start();
 		return this.lazyLoadController.trigger();
 	}
+	/** 判断本轮是否需要重新扫描槽位组，返回原因 */
+	consumeRescanReason(map) {
+		const { structureDirty } = this;
+		this.structureDirty = false;
+		if (structureDirty) return "structure";
+		if (this.imgSelector !== this.lastScannedSelector) return "selector";
+		const { groups } = this.imageSlotGroupManager;
+		if (groups.length === 0) return "noGroups";
+		if (this.hasNewQualifiedImageInsideGroups(map, groups)) return "newImgInGroup";
+		if (this.imageSlotGroupManager.hasNewQualifiedImageInsideObserving(map)) return "newImgInObserving";
+	}
+	/** 判断是否有新合格图片出现在现有 active groups 内部，是否需要重新扫描组 */
+	hasNewQualifiedImageInsideGroups = (map, groups) => {
+		const covered = /* @__PURE__ */ new Set();
+		for (const group of groups) for (const img of group.coveredImgs) covered.add(img);
+		for (const img of map.keys()) if (!covered.has(img) && groups.some((group) => group.parent.contains(img))) return true;
+		return false;
+	};
 	/** 记录传入的图片元素中最常见的那个 selector（仅 initSelector 失效时） */
 	saveImgEleSelector = (list) => {
 		if (list.length < 7 || this.initSelector && this.imgSelector === this.initSelector) return;
@@ -12537,26 +12911,37 @@ var AutoImageScanner = class {
 		}
 	};
 	/** 图片集合变化时更新图片列表、章节按钮并触发懒加载 */
-	handleChanged = helper.throttle(async (map, generation) => {
+	handleChanged = helper.throttle(helper.singleThreaded(async (_state, map, generation) => {
 		if (generation !== this.generation) return;
 		if (map.size === 0) {
-			this.imageSlotGroups = [];
+			this.imageSlotGroupManager.clear();
+			this.lastScannedSelector = void 0;
 			this.imageListBuilder.clearListState();
 			return this.onEmpty?.();
 		}
-		const { groups, bestGroup } = getImageSlotGroupResult(map);
-		this.imageSlotGroups = groups;
-		const imgEleList = [...map.keys()];
-		const { isEdited, isEmpty } = await this.imageListBuilder.update(map, bestGroup, generation);
+		if (this.consumeRescanReason(map)) {
+			this.imageSlotGroupManager.scan(map, this.imgSelector || void 0);
+			this.lastScannedSelector = this.imgSelector;
+		}
+		await this.syncImageList(generation);
+		if (generation !== this.generation) return;
+		(async () => {
+			await this.lazyLoadController.trigger();
+			if (generation === this.generation && this.imageSlotGroupManager.retryObserving()) await this.syncImageList(generation);
+		})();
+	}, { latestOnly: true }), 500);
+	/** 将当前槽位组同步到图片列表 */
+	async syncImageList(generation) {
+		const selectedSlots = this.imageSlotGroupManager.buildSlotElements();
+		const { isEdited, isEmpty } = await this.imageListBuilder.update(selectedSlots, generation);
 		if (generation !== this.generation) return;
 		if (isEmpty) return;
-		if (isEdited) this.saveImgEleSelector(imgEleList);
-		this.lazyLoadController.trigger();
+		if (isEdited) this.saveImgEleSelector(selectedSlots);
 		this.chapterSwitch = getChapterSwitch();
 		await this.onChapterSwitchChange?.({ ...this.chapterSwitch });
 		if (generation !== this.generation) return;
 		this.imageListBuilder.notifyFinalImgListChange(isEdited);
-	}, 500);
+	}
 };
 //#endregion
 exports.AutoImageScanner = AutoImageScanner;
@@ -17806,7 +18191,7 @@ let helper = require("helper");
 		name: "KLZ9",
 		selector: imgSelector,
 		isMangaPage: async () => {
-			if (!/-chapter-\\d+\\.html$/iu.test(location.pathname)) return false;
+			if (!/-chapter-[.0-9]+\\.html$/iu.test(location.pathname)) return false;
 			await helper.wait(() => helper.querySelector(imgSelector));
 			return { id: location.pathname };
 		},
@@ -18358,13 +18743,12 @@ core.setupSiteAdapter({
 		load_original_image: true
 	},
 	getPageContext: async () => {
-		const path = location.pathname.replace(/^\\/(?:[^/]+\\/)?/u, "/");
-		const listId = /^\\/users\\/(?<listId>\\d+)/u.exec(path)?.groups?.listId;
+		const listId = /^\\/(?:en\\/)?users\\/(?<listId>\\d+)/u.exec(location.pathname)?.groups?.listId;
 		if (listId) return {
 			type: "list",
 			id: listId
 		};
-		const id = /^\\/artworks\\/(?<id>\\d+)/u.exec(path)?.groups?.id;
+		const id = /^\\/(?:en\\/)?artworks\\/(?<id>\\d+)/u.exec(location.pathname)?.groups?.id;
 		if (!id) return;
 		const res = await core.request(\`/ajax/illust/\${id}/pages\`, { responseType: "json" });
 		if (res.response.body.length === 0) return;

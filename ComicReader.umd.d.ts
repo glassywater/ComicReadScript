@@ -394,23 +394,6 @@ export type ShowState = {
 	};
 };
 declare const showState: ShowState;
-declare const mountComponents: (id: string, fc: () => JSX.Element) => HTMLDivElement;
-declare class FaviconProgress {
-	initLink: string;
-	color: string;
-	private readonly canvas;
-	private readonly ctx;
-	private readonly link;
-	constructor(color?: string);
-	update(progress: number): void;
-	updateFavicon(): void;
-	/** 恢复默认图标 */
-	recover(): void;
-}
-declare const useFaviconProgress: () => void;
-declare const lang: import("solid-js").Accessor<"zh" | "en" | "ru">, setLang: import("solid-js").Setter<"zh" | "en" | "ru">;
-declare const setInitLang: () => Promise<"zh" | "en" | "ru">;
-declare const t: (keys: string, variables?: Record<string, unknown>) => string;
 declare const log: {
 	(...args: unknown[]): void;
 	warn(...args: unknown[]): void;
@@ -423,36 +406,23 @@ declare const fileType: {
 	readonly w: "webp";
 	readonly b: "bmp";
 };
-declare const exposeToGlobal: (obj: Record<string, unknown>) => void;
-declare const throttle: ScheduleCallback;
-declare const debounce: ScheduleCallback;
+declare const waitImgLoad: (target: HTMLImageElement | string, timeout?: number) => Promise<HTMLImageElement>;
+declare const testImgUrl: (url: string) => Promise<unknown>;
+declare const canvasToBlob: (canvas: HTMLCanvasElement | OffscreenCanvas, type?: string, quality?: number) => Promise<Blob>;
+declare const canvasToBlobUrl: (canvas: HTMLCanvasElement | OffscreenCanvas, type?: string, quality?: number) => Promise<string>;
+declare const getImageData: (img: HTMLImageElement, maxSize?: number) => ImageData;
+declare const lang: import("solid-js").Accessor<"zh" | "en" | "ru">, setLang: import("solid-js").Setter<"zh" | "en" | "ru">;
+declare const setInitLang: () => Promise<"zh" | "en" | "ru">;
+declare const t: (keys: string, variables?: Record<string, unknown>) => string;
 declare const sleep: (ms: number) => Promise<unknown>;
-declare const clamp: (min: number, val: number, max: number) => number;
-declare const inRange: (min: number, val: number, max: number) => boolean;
-declare const getFileName: (url: string) => string | undefined;
-declare const isString: (val: unknown) => val is string;
-declare const isNumber: (val: unknown) => val is number;
-declare const isArray: (val: unknown) => val is unknown[];
-declare const approx: (val: number, target: number, range?: number) => boolean;
 declare const once: <T extends (...args: any[]) => any>(fn: T) => ((...args: Parameters<T>) => ReturnType<T>);
-declare function range(a: number, b?: number): number[];
-declare function range<T = number>(a: number, b: (K: number) => T): T[];
-declare function range<T = number>(a: number, b: T): T[];
-declare function range<T = number>(a: number, b: number, c: (K: number) => T): T[] | number[];
-declare const isHTMLElement: (node: Node) => node is HTMLElement;
-declare const isImageElement: (node: Node) => node is HTMLImageElement;
-declare const querySelector: <T extends HTMLElement = HTMLElement>(selector: string) => T | null;
-declare const querySelectorAll: <T extends HTMLElement = HTMLElement>(selector: string) => T[];
-declare const querySelectorClick: (selector: string | (() => HTMLElement | undefined | null), textContent?: string) => (() => void | undefined) | undefined;
-declare const getMostItem: <T>(list: T[]) => T;
-declare const isUrl: (text: string) => boolean;
-declare const saveAs: (blob: Blob, name?: string) => void;
-declare const scrollIntoView: (selector: string, behavior?: ScrollBehavior) => void | undefined;
 export type SingleThreadedState<T extends any[]> = {
 	running: boolean;
 	argList: T[];
-	/** 是否保留运行期间的调用到当此运行结束后调用 */
+	/** 是否在一轮运行结束后清空等待调用队列 */
 	abandon?: boolean;
+	/** 是否在一轮运行结束后只补跑最后一次等待调用 */
+	latestOnly?: boolean;
 	/** 连续调用的间隔 */
 	timeout?: number;
 	/** 确保本次运行完后再运行一次 */
@@ -473,27 +443,53 @@ declare class PQueue<T> {
 	set(...items: T[]): void;
 	clear(): void;
 }
-declare const needDarkMode: (hexColor: string) => boolean;
 declare function wait<T>(fn: () => Promisable<T | undefined>): Promise<TrueValue<T>>;
 declare function wait<T>(fn: () => Promisable<T>, timeout?: number, waitTime?: number): Promise<T>;
-declare function waitDom(selector: string, count?: number): Promise<HTMLElement[]>;
-declare function waitDom(selector: string, count?: number, timeout?: number): Promise<HTMLElement[] | undefined>;
-declare const waitImgLoad: (target: HTMLImageElement | string, timeout?: number) => Promise<HTMLImageElement>;
-declare const boolDataVal: (val: boolean | undefined) => "" | undefined;
-declare const testImgUrl: (url: string) => Promise<unknown>;
-declare const canvasToBlob: (canvas: HTMLCanvasElement | OffscreenCanvas, type?: string, quality?: number) => Promise<Blob>;
-declare const canvasToBlobUrl: (canvas: HTMLCanvasElement | OffscreenCanvas, type?: string, quality?: number) => Promise<string>;
+declare const mountComponents: (id: string, fc: () => JSX.Element) => HTMLDivElement;
 declare const difference: <T extends object>(a: T, b: T) => Partial<T>;
 declare const assign: <T extends object>(target: T, ...sources: (Partial<T> | undefined)[]) => T;
 declare const byPath: <T = object>(obj: object, path: string | string[], handleVal?: (parentObj: object, key: string) => unknown) => T | null;
+declare const querySelector: <T extends HTMLElement = HTMLElement>(selector: string) => T | null;
+declare const querySelectorAll: <T extends HTMLElement = HTMLElement>(selector: string) => T[];
+declare const querySelectorClick: (selector: string | (() => HTMLElement | undefined | null), textContent?: string) => (() => void | undefined) | undefined;
+declare const scrollIntoView: (selector: string, behavior?: ScrollBehavior) => void | undefined;
+declare const domParse: (html: string) => Document;
+declare class FaviconProgress {
+	initLink: string;
+	color: string;
+	private readonly canvas;
+	private readonly ctx;
+	private readonly link;
+	constructor(color?: string);
+	update(progress: number): void;
+	updateFavicon(): void;
+	/** 恢复默认图标 */
+	recover(): void;
+}
+declare const useFaviconProgress: () => void;
+declare function range(a: number, b?: number): number[];
+declare function range<T = number>(a: number, b: (K: number) => T): T[];
+declare function range<T = number>(a: number, b: T): T[];
+declare function range<T = number>(a: number, b: number, c: (K: number) => T): T[] | number[];
+declare const extractRange: (rangeText: string, length: number) => Set<number>;
+declare const descRange: (list: Iterable<number>, length: number) => string;
+declare const exposeToGlobal: (obj: Record<string, unknown>) => void;
+declare const getFileName: (url: string) => string | undefined;
+declare const getMostItem: <T>(list: T[]) => T;
+declare const isUrl: (text: string) => boolean;
+declare const saveAs: (blob: Blob, name?: string) => void;
+declare const needDarkMode: (hexColor: string) => boolean;
+declare const clamp: (min: number, val: number, max: number) => number;
+declare const inRange: (min: number, val: number, max: number) => boolean;
+declare const approx: (val: number, target: number, range?: number) => boolean;
+declare function waitDom(selector: string, count?: number): Promise<HTMLElement[]>;
+declare function waitDom(selector: string, count?: number, timeout?: number): Promise<HTMLElement[] | undefined>;
+declare const boolDataVal: (val: boolean | undefined) => "" | undefined;
 declare const requestIdleCallback$1: (callback: IdleRequestCallback, timeout?: number) => number;
 declare const getKeyboardCode: (e: KeyboardEvent) => string;
 declare const keyboardCodeToText: (code: string) => string;
-declare const domParse: (html: string) => Document;
 declare const hijackFn: <T extends unknown[] = unknown[], R = unknown>(fnName: string, fn: (rawFn: (...args: T) => R, args: T) => R) => void;
 declare const ensureGmValue: <T extends string | number | object = string>(name: string, defaultValue: string | (() => Promisable<void | string>)) => Promise<T>;
-declare const extractRange: (rangeText: string, length: number) => Set<number>;
-declare const descRange: (list: Iterable<number>, length: number) => string;
 declare const onUrlChange: (fn: (lastUrl: string, nowUrl: string) => Promisable<void>, handleUrl?: (location: Location) => string) => () => void;
 declare const waitUrlChange: <T = unknown>(isValidUrl: () => T) => Promise<NonNullable<T>>;
 declare abstract class AnimationFrame {
@@ -509,7 +505,6 @@ declare class WakeLock$1 {
 	on: () => Promise<boolean | null>;
 	off: () => Promise<void>;
 }
-declare const getImageData: (img: HTMLImageElement, maxSize?: number) => ImageData;
 declare const withEventStop: <T extends Event>(handler?: (e: T) => void) => (e: T) => void;
 declare const versionLt: (version1: string, version2: string) => boolean;
 declare const gql: (strings: TemplateStringsArray, ...values: string[]) => string;
@@ -523,6 +518,18 @@ declare const createMemoMap: <Return extends Record<string, any>>(fnMap: {
 declare const createRootEffect: typeof createEffect;
 declare const createEffectOn: typeof on;
 declare const onAutoMount: (fn: (owner: Owner | null) => void | (() => void)) => void | (() => void);
+export type SetStateFunction<State> = SetStoreFunction<State> & ((fn: (state: State) => void) => void);
+declare const useStore: <State extends object>(initState: State) => {
+	store: Readonly<State>;
+	setState: SetStateFunction<State>;
+};
+declare const throttle: ScheduleCallback;
+declare const debounce: ScheduleCallback;
+declare const isString: (val: unknown) => val is string;
+declare const isNumber: (val: unknown) => val is number;
+declare const isArray: (val: unknown) => val is unknown[];
+declare const isHTMLElement: (node: Node) => node is HTMLElement;
+declare const isImageElement: (node: Node) => node is HTMLImageElement;
 export type UseStore = <T>(txMode: IDBTransactionMode, callback: (store: IDBObjectStore) => T | PromiseLike<T>) => Promise<T>;
 declare const promisifyRequest: <T>(request: IDBRequest<T>) => Promise<T>;
 declare const useCache: <Schema extends Record<string, unknown>>(schema: Record<string, string> | ((db: IDBDatabase) => void), name?: string, version?: number) => Promise<{
@@ -566,11 +573,6 @@ export type UseDragOptions = {
 };
 export type UseDrag = (state: PointerState, e: PointerEvent) => void;
 declare const useDrag: ({ ref, handleDrag, easyMode, handleClick, skip, setCapture, touches, }: UseDragOptions) => void;
-export type SetStateFunction<State> = SetStoreFunction<State> & ((fn: (state: State) => void) => void);
-declare const useStore: <State extends object>(initState: State) => {
-	store: Readonly<State>;
-	setState: SetStateFunction<State>;
-};
 export type StyleMap = {
 	[P in keyof JSX.CSSProperties]: Accessor<JSX.CSSProperties[P]>;
 };
