@@ -18,11 +18,12 @@ setupSiteAdapter({
   },
   getPageContext: async () => {
     // pixiv 在切换为英语后会在路径前面加入一个 `/en/`，需要忽略
-    const path = location.pathname.replace(/^\/(?:[^/]+\/)?/u, '/');
-    const listId = /^\/users\/(?<listId>\d+)/u.exec(path)?.groups?.listId;
+    const listId = /^\/(?:en\/)?users\/(?<listId>\d+)/u.exec(location.pathname)
+      ?.groups?.listId;
     if (listId) return { type: 'list', id: listId } as const;
 
-    const id = /^\/artworks\/(?<id>\d+)/u.exec(path)?.groups?.id;
+    const id = /^\/(?:en\/)?artworks\/(?<id>\d+)/u.exec(location.pathname)
+      ?.groups?.id;
     if (!id) return;
 
     const res = await request<{ body: typeof imgs }>(
