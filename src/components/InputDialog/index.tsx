@@ -10,6 +10,8 @@ export type PasswordRequest = {
   tip?: string;
   /** 输入框的初始值 */
   defaultValue?: string;
+  /** 输入框类型，默认 text */
+  type?: string;
   resolve: (password: string | null) => void;
 };
 
@@ -67,7 +69,7 @@ export const InputDialog: Component = () => {
         <input
           ref={(ref) => setState('inputRef', ref)}
           class={classes.input}
-          type="text"
+          type={store.queue[0]?.type ?? 'text'}
           value={store.password}
           on:input={(e) => setState('password', e.currentTarget.value)}
         />
@@ -94,6 +96,7 @@ let dom: HTMLDivElement;
 const init = () => {
   if (dom || store.ref) return;
   dom = mountComponents('input-dialog', () => <InputDialog />);
+  dom.classList.add('comicread-ignore');
 };
 
 /**
@@ -105,16 +108,18 @@ export const askInput = ({
   message = t('other.enter_password'),
   tip,
   defaultValue = '',
+  type,
 }: {
   message?: string;
   tip?: string;
   defaultValue?: string;
+  type?: PasswordRequest['type'];
 } = {}) =>
   new Promise<string | null>((resolve) => {
     init();
     setState('queue', (queue) => [
       ...queue,
-      { message, tip, defaultValue, resolve },
+      { message, tip, defaultValue, type, resolve },
     ]);
     // 首个请求立即弹出，后续请求在 complete 中关闭后延迟重开
     if (store.queue.length === 1) openNow();

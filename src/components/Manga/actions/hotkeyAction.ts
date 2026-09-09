@@ -4,6 +4,7 @@ import { setState, store } from '../store';
 import { handleEndTurnPage } from './endPage';
 import { getImg, setOption } from './helper';
 import { reloadImg } from './imageLoad';
+import { jumpToPage } from './jumpToPage';
 import {
   abreastScrollFill,
   findTopPage,
@@ -191,6 +192,8 @@ export const handleHotkey = (hotkey: string, e?: KeyboardEvent) => {
         'activePageIndex',
         Math.max(0, store.pageList.length - 1),
       );
+    case 'jump_to_page':
+      return void jumpToPage();
 
     case 'switch_page_fill':
       return switchFillEffect();

@@ -14,6 +14,7 @@ export const [defaultHotkeys, setDefaultHotkeys] = createSignal<
   page_down: [' ', 'PageDown', 'Shift + s'],
   jump_to_home: ['Home'],
   jump_to_end: ['End'],
+  jump_to_page: ['g'],
   exit: ['Escape'],
   switch_page_fill: ['/', 'm', 'z'],
   switch_scroll_mode: [],
