@@ -20,7 +20,7 @@ import { querySelector, querySelectorAll, wait } from 'helper';
     selector: imgSelector,
     // 统一用「路径以 -chapter-数字.html 结尾」判断漫画页
     isMangaPage: async () => {
-      if (!/-chapter-\d+\.html$/iu.test(location.pathname)) return false;
+      if (!/-chapter-[.0-9]+\.html$/iu.test(location.pathname)) return false;
       await wait(() => querySelector(imgSelector));
       return { id: location.pathname };
     },
