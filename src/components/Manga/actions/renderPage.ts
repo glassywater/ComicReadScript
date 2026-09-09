@@ -1,4 +1,10 @@
-import { clamp, createEffectOn, createRootMemo, throttle } from 'helper';
+import {
+  clamp,
+  createEffectOn,
+  createRootMemo,
+  inRange,
+  throttle,
+} from 'helper';
 import { reconcile } from 'solid-js/store';
 
 import { type State, setState, store } from '../store';
@@ -137,3 +143,25 @@ createEffectOn(
   },
   { defer: true },
 );
+
+/** 将页面移回原位 */
+export const resetPage = (state: State, animation = false) => {
+  updateShowRange(state);
+  state.page.offset.x.pct = 0;
+  state.page.offset.y.pct = 0;
+
+  if (state.option.scrollMode.enabled) {
+    state.page.anima = '';
+    return;
+  }
+
+  let i = -1;
+  if (
+    inRange(state.renderRange[0], state.activePageIndex, state.renderRange[1])
+  )
+    i = state.activePageIndex - state.renderRange[0];
+  if (store.page.vertical) state.page.offset.y.pct = i === -1 ? 0 : -i;
+  else state.page.offset.x.pct = i === -1 ? 0 : i;
+
+  state.page.anima = animation ? 'page' : '';
+};

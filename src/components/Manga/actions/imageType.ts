@@ -2,8 +2,8 @@ import { createRootEffect } from 'helper';
 
 import { type State, setState, store } from '../store';
 import { type ComicImg } from '../store/image';
-import { updatePageData } from './image';
 import { placeholderSize } from './memo';
+import { updatePageData } from './pageData';
 
 export const isWideType = (type: ComicImg['type']) =>
   type === 'wide' || type === 'long';

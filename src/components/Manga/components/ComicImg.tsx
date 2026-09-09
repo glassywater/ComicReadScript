@@ -42,11 +42,15 @@ export const ComicImg: Component<TComicImg & { index: number }> = (img) => {
     return img.src;
   };
 
+  /** 并排卷轴模式下图片在各列中的位置 */
+  const abreastPosition = createMemo(() =>
+    isAbreastMode() ? abreastArea().position[img.index] : undefined,
+  );
+
   /** 并排卷轴模式下需要复制的图片数量 */
   const cloneNum = createMemo(() => {
-    if (!isAbreastMode()) return 0;
-    const imgPosition = abreastArea().position[img.index];
-    return imgPosition ? imgPosition.length - 1 : 0;
+    const positions = abreastPosition();
+    return positions ? positions.length - 1 : 0;
   });
 
   /** 打开「边缘裁切」后使用的样式 */
@@ -123,42 +127,54 @@ export const ComicImg: Component<TComicImg & { index: number }> = (img) => {
     },
   }));
 
-  const ComicImgBase: Component<{ cloneIndex?: number }> = (props) => (
-    <div
-      class={classes.img}
-      id={`_${img.index}_${props.cloneIndex ?? 0}`}
-      style={styles().img}
-      data-show={showState()}
-      data-type={img.type ?? store.defaultImgType}
-      data-load-type={img.loadType === 'loaded' ? undefined : img.loadType}
-    >
-      {/* 因为 img 无法使用 ::after，所以得用 picture 包一下 */}
-      <picture style={styles().picture} data-src={img.src}>
-        <Show when={src()}>
-          <img
-            style={styles().imgEle}
-            ref={(el) => {
-              refs.imgEleMap[img.src] ??= new Set();
-              const set = refs.imgEleMap[img.src];
-              set.add(el);
-              onCleanup(() => {
-                set.delete(el);
-                if (set.size === 0) delete refs.imgEleMap[img.src];
-              });
-            }}
-            src={src()}
-            alt={`${img.index}`}
-            data-src={img.src}
-            onLoad={(e) => handleImgLoaded(img.src, e.currentTarget)}
-            onError={(e) => handleImgError(img.src, e.currentTarget)}
-            draggable="false"
-            decoding="async"
-          />
-        </Show>
-        <div class={classes.pageTip}>{getImgTip(img.index)}</div>
-      </picture>
-    </div>
-  );
+  const ComicImgBase: Component<{ cloneIndex?: number }> = (props) => {
+    const imgStyle = createMemo(() => {
+      // 并排卷轴模式下按图片所在列定位
+      const position = abreastPosition()?.[props.cloneIndex ?? 0];
+      if (!position) return styles().img;
+      return {
+        ...styles().img,
+        'grid-area': `_${position.column}`,
+        transform: `translateY(${position.top}px)`,
+      };
+    });
+
+    return (
+      <div
+        class={classes.img}
+        style={imgStyle()}
+        data-show={showState()}
+        data-type={img.type ?? store.defaultImgType}
+        data-load-type={img.loadType === 'loaded' ? undefined : img.loadType}
+      >
+        {/* 因为 img 无法使用 ::after，所以得用 picture 包一下 */}
+        <picture style={styles().picture} data-src={img.src}>
+          <Show when={src()}>
+            <img
+              style={styles().imgEle}
+              ref={(el) => {
+                refs.imgEleMap[img.src] ??= new Set();
+                const set = refs.imgEleMap[img.src];
+                set.add(el);
+                onCleanup(() => {
+                  set.delete(el);
+                  if (set.size === 0) delete refs.imgEleMap[img.src];
+                });
+              }}
+              src={src()}
+              alt={`${img.index}`}
+              data-src={img.src}
+              onLoad={(e) => handleImgLoaded(img.src, e.currentTarget)}
+              onError={(e) => handleImgError(img.src, e.currentTarget)}
+              draggable="false"
+              decoding="async"
+            />
+          </Show>
+          <div class={classes.pageTip}>{getImgTip(img.index)}</div>
+        </picture>
+      </div>
+    );
+  };
 
   return (
     <>

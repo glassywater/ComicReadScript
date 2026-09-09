@@ -1,9 +1,9 @@
 import { type State, refs, setState, store } from '../store';
 import { setOption } from './helper';
-import { updatePageData } from './image';
 import { syncImgLoadState, updateImgLoadType } from './imageLoad';
 import { invalidateRecognition } from './imageRecognition';
 import { activeImgIndex, autoPageNum, nowFillIndex, pageNum } from './memo';
+import { updatePageData } from './pageData';
 import { constantScroll, jumpToImg } from './scroll';
 import { zoom } from './zoom';
 

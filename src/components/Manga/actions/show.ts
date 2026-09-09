@@ -1,31 +1,9 @@
-import { createEffectOn, inRange, t, throttle } from 'helper';
+import { createEffectOn, t, throttle } from 'helper';
 
-import { type State, setState, store } from '../store';
+import { setState, store } from '../store';
 import { getImg } from './helper';
 import { activePage, isUpscale } from './memo';
-import { updateShowRange } from './renderPage';
-
-/** 将页面移回原位 */
-export const resetPage = (state: State, animation = false) => {
-  updateShowRange(state);
-  state.page.offset.x.pct = 0;
-  state.page.offset.y.pct = 0;
-
-  if (state.option.scrollMode.enabled) {
-    state.page.anima = '';
-    return;
-  }
-
-  let i = -1;
-  if (
-    inRange(state.renderRange[0], state.activePageIndex, state.renderRange[1])
-  )
-    i = state.activePageIndex - state.renderRange[0];
-  if (store.page.vertical) state.page.offset.y.pct = i === -1 ? 0 : -i;
-  else state.page.offset.x.pct = i === -1 ? 0 : i;
-
-  state.page.anima = animation ? 'page' : '';
-};
+import { resetPage } from './renderPage';
 
 /** 获取指定图片的提示文本 */
 export const getImgTip = (i: number) => {

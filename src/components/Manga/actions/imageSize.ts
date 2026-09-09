@@ -100,9 +100,9 @@ export const updateImgSize = withOptionalState(
   },
 );
 
+// 显示配置变化会影响所有图片的显示尺寸
 createEffectOn(
   [
-    placeholderSize,
     () => store.rootSize,
     () => store.option.scrollMode.enabled,
     () => store.option.scrollMode.imgScale,
@@ -120,3 +120,17 @@ createEffectOn(
     });
   },
 );
+
+createEffectOn(placeholderSize, () => {
+  setState((state) => {
+    // 并排卷轴模式下，列宽派生自图片占位尺寸，所以所有图片都会受影响
+    const skipLoaded = !isAbreastMode();
+    for (const url of state.imgList) {
+      const img = state.imgMap[url];
+      // 图片占位尺寸的变化只会影响没有真实尺寸的图片，
+      // 所以这里跳过已有真实尺寸的图片
+      if (skipLoaded && img.width !== undefined) continue;
+      Object.assign(img.size, getImgDisplaySize(state, img));
+    }
+  });
+});

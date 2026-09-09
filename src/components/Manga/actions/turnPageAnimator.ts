@@ -2,7 +2,7 @@ import { AnimationFrame, clamp } from 'helper';
 
 import { type State, setState, store } from '../store';
 import { type Dir } from './endPage';
-import { resetPage } from './show';
+import { resetPage } from './renderPage';
 import { turnPage } from './turnPage';
 
 /** 拖动松手翻页动画时长（固定） */

@@ -6,8 +6,7 @@ import { refs, setState, store } from '../store';
 import { getImg, getImgEle, resetUI } from './helper';
 import { handleHotkey } from './hotkeyAction';
 import { reloadImg } from './imageLoad';
-import { showImgList } from './renderPage';
-import { resetPage } from './show';
+import { resetPage, showImgList } from './renderPage';
 import { getTurnPageDir } from './turnPage';
 import {
   DRAG_TURN_ANIMATION_DURATION,

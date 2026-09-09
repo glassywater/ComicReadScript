@@ -141,21 +141,3 @@ export const abreastContentWidth = createRootMemo(
 export const abreastScrollWidth = createRootMemo(
   () => abreastContentWidth() - store.rootSize.width,
 );
-
-/** 并排卷轴模式下每个图片所在位置的样式 */
-export const imgAreaStyle = createRootMemo(() => {
-  if (!isAbreastMode()) return '';
-
-  let styleText = '';
-
-  for (const index of store.imgList.keys()) {
-    let imgNum = 0;
-    for (const { column, top } of abreastArea().position[index] ?? []) {
-      const itemStyle = `grid-area: _${column} !important; transform: translateY(${top}px);`;
-      styleText += `#_${index}_${imgNum} { ${itemStyle} }\n`;
-      imgNum += 1;
-    }
-  }
-
-  return styleText;
-});

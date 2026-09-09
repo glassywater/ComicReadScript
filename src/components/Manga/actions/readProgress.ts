@@ -3,9 +3,9 @@ import { unwrap } from 'solid-js/store';
 
 import { type State, store } from '../store';
 import { type FillEffect } from '../store/image';
-import { updatePageData } from './image';
 import { updateImgSize } from './imageSize';
 import { activeImgIndex, imgList } from './memo';
+import { updatePageData } from './pageData';
 import { jumpToImg, scrollViewImg } from './scroll';
 
 type Progress = {

@@ -1,7 +1,7 @@
 import { approx, createEffectOn, createRootMemo, inRange } from 'helper';
 
 import { setState, store } from '../../store';
-import { resetImgState, updatePageData } from '../image';
+import { resetImgState, updatePageData } from '../pageData';
 import { isAbreastMode } from './options';
 
 /** 记录每张图片所在的页面 */

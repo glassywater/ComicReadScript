@@ -1,4 +1,4 @@
-import { createRootMemo } from 'helper';
+import { createRootMemo, createThrottleMemo } from 'helper';
 
 import { store } from '../../store';
 import { type ComicImg } from '../../store/image';
@@ -22,7 +22,7 @@ export const scrollPageList = createRootMemo<([number] | [number, number])[][]>(
 );
 
 /** 卷轴模式下每行高度 */
-export const pageHeightList = createRootMemo(() => {
+export const pageHeightList = createThrottleMemo(() => {
   if (!isScrollMode()) return [];
   if (!isDoubleMode()) return imgList().map((img) => img.size.height ?? 0);
 
@@ -43,7 +43,7 @@ export const pageHeightList = createRootMemo(() => {
       ),
     ),
   );
-});
+}, 100);
 
 /** 卷轴模式下每页位置 */
 export const pageTopList = createRootMemo(() => {

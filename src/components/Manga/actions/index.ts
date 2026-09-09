@@ -3,7 +3,7 @@ export * from './endPage';
 export * from './helper';
 export * from './hotkeyAction';
 export * from './hotkeys';
-export * from './image';
+export * from './pageData';
 export * from './imageLoad';
 export * from './imageSize';
 export * from './imageType';

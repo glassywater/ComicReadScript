@@ -2,7 +2,7 @@ import { createRootMemo, debounce, throttle } from 'helper';
 
 import { type State, setState, store } from '../../store';
 import { openScrollLock } from '../helper';
-import { resetPage } from '../show';
+import { resetPage } from '../renderPage';
 import { turnPage } from '../turnPage';
 
 /** 虚拟棘轮步长 */

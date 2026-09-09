@@ -21,7 +21,6 @@ import {
   handlePinchZoom,
   handleScrollModeDrag,
   handleZoomDrag,
-  imgAreaStyle,
   imgIndexMap,
   isEnableBg,
   isScrollMode,
@@ -184,8 +183,6 @@ export const ComicImgFlow: Component = () => {
         ? (getImg(activeImgIndex())?.background ?? undefined)
         : undefined,
   });
-
-  css(imgAreaStyle);
 
   const renderList = createMemo(() => {
     const list = new Set(renderImgList());

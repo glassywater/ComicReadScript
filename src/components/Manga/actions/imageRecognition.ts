@@ -13,8 +13,8 @@ import * as worker from 'worker/ImageRecognition';
 
 import { setState, store } from '../store';
 import { getImg, getImgEle, getImgIndexs } from './helper';
-import { updatePageData } from './image';
 import { updateImgSize } from './imageSize';
+import { updatePageData } from './pageData';
 import { renderImgList } from './renderPage';
 
 /**
