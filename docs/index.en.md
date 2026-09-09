@@ -30,6 +30,10 @@ auto-updated from `src/index.ts`. -->
   </a>
 </p>
 
+<div align="right">
+  <strong>English</strong> | <a href="https://github.com/hymbz/ComicReadScript/blob/master/docs/index.md">[中文]</a>
+</div>
+
 ## Introduction
 
 This is a userscript written by someone who was constantly annoyed that most comic sites don't support two-page display, and that large two-page spreads in comics get split into two pages**. To achieve a better reading experience, it adds a **two-page reading mode** and various enhancement features to mainstream comic sites.

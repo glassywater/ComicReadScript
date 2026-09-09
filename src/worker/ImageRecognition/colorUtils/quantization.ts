@@ -1,4 +1,3 @@
-// oxlint-disable max-params
 import { LAB_QUANTIZE_LEVELS } from '../backgroundDetection/thresholds';
 import { LAB_AB_RANGE, LAB_L_RANGE, rgbToOklab } from './lab';
 

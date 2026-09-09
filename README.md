@@ -24,7 +24,9 @@
   </a>
 </p>
 
-**中文** | [English](https://github.com/hymbz/ComicReadScript/blob/master/docs/index.en.md)
+<div align="right">
+  <strong>中文</strong> | <a href="./docs/index.en.md">[English]</a>
+</div>
 
 ## 简介
 
