@@ -1,5 +1,3 @@
-export type RGBColor = { r: number; g: number; b: number };
-
 /** 对指定数值取整 */
 export const round = (n: number, int: number) => {
   if (int <= 0) return n;

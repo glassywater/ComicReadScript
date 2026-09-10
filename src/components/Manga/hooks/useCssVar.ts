@@ -1,4 +1,4 @@
-import { t } from 'helper';
+import { effectiveDark, t } from 'helper';
 import { type JSX } from 'solid-js';
 
 import classes from '../index.module.css';
@@ -43,9 +43,7 @@ const getImgFilter = () => {
 
 export const useCssVar = () => {
   const svg = () => {
-    const fill = store.option.darkMode
-      ? 'rgb(156,156,156)'
-      : 'rgb(110,110,110)';
+    const fill = effectiveDark() ? 'rgb(156,156,156)' : 'rgb(110,110,110)';
     return {
       '--md-image-not-supported': createSvgIcon(fill, MdImageNotSupported),
       '--md-cloud-download': createSvgIcon(fill, MdCloudDownload),
@@ -62,10 +60,9 @@ export const useCssVar = () => {
   css(`.${classes.root}`, [
     {
       '--bg': () =>
-        store.option.customBackground ??
-        (store.option.darkMode ? '#000' : '#fff'),
+        store.option.customBackground ?? (effectiveDark() ? '#000' : '#fff'),
       '--scroll-mode-spacing': () => store.option.scrollMode.spacing,
-      'color-scheme': () => (store.option.darkMode ? 'dark' : 'light'),
+      'color-scheme': () => (effectiveDark() ? 'dark' : 'light'),
       '--img-filter': getImgFilter,
     },
     () => themeStyle,

@@ -17,10 +17,8 @@ export type Option = {
   customBackground?: string;
   /** 禁止自动放大图片 */
   disableZoom: boolean;
-  /** 黑暗模式 */
-  darkMode: boolean;
-  /** 黑暗模式跟随系统 */
-  autoDarkMode: boolean;
+  /** 黑暗模式。undefined 表示跟随网站色调 */
+  darkMode: boolean | undefined;
   /** 左右翻页键交换 */
   swapPageTurnKey: boolean;
   /** 始终加载所有图片 */
@@ -180,8 +178,7 @@ const _defaultOption: Readonly<Option> = {
   },
   firstPageFill: true,
   disableZoom: false,
-  darkMode: false,
-  autoDarkMode: false,
+  darkMode: undefined,
   swapPageTurnKey: false,
   scroolEnd: 'auto',
   alwaysLoadAllImg: false,

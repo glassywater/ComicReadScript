@@ -1,6 +1,8 @@
 export * from './logger';
 export * from './image';
 export * from './i18n';
+// 黑暗模式状态管理
+export * from './darkMode';
 // 异步等待与执行/并发控制
 export * from './asyncControl';
 // SolidJS 组件挂载

@@ -1,7 +1,6 @@
 import {
   ColorHistogram,
   type LabQuantizedData,
-  type RGBColor,
   groupColorsByHsv,
   rgbToHex,
 } from '../colorUtils';
@@ -125,7 +124,7 @@ export abstract class Region {
   }
 
   /** 获取区域的量化 RGB（Oklab 量化分组对应的平均 RGB，仅用于 HSV 分组） */
-  getQuantizedRgb(): { r: number; g: number; b: number } | undefined {
+  getQuantizedRgb(): RGBColor | undefined {
     const group = this.getQuantizedGroup();
     if (group === undefined) return;
 
@@ -143,10 +142,7 @@ export abstract class Region {
     const group = this.colorHistogram.getModeKey();
     if (group === undefined) throw new Error('区域没有像素，无法获取主色');
 
-    const counts = new Map<
-      number,
-      { count: number; r: number; g: number; b: number }
-    >();
+    const counts = new Map<number, { count: number } & RGBColor>();
     let maxKey = 0;
     let maxCount = 0;
 

@@ -9,10 +9,10 @@ export default {
 };
 
 export const 夜间模式 = {
-  async play() {
-    await clickSettingItem(t('setting.option.dark_mode'));
-    await waitImgLoaded();
-  },
+  args: {
+    option: { darkMode: true },
+  } satisfies PartialProps,
+  play: waitImgLoaded,
 };
 
 export const 放大 = {

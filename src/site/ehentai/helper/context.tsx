@@ -1,4 +1,9 @@
-import { type CoreContext, type PageHandler, request } from 'core';
+import {
+  type CoreContext,
+  type PageHandler,
+  type SiteOptions,
+  request,
+} from 'core';
 import { querySelector, range } from 'helper';
 
 export const featureOptions = {
@@ -26,8 +31,11 @@ export const featureOptions = {
   expand_tag_list: true,
 
   autoShow: false,
-  // 默认开启图像识别，避免图片 url 过期后还要刷新
-  defaultOption: { imgRecognition: { enabled: true } },
+  defaultOption: {
+    // 默认开启图像识别，避免图片 url 过期后还要刷新
+    imgRecognition: { enabled: true },
+    darkMode: false,
+  } as SiteOptions['defaultOption'],
 };
 
 export type EhOptions = typeof featureOptions;

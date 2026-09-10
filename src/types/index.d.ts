@@ -24,6 +24,8 @@ declare global {
   /** 将指定的 i18n 字段在打包时单独提取为一个函数，避免导入 main */
   const extractI18n: (key: string) => (lang: string) => string;
 
+  type RGBColor = { r: number; g: number; b: number; a?: number };
+
   interface Window {
     crsLib?: {
       [k: string]: any;

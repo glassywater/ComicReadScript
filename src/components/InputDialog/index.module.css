@@ -1,10 +1,10 @@
 .dialog {
-  --pd-bg: #fff;
-  --pd-text: #1f1f1f;
-  --pd-muted: #666;
-  --pd-btn: #eee;
+  --pd-bg: light-dark(#fff, #2b2b2b);
+  --pd-text: light-dark(#1f1f1f, #eee);
+  --pd-muted: light-dark(#666, #aaa);
+  --pd-btn: light-dark(#eee, #3a3a3a);
   --pd-primary: #607d8b;
-  --pd-focus: #afbec5;
+  --pd-focus: light-dark(#afbec5, #4a4a4a);
 
   box-sizing: border-box;
   width: max-content;
@@ -23,14 +23,6 @@
   &::backdrop {
     background: rgb(0 0 0 / 50%);
     backdrop-filter: none;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    --pd-bg: #2b2b2b;
-    --pd-text: #eee;
-    --pd-muted: #aaa;
-    --pd-btn: #3a3a3a;
-    --pd-focus: #4a4a4a;
   }
 }
 

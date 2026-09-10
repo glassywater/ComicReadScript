@@ -4,7 +4,6 @@ import {
   SATURATION_THRESHOLD,
 } from '../backgroundDetection/thresholds';
 import { type HSVColor, hsvDistanceSquared, rgbToHsv } from './hsv';
-import { type RGBColor } from './rgb';
 
 /** 每个色相桶的边界组索引，-1 表示该桶为空。 */
 type BucketBoundary = { first: number; last: number };

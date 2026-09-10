@@ -1,6 +1,14 @@
 import MdOutlineFormatTextdirectionLToR from '@material-design-icons/svg/round/format_textdirection_l_to_r.svg';
 import MdOutlineFormatTextdirectionRToL from '@material-design-icons/svg/round/format_textdirection_r_to_l.svg';
-import { clamp, lang, needDarkMode, setLang, t, throttle } from 'helper';
+import {
+  clamp,
+  effectiveDark,
+  lang,
+  needDarkMode,
+  setLang,
+  t,
+  throttle,
+} from 'helper';
 import { type Component, Show } from 'solid-js';
 import { supportWorker } from 'userscript/supportWorker';
 
@@ -254,13 +262,20 @@ export const defaultSettingList: () => SettingList = () => [
     t('setting.option.paragraph_appearance'),
     () => (
       <>
-        <SettingsItemSwitch
+        <SettingsItemSelect
           name={t('setting.option.dark_mode')}
-          {...bindOption('darkMode')}
-        />
-        <SettingsItemSwitch
-          name={t('setting.option.dark_mode_auto')}
-          {...bindOption('autoDarkMode')}
+          options={[
+            ['site', t('setting.option.dark_mode_site')],
+            ['light', t('setting.option.dark_mode_light')],
+            ['dark', t('setting.option.dark_mode_dark')],
+          ]}
+          value={(() => {
+            if (store.option.darkMode === undefined) return 'site';
+            return store.option.darkMode ? 'dark' : 'light';
+          })()}
+          onChange={(val) =>
+            setOption('darkMode', val === 'site' ? undefined : val === 'dark')
+          }
         />
         <SettingsItemNumber
           name={t('setting.option.turn_page_animation_duration')}
@@ -299,7 +314,7 @@ export const defaultSettingList: () => SettingList = () => [
             style={{ width: '2em', 'margin-right': '.4em' }}
             value={
               store.option.customBackground ??
-              (store.option.darkMode ? '#000000' : '#ffffff')
+              (effectiveDark() ? '#000000' : '#ffffff')
             }
             on:input={throttle((e) => {
               if (!e.target.value) return;

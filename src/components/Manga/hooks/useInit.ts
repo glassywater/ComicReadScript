@@ -3,6 +3,7 @@ import {
   createEffectOn,
   createRootMemo,
   debounce,
+  setManualDark,
   throttle,
 } from 'helper';
 import { createEffect, on } from 'solid-js';
@@ -26,7 +27,7 @@ import {
 } from '../actions';
 import { playAnimation, stopPropagation } from '../helper';
 import classes from '../index.module.css';
-import { type State, refs, setState } from '../store';
+import { type State, refs, setState, store } from '../store';
 import { type ComicImg } from '../store/image';
 import { type Option, defaultOption } from '../store/option';
 
@@ -123,6 +124,12 @@ export const useInit = (props: MangaProps) => {
       };
     });
   });
+
+  // 将黑暗模式选项同步到全局色调状态
+  // Manga 显示期间使用用户手动设置的值；不显示后清除，让弹窗等组件跟随网站色调
+  createEffect(() =>
+    setManualDark(props.show === false ? undefined : store.option.darkMode),
+  );
 
   const handleImgList = () => {
     setState((state) => {

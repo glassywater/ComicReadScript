@@ -1,5 +1,4 @@
 import { SATURATION_WEIGHT } from '../backgroundDetection/thresholds';
-import { type RGBColor } from './rgb';
 
 export type HSVColor = { h: number; s: number; v: number };
 

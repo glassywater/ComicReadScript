@@ -30,20 +30,6 @@ export const bindScrollTop = (dom: HTMLElement) => {
   );
 };
 
-// 自动切换黑暗模式
-const darkModeQuery = matchMedia('(prefers-color-scheme: dark)');
-const autoSwitchDarkMode = (query: MediaQueryList | MediaQueryListEvent) => {
-  if (!store.option.autoDarkMode) return;
-  if (query.matches === store.option.darkMode) return;
-  setState('option', 'darkMode', query.matches);
-};
-darkModeQuery.addEventListener('change', autoSwitchDarkMode);
-autoSwitchDarkMode(darkModeQuery);
-createEffectOn(
-  () => store.option.autoDarkMode,
-  () => autoSwitchDarkMode(darkModeQuery),
-);
-
 // 窗口宽度小于800像素时，标记为移动端
 createEffectOn(
   () => store.rootSize.width,
