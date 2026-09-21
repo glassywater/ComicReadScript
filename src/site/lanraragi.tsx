@@ -64,7 +64,7 @@ setup({
   },
   handler: ({ setState }, { id }) => {
     setState('manga', {
-      onShowImgsChange: debounce((showImgs, imgList) => {
+      onShowImgsChange: debounce(({ showImgs, imgList }) => {
         // 在刚打开时跳到 LANraragi 记录的进度
         if (imgList.length > 0 && initFlag) {
           initFlag = false;

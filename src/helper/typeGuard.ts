@@ -1,10 +1,8 @@
-export const isString = (val: unknown): val is string =>
-  typeof val === 'string';
-
 export const isNumber = (val: unknown): val is number =>
-  typeof val === 'number';
+  typeof val === 'number' && !Number.isNaN(val);
 
-export const isArray = (val: unknown): val is unknown[] => Array.isArray(val);
+export const isSafeInteger = (val: unknown): val is number =>
+  Number.isSafeInteger(val);
 
 /** 判断节点是否为元素节点 */
 export const isHTMLElement = (node: Node): node is HTMLElement =>

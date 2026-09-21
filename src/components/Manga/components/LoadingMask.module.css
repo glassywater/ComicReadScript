@@ -15,12 +15,26 @@
 
   & p {
     font-size: 1.5em;
-    opacity: 0.8;
+    animation: loadingMaskBlink 1.5s infinite;
   }
 }
 
 @keyframes loadingMaskFadeIn {
   from {
     opacity: 0;
+  }
+}
+
+@keyframes loadingMaskBlink {
+  0% {
+    opacity: 0.2;
+  }
+
+  50% {
+    opacity: 0.9;
+  }
+
+  100% {
+    opacity: 0.2;
   }
 }

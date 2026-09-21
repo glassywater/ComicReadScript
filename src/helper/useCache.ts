@@ -1,5 +1,7 @@
 import { type Promisable } from 'type-fest';
 
+import { log } from './logger';
+
 export type UseStore = <T>(
   txMode: IDBTransactionMode,
   callback: (store: IDBObjectStore) => T | PromiseLike<T>,
@@ -22,7 +24,7 @@ const openDb = (
     request.onupgradeneeded = () => initSchema(request.result);
     request.onsuccess = () => resolve(request.result);
     request.onerror = (error) => {
-      console.error('数据库打开失败', error);
+      log.error('数据库打开失败', error);
       reject(new Error('数据库打开失败'));
     };
   });

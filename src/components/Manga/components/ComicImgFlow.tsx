@@ -40,7 +40,6 @@ import { css } from '../hooks/useStyle';
 import classes from '../index.module.css';
 import { refs, setState, store } from '../store';
 import { ComicImg } from './ComicImg';
-import { EmptyTip } from './EmptyTip';
 
 export const ComicImgFlow: Component = () => {
   const hiddenMouse = useHiddenMouse(() => refs.mangaFlow);
@@ -222,7 +221,7 @@ export const ComicImgFlow: Component = () => {
         onTransitionEnd={handleTransitionEnd}
         tabIndex={-1}
       >
-        <For each={renderList()} fallback={<EmptyTip />}>
+        <For each={renderList()}>
           {(i) => <ComicImg index={i} {...store.imgMap[store.imgList[i]]} />}
         </For>
       </div>

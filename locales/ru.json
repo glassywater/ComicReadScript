@@ -2,6 +2,7 @@
   "alert": {
     "comic_load_error": "Ошибка загрузки комикса",
     "download_failed": "Не удалось скачать",
+    "fetch_chapter_list_failed": "Не удалось загрузить главы",
     "fetch_comic_img_failed": "Не удалось загрузить изображения",
     "img_load_failed": "Не удалось загрузить изображение",
     "no_img_download": "Нет доступных картинок для загрузки",
@@ -11,6 +12,7 @@
   },
   "button": {
     "auto_scroll": "Автопрокрутка",
+    "chapter_list": "Главы",
     "close_current_page_translation": "Скрыть перевод текущей страницы",
     "download_completed": "Загрузка завершена",
     "download_completed_error": "Загрузка завершена, но {{errorNum}} изображений не удалось загрузить",

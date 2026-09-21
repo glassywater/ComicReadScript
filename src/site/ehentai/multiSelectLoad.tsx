@@ -1,4 +1,5 @@
 import { askInput } from 'components/InputDialog';
+import { useMultiSelectLoad } from 'core';
 import {
   css,
   descRange,
@@ -10,7 +11,6 @@ import {
   singleThreaded,
   t,
 } from 'helper';
-import { useMultiSelectLoad } from 'userscript/multiSelect';
 
 import { detectAd } from './detectAd';
 import { type GalleryHandler } from './helper';
@@ -26,7 +26,7 @@ export const multiSelectLoad: GalleryHandler<
     handleClick: (e: MouseEvent) => Promise<void>;
   }>
 > = async (coreCtx, pageCtx) => {
-  const { setState, showComic } = coreCtx;
+  const { setState } = coreCtx;
 
   css`
     #gdt > a [title] {
@@ -61,6 +61,13 @@ export const multiSelectLoad: GalleryHandler<
   const ms = await useMultiSelectLoad(coreCtx, {
     id: pageCtx.galleryId,
     allItemIds: () => range(pageCtx.imgNum).map(String),
+    registerItems: (map) => {
+      for (const dom of querySelectorAll<HTMLAnchorElement>('#gdt a')) {
+        const imgIndex = Number(/(?<=-)\d+(?:\?|$)/u.exec(dom.href)?.[0]) - 1;
+        if (!Number.isNaN(imgIndex))
+          map.set(dom.querySelector('[title]')!, String(imgIndex));
+      }
+    },
     getImgList: async (id) => {
       await ensureSetup();
       const i = Number(id);
@@ -70,37 +77,27 @@ export const multiSelectLoad: GalleryHandler<
     },
   });
 
-  await ms.registerItems(pageCtx.galleryId, (map) => {
-    for (const dom of querySelectorAll<HTMLAnchorElement>('#gdt a')) {
-      const imgIndex = Number(/(?<=-)\d+(?:\?|$)/u.exec(dom.href)?.[0]) - 1;
-      if (!Number.isNaN(imgIndex))
-        map.set(dom.querySelector('[title]')!, String(imgIndex));
-    }
-  });
-
   return {
     handleClick: async (e: MouseEvent) => {
       if (!e.shiftKey) return;
       e.stopPropagation();
 
-      const defaultValue = coreCtx.multiSelect
-        ? descRange(
-            coreCtx.multiSelect.selectedIds().map(Number),
-            pageCtx.imgNum,
-          )
-        : '';
+      const defaultValue = descRange(
+        ms.selectedIds().map(Number),
+        pageCtx.imgNum,
+      );
 
       const [message, tip] = t('other.page_range').split('\n');
       const pageRange = await askInput({ message, tip, defaultValue });
       if (!pageRange) return;
 
-      coreCtx.multiSelect?.setSelectedIds(
+      // 进入多选模式，确保退出阅读模式后能看到选中的页面
+      if (!ms.isEnabled()) ms.start();
+      ms.setSelectedIds(
         [...extractRange(pageRange, pageCtx.imgNum)].map(String),
       );
 
-      // 删掉当前的图片列表以便触发重新加载
-      setState('comicMap', '', 'imgList', undefined);
-      await showComic('');
+      await ms.load();
     },
   };
 };

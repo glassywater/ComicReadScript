@@ -54,7 +54,7 @@ export const threadHandler = (
 
       return imgList.map((img) => img.src);
     };
-    setState('comicMap', '', { getImgList });
+    setState('imgListMap', '', { getImgList });
 
     setState('manga', {
       // 在图片加载完成后再检查一遍有没有小图，有就删掉

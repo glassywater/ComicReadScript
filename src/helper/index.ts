@@ -17,6 +17,8 @@ export * from './faviconProgress';
 export * from './range';
 // 杂项
 export * from './other';
+// 监听 URL 变化
+export * from './urlChange';
 // SolidJS 响应式封装
 export * from './solidJs';
 // 节流与防抖

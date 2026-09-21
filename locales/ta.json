@@ -2,6 +2,7 @@
   "alert": {
     "comic_load_error": "காமிக் ஏற்றுவதில் பிழை",
     "download_failed": "பதிவிறக்கம் தோல்வியடைந்தது",
+    "fetch_chapter_list_failed": "அத்தியாயங்களைப் பெறுவதில் தோல்வி",
     "fetch_comic_img_failed": "காமிக் படங்களைப் பெறுவதில் தோல்வி",
     "img_load_failed": "படம் ஏற்றுவதில் தோல்வி",
     "no_img_download": "பதிவிறக்குவதற்கான படங்கள் எதுவும் இல்லை",
@@ -11,6 +12,7 @@
   },
   "button": {
     "auto_scroll": "தானியங்கி உருட்டல்",
+    "chapter_list": "அத்தியாயங்கள்",
     "close_current_page_translation": "தற்போதைய பக்கத்தின் மொழிபெயர்ப்பை மூடு",
     "download_completed": "பதிவிறக்கம் முடிந்தது",
     "download_completed_error": "பதிவிறக்கம் முடிந்தது, ஆனால் {{errorNum}} படங்கள் பதிவிறக்கம் தோல்வியடைந்தன",

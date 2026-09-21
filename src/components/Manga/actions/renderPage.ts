@@ -5,12 +5,13 @@ import {
   inRange,
   throttle,
 } from 'helper';
-import { reconcile } from 'solid-js/store';
+import { reconcile, unwrap } from 'solid-js/store';
 
 import { type State, setState, store } from '../store';
 import {
   abreastArea,
   abreastShowColumn,
+  activeImgIndex,
   findTopPage,
   imgList,
   scrollLength,
@@ -139,7 +140,14 @@ createEffectOn(
   showImgList,
   (showImgs) => {
     if (showImgs.size === 0) return;
-    store.prop.onShowImgsChange?.(showImgs, imgList());
+    store.prop.onShowImgsChange?.({
+      showImgs,
+      imgList: imgList(),
+      showRange: [...store.showRange],
+      pageList: store.pageList,
+      activeImgIndex: activeImgIndex(),
+      fillEffect: unwrap(store.fillEffect),
+    });
   },
   { defer: true },
 );

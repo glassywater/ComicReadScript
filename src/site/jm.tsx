@@ -1,4 +1,4 @@
-﻿import { type ComicImgData } from 'components/Manga';
+import { type ComicImgData } from 'components/Manga';
 import { request, setupSiteAdapter, toast } from 'core';
 import {
   canvasToBlob,
@@ -46,7 +46,7 @@ setupSiteAdapter({
         unsafeWindow.aid < unsafeWindow.scramble_id ||
         unsafeWindow.speed === '1'
       )
-        return setState('comicMap', '', {
+        return setState('imgListMap', '', {
           getImgList: () => imgEleList.map((e) => e.dataset.original ?? ''),
         });
 
@@ -122,7 +122,7 @@ setupSiteAdapter({
         );
       });
 
-      setState('comicMap', '', {
+      setState('imgListMap', '', {
         getImgList: ({ dynamicLazyLoad }) =>
           dynamicLazyLoad({ loadImg, length: imgEleList.length }),
       });

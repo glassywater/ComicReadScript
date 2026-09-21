@@ -44,6 +44,10 @@ flowchart LR
 
 模块通过固定模块名导入（模块名即 `src/` 下的路径，如 `src/helper/index.ts` → `helper`），完整清单见 [scripts/lib/packlist.json](scripts/lib/packlist.json)。**正常编写代码即可**，误用相对路径或子模块形式导入时，lint 会警告并自动修复为模块名（[oxlint.config.ts](oxlint.config.ts) 的 restricted-relative-imports 规则）。
 
+## 事件监听
+
+- 原生 DOM 元素上的事件必须用 `on:<event>` 形式（如 `on:click`），禁止 `onClick` 驼峰写法。否则会因为组件都挂载在 shadow DOM 中且根节点会 `stopPropagation`，导致监听失效（组件 props 上的 `onClick` 不受限制）
+
 ## 目录结构
 
 | 目录                               | 职责                                                                                                                                                                                                                                 |

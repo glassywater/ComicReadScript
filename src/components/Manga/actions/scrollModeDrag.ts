@@ -2,7 +2,6 @@ import { AnimationFrame, type UseDrag } from 'helper';
 
 import { refs, store } from '../store';
 import { abreastScrollFill, scrollTop, setAbreastScrollFill } from './memo';
-import { saveReadProgress } from './readProgress';
 import { scrollTo } from './scroll';
 
 /** 摩擦系数 */
@@ -84,7 +83,6 @@ export const handleScrollModeDrag: UseDrag = (
       calcVelocityAnim.cancel();
       if (performance.now() - startTime < 50) return;
       slideAnim.call();
-      saveReadProgress();
     }
   }
 };

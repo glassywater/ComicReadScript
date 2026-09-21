@@ -1,6 +1,6 @@
 import MDLaunch from '@material-design-icons/svg/round/launch.svg';
 import { registerEsc, request } from 'core';
-import { css, domParse, hijackFn, querySelector } from 'helper';
+import { css, domParse, hijackFn, log, querySelector } from 'helper';
 import { type JSX, Show, createSignal } from 'solid-js';
 import { createMutable } from 'solid-js/store';
 import { render } from 'solid-js/web';
@@ -139,7 +139,7 @@ export const quickTagDefine: EhFeatureHandler = (_, pageCtx) => {
     try {
       await saveTagContent(unsafeWindow.selected_tagname);
     } catch (error) {
-      console.error(error);
+      log.error(error);
       setShow(false);
     }
   };

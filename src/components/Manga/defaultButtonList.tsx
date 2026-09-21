@@ -57,6 +57,49 @@ const ZoomButton = () => (
   />
 );
 
+/** 设置按钮 */
+export const SettingButton: Component = () => {
+  const [showPanel, setShowPanel] = createSignal(false);
+
+  const handleClick = () => {
+    const newVal = !showPanel();
+    setState('show', 'toolbar', newVal);
+    setShowPanel(newVal);
+  };
+
+  createEffectOn(
+    () => store.show.toolbar,
+    (showToolbar) => showToolbar || setShowPanel(false),
+  );
+
+  const Popper = (
+    <Show when={showPanel()}>
+      <SettingPanel />
+      <div
+        class={classes.closeCover}
+        on:click={handleClick}
+        onWheel={(e) => {
+          if (isScrollMode()) refs.mangaBox.scrollBy({ top: e.deltaY });
+        }}
+        role="button"
+        tabIndex={-1}
+      />
+    </Show>
+  );
+
+  return (
+    <IconButton
+      tip={t('other.setting')}
+      enabled={showPanel()}
+      showTip={showPanel()}
+      onClick={handleClick}
+      popperClassName={showPanel() && classes.SettingPanelPopper}
+      popper={showPanel() && Popper}
+      children={<MdSettings />}
+    />
+  );
+};
+
 /** 工具栏的默认按钮列表 */
 export const defaultButtonList: ToolbarButtonList = [
   // 单双页模式
@@ -165,47 +208,7 @@ export const defaultButtonList: ToolbarButtonList = [
   ),
   DownloadButton,
   // 设置
-  () => {
-    const [showPanel, setShowPanel] = createSignal(false);
-
-    const handleClick = () => {
-      const newVal = !showPanel();
-      setState('show', 'toolbar', newVal);
-      setShowPanel(newVal);
-    };
-
-    createEffectOn(
-      () => store.show.toolbar,
-      (showToolbar) => showToolbar || setShowPanel(false),
-    );
-
-    const Popper = (
-      <Show when={showPanel()}>
-        <SettingPanel />
-        <div
-          class={classes.closeCover}
-          on:click={handleClick}
-          onWheel={(e) => {
-            if (isScrollMode()) refs.mangaBox.scrollBy({ top: e.deltaY });
-          }}
-          role="button"
-          tabIndex={-1}
-        />
-      </Show>
-    );
-
-    return (
-      <IconButton
-        tip={t('other.setting')}
-        enabled={showPanel()}
-        showTip={showPanel()}
-        onClick={handleClick}
-        popperClassName={showPanel() && classes.SettingPanelPopper}
-        popper={showPanel() && Popper}
-        children={<MdSettings />}
-      />
-    );
-  },
+  SettingButton,
   () => <hr />,
   () => (
     <IconButton tip={t('other.exit')} onClick={() => store.prop.onExit?.()}>

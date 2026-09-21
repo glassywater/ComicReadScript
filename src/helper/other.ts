@@ -1,6 +1,6 @@
 import { type Promisable } from 'type-fest';
 
-import { singleThreaded, wait } from './asyncControl';
+import { wait } from './asyncControl';
 
 const CRSD: Record<string, unknown> = {};
 /** 将调试变量挂到全局 CRSD 对象上 */
@@ -172,41 +172,6 @@ export const ensureGmValue = async <
   }
   return (await GM.getValue(name)) as T;
 };
-
-/** 监听 url 变化 */
-export const onUrlChange = (
-  fn: (lastUrl: string, nowUrl: string) => Promisable<void>,
-  handleUrl = (location: Location) => location.href,
-) => {
-  let lastUrl = '';
-  const refresh = singleThreaded(async () => {
-    if (!(await wait(() => handleUrl(location) !== lastUrl, 5000))) return;
-    const nowUrl = handleUrl(location);
-    await fn(lastUrl, nowUrl);
-    lastUrl = nowUrl;
-  });
-
-  const controller = new AbortController();
-  for (const eventName of ['click', 'popstate'])
-    window.addEventListener(eventName, refresh, {
-      capture: true,
-      signal: controller.signal,
-    });
-  void refresh();
-
-  return () => controller.abort();
-};
-
-/** wait，但是只在 url 变化时判断 */
-export const waitUrlChange = <T = unknown>(isValidUrl: () => T) =>
-  new Promise<NonNullable<T>>((resolve) => {
-    const abort = onUrlChange(async () => {
-      const res = await isValidUrl();
-      if (!res) return;
-      resolve(res);
-      abort();
-    });
-  });
 
 export abstract class AnimationFrame {
   animationId = 0;

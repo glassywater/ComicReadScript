@@ -1,4 +1,6 @@
 export * from './siteAdapter';
+export * from './chapters';
+export * from './multiSelect';
 
 export type * from './types';
 export * from './useInit';

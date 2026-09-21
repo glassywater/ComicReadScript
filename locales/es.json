@@ -2,6 +2,7 @@
   "alert": {
     "comic_load_error": "Error al cargar el cómic",
     "download_failed": "Descarga fallida",
+    "fetch_chapter_list_failed": "No se pudieron obtener los capítulos",
     "fetch_comic_img_failed": "No se pudieron obtener las imágenes del cómic",
     "img_load_failed": "No fue posible cargar la imagen",
     "no_img_download": "No hay imágenes disponibles para descargar",
@@ -11,6 +12,7 @@
   },
   "button": {
     "auto_scroll": "Desplazamiento automático",
+    "chapter_list": "Capítulos",
     "close_current_page_translation": "Cerrar la traducción de la página actual",
     "download_completed": "Descarga completada",
     "download_completed_error": "Descarga completada, pero {{errorNum}} imágenes han fallado al descargar",

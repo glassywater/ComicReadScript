@@ -70,12 +70,13 @@ setupSiteAdapter<YamiboPageContext, YamiboOptions>({
     thread: threadHandler,
   },
   features: {
-    固定导航条: () =>
+    固定导航条: () => {
       css`
         .header-stackup {
           position: fixed !important;
         }
-      `,
+      `;
+    },
 
     关闭快捷导航的跳转: () =>
       querySelector('#qmenu a')?.setAttribute('href', 'javascript:;'),

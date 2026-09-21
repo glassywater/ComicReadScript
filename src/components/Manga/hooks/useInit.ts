@@ -1,8 +1,10 @@
 import {
   assign,
+  clamp,
   createEffectOn,
   createRootMemo,
   debounce,
+  isSafeInteger,
   setManualDark,
   throttle,
 } from 'helper';
@@ -16,9 +18,10 @@ import {
   focus,
   getImgDisplaySize,
   getImgType,
+  jumpToImg,
   resetImgState,
-  resumeReadProgress,
   scrollTo,
+  scrollViewImg,
   syncImgLoadState,
   updateMitTranslators,
   updatePageData,
@@ -179,10 +182,12 @@ export const useInit = (props: MangaProps) => {
 
       const oldImgSet = new Set(state.imgList);
       const newImgSet = new Set(newImgList);
-      if (oldImgSet.size === 0 && newImgList.length > 0) {
-        void resumeReadProgress(state);
-        if (state.option.translation.enabled) void updateMitTranslators(true);
-      }
+      if (
+        oldImgSet.size === 0 &&
+        newImgList.length > 0 &&
+        state.option.translation.enabled
+      )
+        void updateMitTranslators(true);
 
       /** 被删除的图片 */
       const deleteList = oldImgSet.difference(newImgSet);
@@ -227,6 +232,16 @@ export const useInit = (props: MangaProps) => {
         resetImgState(state);
         state.activePageIndex = 0;
         scrollTo(0);
+
+        // 初始跳页（用于恢复阅读进度等场景）
+        const { initialImgIndex } = props;
+        if (isSafeInteger(initialImgIndex) && state.imgList.length > 1) {
+          const index = clamp(0, initialImgIndex, state.imgList.length - 1);
+          // 卷轴模式下同步跳转时 DOM 尚未展开，需等渲染稳定
+          if (state.option.scrollMode.enabled)
+            return setTimeout(scrollViewImg, 500, index);
+          jumpToImg(index);
+        }
         return;
       }
 

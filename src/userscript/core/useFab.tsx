@@ -19,12 +19,13 @@ import {
 } from 'helper';
 import { type Accessor, createEffect } from 'solid-js';
 
+import { multiSelectController } from './multiSelect';
 import { type CoreContext } from './types';
 import { useSpeedDial } from './useSpeedDial';
 
 export const useFab = <T extends Record<string, any>>(
   coreCtx: CoreContext<T>,
-  nowImgList: Accessor<(string | ComicImgData)[] | undefined>,
+  currentImgListId: Accessor<(string | ComicImgData)[] | undefined>,
 ) => {
   const { store, setState, options, setOptions, showComic } = coreCtx;
 
@@ -46,7 +47,7 @@ export const useFab = <T extends Record<string, any>>(
 
   /** 当前已取得 url 的图片数量 */
   const doneImgNum = createRootMemo(
-    () => nowImgList()?.filter(Boolean)?.length,
+    () => currentImgListId()?.filter(Boolean)?.length,
   );
 
   /** 已加载完毕的图片数量 */
@@ -60,11 +61,11 @@ export const useFab = <T extends Record<string, any>>(
     [
       doneImgNum,
       loadedImgNum,
-      () => nowImgList()?.length,
+      () => currentImgListId()?.length,
       coreCtx.canLoadComic,
       coreCtx.canMultiSelect,
-      () => coreCtx.multiSelect?.isEnabled(),
-      () => coreCtx.multiSelect?.selectedIds().length,
+      () => multiSelectController()?.isEnabled(),
+      () => multiSelectController()?.selectedIds().length,
       () => options.hiddenFab,
     ],
     ([
@@ -80,7 +81,7 @@ export const useFab = <T extends Record<string, any>>(
       setState((state) => {
         // 多选相关状态：已激活时显示选中数量，未激活但可多选时显示多选按钮图标
         if (enabled || (canMultiSelect && !canLoadComic)) {
-          const ms = coreCtx.multiSelect!;
+          const ms = multiSelectController()!;
           const isActive = enabled && isNumber(selectedCount);
           state.fab.show = isActive ? true : undefined;
           state.fab.children = isActive ? (

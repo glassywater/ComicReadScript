@@ -1,8 +1,8 @@
-import { type Promisable } from 'type-fest';
+import { type Promisable, type ReadonlyDeep } from 'type-fest';
 
 import { type ToolbarButtonList } from '../defaultButtonList';
 import { type SettingList } from '../defaultSettingList';
-import { type ComicImg } from './image';
+import { type ComicImg, type FillEffect, type PageList } from './image';
 import { type Option } from './option';
 
 type PropState = {
@@ -29,9 +29,21 @@ type PropState = {
     onHotkeysChange?: (hotkeys: Record<string, string[]>) => Promisable<void>;
     /** 显示图片发生变化时触发的回调 */
     onShowImgsChange?: (
-      showImgs: Set<number>,
-      imgList: ComicImg[],
-    ) => Promisable<void>;
+      info: ReadonlyDeep<{
+        /** 当前显示的图片索引 */
+        showImgs: Set<number>;
+        /** 图片数据列表 */
+        imgList: ComicImg[];
+        /** 当前显示的页面范围 */
+        showRange: [number, number];
+        /** 页面列表 */
+        pageList: PageList;
+        /** 当前显示的第一张图片的索引 */
+        activeImgIndex: number;
+        /** 当前生效的页面填充数据 */
+        fillEffect: FillEffect;
+      }>,
+    ) => Promisable<unknown>;
     /** 每次加载范围改变后触发的回调，返回加载范围中等待 url 的图片的 index */
     onWaitUrlImgs?: (indexs: Set<number>, imgList: ComicImg[]) => void;
 

@@ -27,7 +27,7 @@ const xmlHttpRequest = <T = any>(
   new Promise((resolve, reject) => {
     const handleError = (error?: Tampermonkey.ErrorResponse) => {
       details.onerror?.(error);
-      console.error('GM_xmlhttpRequest Error', error);
+      log.error('GM_xmlhttpRequest Error', error);
       reject(new Error(error?.responseText || 'GM_xmlhttpRequest Error'));
     };
     const abort = GM_xmlhttpRequest<T>({
@@ -162,7 +162,7 @@ export const request = async <T = any>(
       details.responseType === 'json' &&
       res.responseText &&
       (typeof res.response !== 'object' ||
-        Object.keys(res.response as object).length === 0)
+        Object.keys((res.response as object) ?? {}).length === 0)
     ) {
       try {
         Reflect.set(res, 'response', JSON.parse(res.responseText));
@@ -177,7 +177,7 @@ export const request = async <T = any>(
       return request(url, details, retryNum + 1, errorNum);
     }
     if (errorNum >= retryNum) {
-      (details.noTip ? console.error : toast.error)(
+      (details.noTip ? log.error : toast.error)(
         `${errorText}\nerror: ${(error as Error).message}`,
       );
       throw new Error(errorText, { cause: error });

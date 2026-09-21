@@ -105,7 +105,7 @@ setupSiteAdapter<EhPageContext, EhOptions>({
     },
 
     mpv: ({ setState }) => {
-      setState('comicMap', '', {
+      setState('imgListMap', '', {
         getImgList({ dynamicLazyLoad }) {
           type ImageList = { i: string; xhr: XMLHttpRequest }[];
           const imagelist = unsafeWindow.imagelist as ImageList;
@@ -177,7 +177,7 @@ setupSiteAdapter<EhPageContext, EhOptions>({
               return reloadImg(url);
             }
           }
-          setState('comicMap', '', 'imgList', i, pageCtx.imgList[i]);
+          setState('imgListMap', '', 'imgList', i, pageCtx.imgList[i]);
           for (const img of MangaImgList())
             if (img.loadType === 'error') return reloadImg(img.src);
         },

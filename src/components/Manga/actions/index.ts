@@ -12,7 +12,6 @@ export * from './jumpToPage';
 export * from './memo';
 export * from './operate';
 export * from './pointer';
-export * from './readProgress';
 export * from './renderPage';
 export * from './scroll';
 export * from './scrollMode';

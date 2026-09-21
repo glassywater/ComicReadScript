@@ -1,7 +1,6 @@
 import { type State } from '../store';
 import { type Dir, handleEndTurnPage } from './endPage';
 import { withOptionalState } from './helper';
-import { saveReadProgress } from './readProgress';
 
 /** 翻页。返回是否成功改变了当前页数 */
 export const turnPage = withOptionalState((dir: Dir, state: State) => {
@@ -9,7 +8,6 @@ export const turnPage = withOptionalState((dir: Dir, state: State) => {
 
   if (handleEndTurnPage(dir, state)) return false;
 
-  saveReadProgress();
   state.activePageIndex += dir === 'next' ? 1 : -1;
   return true;
 });

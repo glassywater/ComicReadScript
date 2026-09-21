@@ -188,7 +188,7 @@ setup({
   handler: ({ setState }) =>
     setState('manga', {
       // 跟随阅读进度滚动页面，避免确保能触发进度记录
-      onShowImgsChange: debounce((showImgs, imgList) => {
+      onShowImgsChange: debounce(({ showImgs, imgList }) => {
         const lastImgUrl = imgList[[...showImgs].at(-1)!].src;
         querySelector(`img[src$="${lastImgUrl}"]`)?.scrollIntoView({
           behavior: 'instant',

@@ -3,7 +3,6 @@ import { createSignal } from 'solid-js';
 
 import { refs, setState, store } from '../store';
 import { scrollLength, scrollPosition, sliderHeight } from './memo';
-import { saveReadProgress } from './readProgress';
 import { scrollTo } from './scroll';
 import { stopAutoScroll } from './switch';
 import { finishTurnAnimation } from './turnPageAnimator';
@@ -62,7 +61,7 @@ export const handleScrollbarSlider: UseDrag = ({ type, xy, initial }, e) => {
   lastType = type;
 
   // 跳过拖拽结束事件（单击时会同时触发开始和结束，就用开始事件来完成单击的效果
-  if (type === 'up') return saveReadProgress();
+  if (type === 'up') return;
   if (!refs.mangaFlow) return;
 
   const scrollbarDom = e.target as HTMLElement;

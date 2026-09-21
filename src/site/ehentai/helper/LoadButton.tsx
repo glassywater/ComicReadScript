@@ -10,7 +10,7 @@ export const LoadButton = (props: {
   onClick?: (e: Event) => void;
 }) => {
   const tip = createMemo(() => {
-    const imgList = props.context.store.comicMap[props.id]?.imgList;
+    const imgList = props.context.store.imgListMap[props.id]?.imgList;
     if (imgList?.length === 0) return ` loading - 0/${props.imgNum}`;
     const progress = imgList?.filter(Boolean).length;
 

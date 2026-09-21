@@ -2,6 +2,7 @@
   "alert": {
     "comic_load_error": "Comic loading error",
     "download_failed": "Download failed",
+    "fetch_chapter_list_failed": "Failed to fetch chapters",
     "fetch_comic_img_failed": "Failed to fetch comic images",
     "img_load_failed": "Image loading failed",
     "no_img_download": "No downloadable images",
@@ -11,6 +12,7 @@
   },
   "button": {
     "auto_scroll": "Auto scroll",
+    "chapter_list": "Chapters",
     "close_current_page_translation": "Close current page translation",
     "download_completed": "Download completed",
     "download_completed_error": "Download completed, but {{errorNum}} images failed to download",

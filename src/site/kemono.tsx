@@ -1,4 +1,4 @@
-import { request, setupSiteAdapter } from 'core';
+import { request, setupSiteAdapter, useMultiSelectLoad } from 'core';
 import {
   createEffectOn,
   domParse,
@@ -8,7 +8,6 @@ import {
   querySelectorClick,
   waitDom,
 } from 'helper';
-import { useMultiSelectLoad } from 'userscript/multiSelect';
 
 const kemonoOptions = {
   autoShow: false,
@@ -107,16 +106,16 @@ setupSiteAdapter<KemonoPageContext, KemonoOptions>({
       createEffectOn(
         () => store.options.load_original_image,
         (isOriginal, prev) => {
-          setState('nowComic', isOriginal ? 'original' : 'thumbnail');
+          setState('currentImgListId', isOriginal ? 'original' : 'thumbnail');
           if (prev) void showComic();
         },
       );
 
       setState((state) => {
-        state.comicMap.original = {
+        state.imgListMap.original = {
           getImgList: () => original(document, store.options.sort_by_filename),
         };
-        state.comicMap.thumbnail = {
+        state.imgListMap.thumbnail = {
           getImgList: () => thumbnail(document, store.options.sort_by_filename),
         };
         state.manga.onNext = querySelectorClick('.post__nav-link.next');
@@ -130,6 +129,12 @@ setupSiteAdapter<KemonoPageContext, KemonoOptions>({
           for (const item of querySelectorAll('.post-card'))
             item.style.position = 'relative';
         },
+        registerItems: async (map) => {
+          for (const dom of await waitDom('.post-card', 20))
+            map.set(dom, dom.dataset.id!);
+        },
+        isSameList: (nextPageCtx) =>
+          nextPageCtx?.type === 'list' && nextPageCtx.id === id,
         getImgList: async (postId) => {
           const res = await request(`${location.pathname}/post/${postId}`);
           const doc = domParse(res.responseText);
@@ -139,12 +144,7 @@ setupSiteAdapter<KemonoPageContext, KemonoOptions>({
         },
       });
 
-      await ms.registerItems(id, async (map) => {
-        for (const dom of await waitDom('.post-card', 20))
-          map.set(dom, dom.dataset.id!);
-      });
-
-      return ms.createCleanup(id);
+      return ms.createCleanup();
     },
   },
 

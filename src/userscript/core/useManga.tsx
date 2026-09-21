@@ -19,6 +19,7 @@ import {
 import { type Component } from 'solid-js';
 
 import { migrationOption } from './migration';
+import { dispatchShowImgsChange } from './showImgsChange';
 import { type CoreContext } from './types';
 
 let dom: HTMLDivElement;
@@ -88,7 +89,16 @@ export const useManga = <T extends Record<string, any>>({
     },
   });
 
-  dom = mountComponents('comicRead', () => <Manga {...store.manga} />);
+  dom = mountComponents('comicRead', () => (
+    <Manga
+      {...store.manga}
+      onShowImgsChange={(info) => {
+        // 因为 Manga 只接受一个 onShowImgsChange，所以要在这里组合一下
+        store.manga.onShowImgsChange?.(info);
+        dispatchShowImgsChange(info);
+      }}
+    />
+  ));
   dom.style.setProperty('z-index', '2147483647', 'important');
 
   // 确保 toast 可以显示在漫画之上

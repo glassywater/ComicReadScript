@@ -1,5 +1,5 @@
 import { type CoreContext, request, toast } from 'core';
-import { hijackFn, querySelector, querySelectorAll, t } from 'helper';
+import { hijackFn, log, querySelector, querySelectorAll, t } from 'helper';
 import { type Component, For, type JSX, Show } from 'solid-js';
 import { createStore } from 'solid-js/store';
 import { render } from 'solid-js/web';
@@ -40,7 +40,7 @@ const nhentai: SiteFn = async ({ setState }, { galleryTitle, galleryId }) => {
     .map(({ id, english_title, japanese_title, media_id }) => {
       const itemId = `@nh:${id}`;
 
-      setState('comicMap', itemId, {
+      setState('imgListMap', itemId, {
         getImgList: async ({ dynamicLazyLoad }) => {
           const galleryData = await getNhentaiData(`${id}`);
           const imgList = toImgList(galleryData);
@@ -112,7 +112,7 @@ const hitomi: SiteFn = async ({ setState }, { galleryId }) => {
   };
 
   const itemId = `@hitomi:${data.id}`;
-  setState('comicMap', itemId, {
+  setState('imgListMap', itemId, {
     getImgList: async ({ dynamicLazyLoad }) => {
       const { responseText: ggScript } = await request(
         `https://ltn.${domain}/gg.js?_=${Date.now()}`,
@@ -265,17 +265,17 @@ export const crossSiteLink: EhFeatureHandler = async (coreCtx, pageCtx) => {
       else setComicMap(getSiteComic.name, 'null');
     } catch (error) {
       const errorTip = getSiteComic.errorTip(coreCtx, pageCtx);
-      console.error(errorTip, error);
+      log.error(errorTip, error);
       setComicMap(getSiteComic.name, errorTip);
     }
   }
 
-  const { adList } = coreCtx.store.comicMap[''];
+  const { adList } = coreCtx.store.imgListMap[''];
   if (!adList) return;
   // 如果外站源只匹配到了一个漫画，就直接为其加上当前识别出的广告列表
   for (const itemList of Object.values(comicMap)) {
     if (typeof itemList === 'string') continue;
     if (itemList.length === 1)
-      coreCtx.setState('comicMap', itemList[0].id, { adList });
+      coreCtx.setState('imgListMap', itemList[0].id, { adList });
   }
 };

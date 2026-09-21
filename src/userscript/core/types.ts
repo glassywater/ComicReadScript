@@ -4,8 +4,6 @@ import { type SetStateFunction } from 'helper';
 import { type Accessor, type Component } from 'solid-js';
 import { type Promisable } from 'type-fest';
 
-import { type MultiSelectLoadController } from '../multiSelect/useMultiSelectLoad';
-
 export type SpeedDialButton = {
   /** 按钮名称/提示文本 */
   name: string;
@@ -13,6 +11,47 @@ export type SpeedDialButton = {
   onClick: () => void;
   /** 图标 */
   icon: Component;
+};
+
+export type ChapterId = string | number;
+
+export type ImgListKey = string | number;
+
+/** 阅读器可显示的一个内容单元（图片列表 + 加载器 + 附属数据） */
+export type ImgListEntry<T extends Record<string, any> = any> = {
+  /** undefined 表示还未开始加载，空数组表示刚开始加载 */
+  imgList?: MangaProps['imgList'];
+  getImgList: ((
+    coreCtx: CoreContext<T>,
+  ) => Promisable<MangaProps['imgList']>) & {
+    type?: 'init' | 'multiSelect';
+  };
+  adList?: Set<number>;
+  commentList?: MangaProps['commentList'];
+};
+
+/** 章节信息 */
+export type Chapter<Id extends ChapterId = ChapterId> = {
+  id: Id;
+  title: string;
+  /** 章节页面的 url */
+  url: string;
+};
+
+export type ChapterImgListLoader<Id extends ChapterId = ChapterId> = (
+  chapterId: Id,
+  coreCtx: CoreContext,
+) => Promisable<MangaProps['imgList']>;
+
+export type InitChaptersOptions<Id extends ChapterId = ChapterId> = {
+  /** 当前所在章节的 id */
+  currentId: Id;
+  /** 获取完整的章节列表 */
+  getChapterList: () => Promisable<Chapter<Id>[]>;
+  /** 获取指定章节下的所有图片 */
+  getChapterImgList: ChapterImgListLoader<Id>;
+  /** 获取指定章节下的评论 */
+  getComments?: (chapterId: Id) => Promisable<MangaProps['commentList']>;
 };
 
 export type SiteOptions = {
@@ -39,20 +78,11 @@ export type CoreStore<T extends Record<string, any>> = {
   manga: MangaProps;
   hotkeys: Record<string, string[]>;
 
-  comicMap: Record<
-    string | number,
-    {
-      /** undefined 表示还未开始加载，空数组表示刚开始加载 */
-      imgList?: MangaProps['imgList'];
-      getImgList: ((
-        coreCtx: CoreContext<T>,
-      ) => Promisable<MangaProps['imgList']>) & {
-        type?: 'init' | 'multiSelect';
-      };
-      adList?: Set<number>;
-    }
-  >;
-  nowComic: string | number;
+  imgListMap: Record<ImgListKey, ImgListEntry<T>>;
+  currentImgListId: string | number;
+
+  /** 由漫画页 pageCtx 的 id 字段决定 */
+  comicId?: string;
 
   /** 站点名 */
   name: string;
@@ -66,6 +96,8 @@ export type CoreStore<T extends Record<string, any>> = {
     needAutoShow: boolean;
     /** 当前是否有对应的页面处理逻辑 */
     hasPageHandler: boolean;
+    /** 当前是否处于章节模式 */
+    isChapterMode: boolean;
   };
 };
 
@@ -82,12 +114,6 @@ export type CoreContext<T extends Record<string, any> = Record<string, any>> = {
 
   canLoadComic: Accessor<boolean>;
   canMultiSelect: Accessor<boolean>;
-
-  /** 多选管理器，由 getMultiSelectLoadController 注入 */
-  multiSelect?: MultiSelectLoadController;
-
-  /** 设置多选管理器 */
-  setMultiSelect: (value: any) => void;
 
   /** 动态加载图片列表 */
   dynamicLoad: (

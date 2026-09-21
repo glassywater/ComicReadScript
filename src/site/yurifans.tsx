@@ -1,4 +1,4 @@
-﻿import { request, setupSiteAdapter, toast } from 'core';
+import { request, setupSiteAdapter, toast } from 'core';
 import { querySelector, querySelectorAll, wait, waitDom } from 'helper';
 
 declare const b2token: string;
@@ -41,7 +41,7 @@ setupSiteAdapter({
           const imgList = imgBody.getElementsByTagName('img');
           if (await wait(() => imgList.length, 1000)) {
             const getImgList = () => Array.from(imgList, (e) => e.src);
-            setState('comicMap', '', { getImgList });
+            setState('imgListMap', '', { getImgList });
           }
           break;
         }
@@ -56,10 +56,10 @@ setupSiteAdapter({
             void showComic(i);
 
             setState('manga', {
-              onPrev: Reflect.has(store.comicMap, i - 1)
+              onPrev: Reflect.has(store.imgListMap, i - 1)
                 ? () => switchChapter(i - 1)
                 : undefined,
-              onNext: Reflect.has(store.comicMap, i + 1)
+              onNext: Reflect.has(store.imgListMap, i + 1)
                 ? () => switchChapter(i + 1)
                 : undefined,
             });
@@ -67,7 +67,7 @@ setupSiteAdapter({
 
           for (const [i, a] of querySelectorAll('.xControl > a').entries()) {
             const item = a.parentElement!.nextElementSibling! as HTMLElement;
-            setState('comicMap', i, {
+            setState('imgListMap', i, {
               getImgList: () =>
                 Array.from(
                   item.querySelectorAll('img'),
@@ -92,7 +92,7 @@ setupSiteAdapter({
             querySelectorAll<HTMLImageElement>('.entry-content img').map(
               (e) => e.dataset.src || e.src,
             );
-          setState('comicMap', '', { getImgList });
+          setState('imgListMap', '', { getImgList });
           break;
         }
       }

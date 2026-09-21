@@ -45,6 +45,8 @@ export type MangaProps = {
   imgList: (ComicImgData | string)[];
   /** 页面填充数据 */
   fillEffect?: FillEffect;
+  /** 初始图片索引（用于恢复阅读进度等场景） */
+  initialImgIndex?: number;
   /** 初始化配置 */
   option?: PartialDeep<Option>;
   /** 默认配置 */
@@ -108,8 +110,13 @@ export const Manga: Component<MangaProps> = (props) => {
 };
 
 export * from './actions';
+export { DownloadButton } from './components/DownloadButton';
 export { SettingHotkeys } from './components/SettingHotkeys';
-export { SettingBlockSubtitle } from './components/SettingPanel';
+export {
+  SettingBlockSubtitle,
+  SettingPanelContainer,
+} from './components/SettingPanel';
+export { SettingButton } from './defaultButtonList';
 export { SettingsItem } from './components/SettingsItem';
 export { SettingsItemButton } from './components/SettingsItemButton';
 export { SettingsItemNumber } from './components/SettingsItemNumber';

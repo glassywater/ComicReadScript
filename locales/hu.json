@@ -2,6 +2,7 @@
   "alert": {
     "comic_load_error": "Hiba történt a manga betöltésekor",
     "download_failed": "Letöltés sikertelen",
+    "fetch_chapter_list_failed": "Fejezetek lekérése sikertelen",
     "fetch_comic_img_failed": "Manga képek lekérése sikertelen",
     "img_load_failed": "Kép betöltése sikertelen",
     "no_img_download": "Nincs letölthető kép",
@@ -11,6 +12,7 @@
   },
   "button": {
     "auto_scroll": "Automatikus görgetés",
+    "chapter_list": "Fejezetek",
     "close_current_page_translation": "A jelenlegi oldal fordításának bezárása",
     "download_completed": "Letöltés befejezve",
     "download_completed_error": "Letöltés befejezve, de {{errorNum}} kép letöltése sikertelen",

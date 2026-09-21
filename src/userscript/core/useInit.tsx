@@ -14,11 +14,13 @@ import {
   t,
   useStore,
 } from 'helper';
-import { createSignal } from 'solid-js';
 
 import { handleEsc } from './escManager';
+import { multiSelectController } from './multiSelect';
+import { useReadProgress } from './readProgress';
 import { type CoreContext, type CoreStore, type SiteOptions } from './types';
 import { useFab } from './useFab';
+import { useImgList } from './useImgList';
 import { useManga } from './useManga';
 import { handleVersionUpdate } from './version';
 
@@ -58,17 +60,18 @@ export const useInit = async <T extends Record<string, unknown>>(
       ...structuredClone<typeof defaultOptions>(defaultOptions),
       ...saveOptions,
     } as T & SiteOptions,
-    comicMap: {
+    imgListMap: {
       '': {
         getImgList: Object.assign(() => [], { type: 'init' as const }),
       },
     },
-    nowComic: '',
+    currentImgListId: '',
 
     flag: {
       isStored: saveOptions !== undefined,
       needAutoShow: true,
       hasPageHandler: false,
+      isChapterMode: false,
     },
   });
   setDefaultHotkeys((_hotkeys) => ({
@@ -88,29 +91,36 @@ export const useInit = async <T extends Record<string, unknown>>(
     );
   };
 
-  const loadComic = async (id: string | number = store.nowComic) => {
-    if (!Reflect.has(store.comicMap, id)) throw new Error('comic not found');
+  const loadComic = async (id: string | number = store.currentImgListId) => {
+    if (!Reflect.has(store.imgListMap, id))
+      throw new Error('imgList not found');
+
+    // 记录本次调用的 loader，用于之后检查是否过期
+    const { getImgList } = store.imgListMap[id];
 
     try {
-      setState('comicMap', id, 'imgList', []);
-      const newImgList = await store.comicMap[id].getImgList(coreCtx);
+      setState('imgListMap', id, 'imgList', []);
+      const newImgList = await getImgList(coreCtx);
       if (newImgList.length === 0)
         throw new Error(t('alert.fetch_comic_img_failed'));
-      setState('comicMap', id, 'imgList', newImgList);
+      if (store.imgListMap[id]?.getImgList !== getImgList) return;
+      setState('imgListMap', id, 'imgList', newImgList);
     } catch (error) {
-      setState('comicMap', id, 'imgList', undefined);
+      if (store.imgListMap[id]?.getImgList !== getImgList) return;
+      setState('imgListMap', id, 'imgList', undefined);
       log.error(error);
       throw error;
     }
   };
 
-  const showComic = async (id: string | number = store.nowComic) => {
-    if (!Reflect.has(store.comicMap, id)) throw new Error('comic not found');
-    // 如果 getImgList 还是默认的空函数，说明还未准备好，直接 return 防止报错
-    if (store.comicMap[id].getImgList?.type === 'init') return;
-    if (id !== store.nowComic) setState('nowComic', id);
+  const showComic = async (id: string | number = store.currentImgListId) => {
+    if (!Reflect.has(store.imgListMap, id))
+      throw new Error('imgList not found');
+    // 如果 getList 还是默认的空函数，说明还未准备好，直接 return 防止报错
+    if (store.imgListMap[id].getImgList?.type === 'init') return;
+    if (id !== store.currentImgListId) setState('currentImgListId', id);
 
-    switch (store.comicMap[id].imgList?.length) {
+    switch (store.imgListMap[id].imgList?.length) {
       case 0:
         return toast.warn(t('alert.repeat_load'), { duration: 1500 });
 
@@ -151,21 +161,18 @@ export const useInit = async <T extends Record<string, unknown>>(
     );
   });
 
-  // 首次设置默认漫画的加载函数时，进行初始化
-  createEffectOn(
-    () => store.comicMap[''].getImgList,
-    (_, prev) => !prev && init(),
-    { defer: true },
-  );
-
   const canLoadComic = createRootMemo(() =>
-    Object.values(store.comicMap).some(
+    Object.values(store.imgListMap).some(
       (entry) => entry.getImgList?.type === undefined,
     ),
   );
 
-  const [multiSelect, setMultiSelect] = createSignal<any>();
-  const canMultiSelect = createRootMemo(() => Boolean(multiSelect()));
+  // 从无可加载漫画变为有可加载漫画时，进行初始化
+  createEffectOn(canLoadComic, (canLoad, prev) => canLoad && !prev && init(), {
+    defer: true,
+  });
+
+  const canMultiSelect = createRootMemo(() => Boolean(multiSelectController()));
 
   const coreCtx: CoreContext<T> = {
     store,
@@ -178,65 +185,68 @@ export const useInit = async <T extends Record<string, unknown>>(
     canLoadComic,
     canMultiSelect,
 
-    get multiSelect() {
-      return multiSelect();
-    },
-    setMultiSelect,
-
     dynamicLoad: async (loadImgFn, length, id = '') => {
-      if (store.comicMap[id].imgList?.length) return store.comicMap[id].imgList;
+      if (store.imgListMap[id].imgList?.length)
+        return store.imgListMap[id].imgList;
 
       const imgNum = typeof length === 'number' ? length : length();
-      setState('comicMap', id, 'imgList', range(imgNum, ''));
+      setState('imgListMap', id, 'imgList', range(imgNum, ''));
       // oxlint-disable-next-line typescript/no-misused-promises typescript/strict-void-return
       await new Promise<void>(async (resolve) => {
         try {
           await loadImgFn((i, img) => {
-            setState('comicMap', id, 'imgList', (list) => list!.with(i, img));
+            setState('imgListMap', id, 'imgList', (list) => list!.with(i, img));
             resolve();
           });
         } catch (error) {
           toast.error((error as Error).message);
         }
       });
-      return store.comicMap[id].imgList!;
+      return store.imgListMap[id].imgList!;
     },
 
-    dynamicLazyLoad: async ({ loadImg, length, id = '', concurrency = 4 }) => {
-      if (store.comicMap[id].imgList?.length) return store.comicMap[id].imgList;
+    dynamicLazyLoad: async ({ loadImg, length, id = '', concurrency = 2 }) => {
+      if (store.imgListMap[id].imgList?.length)
+        return store.imgListMap[id].imgList;
 
       const imgNum = typeof length === 'number' ? length : length();
 
       await new Promise<void>((resolve) => {
         const queue = new PQueue<number>(async (i) => {
-          const img = await loadImg(i);
-          setState('comicMap', id, 'imgList', (list) => list!.with(i, img));
-          resolve();
+          try {
+            const img = await loadImg(i);
+            setState('imgListMap', id, 'imgList', (list) => list!.with(i, img));
+          } finally {
+            resolve();
+          }
         }, concurrency);
 
         setState((state) => {
-          state.comicMap[id].imgList = range(imgNum, '');
+          state.imgListMap[id].imgList = range(imgNum, '');
           state.manga.onWaitUrlImgs = (imgs) => queue.set(...imgs);
         });
       });
 
-      return store.comicMap[id].imgList!;
+      return store.imgListMap[id].imgList!;
     },
   };
 
-  const nowImgList = createRootMemo(() => {
-    const comic = store.comicMap[store.nowComic];
-    if (!comic?.imgList) return;
-    if (!comic.adList?.size) return comic.imgList;
-    return comic.imgList.filter((_, i) => !comic.adList?.has(i));
+  const currentImgList = createRootMemo(() => {
+    const entry = store.imgListMap[store.currentImgListId];
+    if (!entry?.imgList) return;
+    if (!entry.adList?.size) return entry.imgList;
+    return entry.imgList.filter((_, i) => !entry.adList?.has(i));
   });
 
+  useReadProgress(coreCtx);
+  useImgList(coreCtx, currentImgList);
+
   createEffectOn(
-    nowImgList,
-    (list) => list && setState('manga', 'imgList', list),
+    () => store.imgListMap[store.currentImgListId]?.commentList,
+    (list) => setState('manga', 'commentList', list ?? []),
   );
 
-  useFab(coreCtx, nowImgList);
+  useFab(coreCtx, currentImgList);
   useManga(coreCtx);
 
   let menuId: number;

@@ -1,6 +1,5 @@
-import { request, setupSiteAdapter } from 'core';
+import { request, setupSiteAdapter, useMultiSelectLoad } from 'core';
 import { createEffectOn, waitDom } from 'helper';
-import { useMultiSelectLoad } from 'userscript/multiSelect';
 
 let imgs: {
   urls: { original: string; regular: string };
@@ -42,7 +41,7 @@ setupSiteAdapter({
       createEffectOn(
         () => store.options.load_original_image,
         (isOriginal, prev) => {
-          setState('nowComic', isOriginal ? 'original' : 'regular');
+          setState('currentImgListId', isOriginal ? 'original' : 'regular');
           if (prev) void showComic();
         },
       );
@@ -54,8 +53,8 @@ setupSiteAdapter({
         });
 
       setState((state) => {
-        state.comicMap.original = { getImgList: getImgList(true) };
-        state.comicMap.regular = { getImgList: getImgList(false) };
+        state.imgListMap.original = { getImgList: getImgList(true) };
+        state.imgListMap.regular = { getImgList: getImgList(false) };
       });
 
       return (nextPageCtx) => {
@@ -67,6 +66,12 @@ setupSiteAdapter({
 
       const ms = await useMultiSelectLoad(coreCtx, {
         id,
+        registerItems: async (map) => {
+          for (const dom of await waitDom('li div[data-worktype="illusts"]'))
+            map.set(dom, dom.dataset.workid!);
+        },
+        isSameList: (nextPageCtx) =>
+          nextPageCtx?.type === 'list' && nextPageCtx.id === id,
         getImgList: async (workId) => {
           const res = await request<{ body: typeof imgs }>(
             `/ajax/illust/${workId}/pages`,
@@ -79,12 +84,7 @@ setupSiteAdapter({
         },
       });
 
-      await ms.registerItems(id, async (map) => {
-        for (const dom of await waitDom('li div[data-worktype="illusts"]'))
-          map.set(dom, dom.dataset.workid!);
-      });
-
-      return ms.createCleanup(id);
+      return ms.createCleanup();
     },
   },
 });

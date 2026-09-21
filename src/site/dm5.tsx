@@ -1,5 +1,6 @@
 import { setup, toast } from 'core';
 import {
+  isSafeInteger,
   isUrl,
   querySelector,
   querySelectorAll,
@@ -12,7 +13,7 @@ import {
   if (!Reflect.has(unsafeWindow, 'DM5_CID')) return;
 
   const imgNum: number = unsafeWindow.DM5_IMAGE_COUNT ?? unsafeWindow.imgsLen;
-  if (!(Number.isSafeInteger(imgNum) && imgNum > 0)) {
+  if (!(isSafeInteger(imgNum) && imgNum > 0)) {
     toast.error(t('site.changed_load_failed'));
     return;
   }

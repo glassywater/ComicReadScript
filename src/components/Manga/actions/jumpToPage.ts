@@ -4,7 +4,6 @@ import { inRange, sleep, t } from 'helper';
 
 import { store } from '../store';
 import { activeImgIndex } from './memo';
-import { saveReadProgress } from './readProgress';
 import { jumpToImg } from './scroll';
 
 /** 弹窗跳转到指定页数（页数按图片序号计算，范围为 1 ~ imgList.length） */
@@ -30,8 +29,4 @@ export const jumpToPage = async (): Promise<void> => {
   if (index === activeImgIndex()) return;
 
   jumpToImg(index);
-
-  // 卷轴模式需要等滚动事件同步到 activePageIndex 后才能读到新位置，
-  // 所以延后到滚动事件处理完再保存阅读进度
-  setTimeout(() => saveReadProgress());
 };

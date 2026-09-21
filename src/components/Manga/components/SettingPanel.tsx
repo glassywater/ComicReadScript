@@ -2,6 +2,7 @@ import { createEffectOn, lang } from 'helper';
 import {
   type Component,
   For,
+  type JSX,
   type ParentComponent,
   Show,
   createSignal,
@@ -11,7 +12,7 @@ import { bindRef } from '../actions';
 import { defaultSettingList } from '../defaultSettingList';
 import { stopPropagation } from '../helper';
 import classes from '../index.module.css';
-import { refs, store } from '../store';
+import { store } from '../store';
 
 export const SettingBlockSubtitle: ParentComponent<{
   onClick?: () => void;
@@ -23,18 +24,47 @@ export const SettingBlockSubtitle: ParentComponent<{
   />
 );
 
-/** 菜单面板 */
+type SettingPanelContainerProps = {
+  ref?: (el: HTMLDivElement) => void;
+  children?: JSX.Element | JSX.Element[];
+  class?: string;
+  style?: JSX.CSSProperties;
+};
+
+/** 侧边面板通用容器 */
+export const SettingPanelContainer: ParentComponent<
+  SettingPanelContainerProps
+> = (props) => {
+  let panelRef!: HTMLDivElement; // oxlint-disable-line no-unassigned-vars
+
+  return (
+    <div
+      ref={(e) => {
+        panelRef = e;
+        if (typeof props.ref === 'function') props.ref(e);
+      }}
+      class={[
+        classes.SettingPanel,
+        classes.beautifyScrollbar,
+        props.class,
+      ].join(' ')}
+      style={props.style}
+      onWheel={(e) =>
+        panelRef.scrollHeight > panelRef.clientHeight && e.stopPropagation()
+      }
+      onScroll={stopPropagation}
+      on:click={stopPropagation}
+    >
+      {props.children}
+    </div>
+  );
+};
+
+/** 设置菜单面板 */
 export const SettingPanel: Component = () => (
-  <div
+  <SettingPanelContainer
     ref={bindRef('settingPanel')}
-    class={`${classes.SettingPanel} ${classes.beautifyScrollbar}`}
     style={{ width: lang() === 'zh' ? '15em' : '20em' }}
-    onWheel={(e) =>
-      refs.settingPanel.scrollHeight > refs.settingPanel.clientHeight &&
-      e.stopPropagation()
-    }
-    onScroll={stopPropagation}
-    on:click={stopPropagation}
   >
     <For each={store.prop.editSettingList(defaultSettingList())}>
       {([name, SettingItem, options], i) => {
@@ -60,5 +90,5 @@ export const SettingPanel: Component = () => (
         );
       }}
     </For>
-  </div>
+  </SettingPanelContainer>
 );

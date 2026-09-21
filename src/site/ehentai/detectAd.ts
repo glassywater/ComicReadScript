@@ -68,7 +68,7 @@ export const detectAd: GalleryHandler<DetectAdReturn | undefined> = (
     options.detect_ad && document.getElementById('ta_other:extraneous_ads');
   if (!enableDetectAd) return;
 
-  setState('comicMap', '', 'adList', new ReactiveSet());
+  setState('imgListMap', '', 'adList', new ReactiveSet());
 
   /** 缩略图列表 */
   const thumbnailList: (ImageBitmap | HTMLImageElement)[] = [];
@@ -86,17 +86,17 @@ export const detectAd: GalleryHandler<DetectAdReturn | undefined> = (
     }
 
     // 先根据文件名判断一次
-    await getAdPageByFileName(fileNameList, store.comicMap[''].adList!);
+    await getAdPageByFileName(fileNameList, store.imgListMap[''].adList!);
     // 不行的话再用缩略图识别
-    if (store.comicMap[''].adList!.size === 0)
-      await getAdPageByContent(thumbnailList, store.comicMap[''].adList!);
+    if (store.imgListMap[''].adList!.size === 0)
+      await getAdPageByContent(thumbnailList, store.imgListMap[''].adList!);
   })();
 
   // 模糊广告页的缩略图
   css(
     createRootMemo(() => {
-      if (!store.comicMap['']?.adList?.size) return '';
-      return [...store.comicMap[''].adList]
+      if (!store.imgListMap['']?.adList?.size) return '';
+      return [...store.imgListMap[''].adList]
         .map(
           (i) => `a[href="${pageList[i]}"] [title]:not(:hover) {
               filter: blur(8px);
@@ -110,10 +110,10 @@ export const detectAd: GalleryHandler<DetectAdReturn | undefined> = (
 
   return {
     checkFileName: once(() =>
-      getAdPageByFileName(fileNameList, store.comicMap[''].adList!),
+      getAdPageByFileName(fileNameList, store.imgListMap[''].adList!),
     ),
     checkContent: once(() =>
-      getAdPageByContent(imgList, store.comicMap[''].adList!),
+      getAdPageByContent(imgList, store.imgListMap[''].adList!),
     ),
   };
 };

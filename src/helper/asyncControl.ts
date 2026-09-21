@@ -1,5 +1,7 @@
 import { type Promisable } from 'type-fest';
 
+import { log } from './logger';
+
 export const sleep = (ms: number) =>
   // oxlint-disable-next-line promise/avoid-new no-promise-executor-return
   new Promise((resolve) => {
@@ -143,7 +145,7 @@ export class PQueue<T> {
         await this.handleTask(item);
         this.done.add(item);
       } catch (error) {
-        console.error(error);
+        log.error(error);
       } finally {
         this.running.delete(item);
       }

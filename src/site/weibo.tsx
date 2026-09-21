@@ -35,7 +35,7 @@ setupSiteAdapter({
         querySelectorAll<HTMLImageElement>(
           '[node-type="articleContent"] figure img',
         ).map((e) => imgUrl(e.getAttribute('pid')) || e.src);
-      setState('comicMap', '', { getImgList });
+      setState('imgListMap', '', { getImgList });
     },
     detail: ({ setState }) => {
       const getImgList = () =>
@@ -45,7 +45,7 @@ setupSiteAdapter({
           (e) =>
             imgUrl(/(?<pid>[^/]+)\.jpg$/u.exec(e.src)?.groups?.pid) || e.src,
         );
-      setState('comicMap', '', { getImgList });
+      setState('imgListMap', '', { getImgList });
     },
   },
 });

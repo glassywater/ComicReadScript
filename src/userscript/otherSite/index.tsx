@@ -73,7 +73,7 @@ export const otherSite = async () => {
 
   const scanner = new AutoImageScanner({
     selector: options.selector,
-    onImgListChange: (imgList) => setState('comicMap', '', 'imgList', imgList),
+    onImgListChange: (imgList) => setState('imgListMap', '', { imgList }),
     onEmpty: () =>
       setState((state) => {
         state.fab.show = false;
@@ -89,7 +89,7 @@ export const otherSite = async () => {
   });
   exposeToGlobal({ scanner });
 
-  setState('comicMap', '', {
+  setState('imgListMap', '', {
     async getImgList() {
       // 在有 selector 的初次扫描时如果没有匹配的图片就判定为非漫画页
       if (
@@ -124,7 +124,7 @@ export const otherSite = async () => {
 
   // 同步滚动显示网页上的图片，用于以防万一保底触发漏网之鱼
   setState('manga', {
-    onShowImgsChange: throttle((showImgs) => {
+    onShowImgsChange: throttle(({ showImgs }) => {
       if (!store.manga.show) return;
       scanner.slotElements[[...showImgs].at(-1)!]?.scrollIntoView({
         behavior: 'instant',
@@ -148,6 +148,6 @@ export const otherSite = async () => {
   onUrlChange((lastUrl, nowUrl) => {
     if (!lastUrl || lastUrl.split('/').length === nowUrl.split('/').length)
       return;
-    setState('comicMap', '', 'imgList', undefined);
+    setState('imgListMap', '', 'imgList', undefined);
   });
 };

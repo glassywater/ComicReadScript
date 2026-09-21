@@ -47,7 +47,7 @@ setupSiteAdapter({
         },
       });
 
-      setState('comicMap', '', {
+      setState('imgListMap', '', {
         getImgList: async () => {
           const galleryId = /^\/g\/(?<id>\d+)/u.exec(location.pathname)?.groups
             ?.id;
@@ -73,35 +73,35 @@ setupSiteAdapter({
   },
   features: {
     /** 识别广告页 */
-    detect_ad: async ({ store, setState }, pageCtx) => {
+    detect_ad: async ({ store: { imgListMap }, setState }, pageCtx) => {
       if (pageCtx.type !== 'manga') return;
       if (!querySelector('#tags .tag[href="/tag/extraneous-ads/"]')) return;
 
-      setState('comicMap', '', 'adList', new ReactiveSet());
+      setState('imgListMap', '', 'adList', new ReactiveSet());
 
       // 先使用缩略图识别
       await getAdPageByContent(
         querySelectorAll<HTMLImageElement>('.thumb-container img').map(
           (img) => img.src,
         ),
-        store.comicMap[''].adList!,
+        imgListMap[''].adList!,
       );
 
       // 加载了原图后再用原图识别
       createEffectOn(
-        () => store.comicMap[''].imgList,
+        () => imgListMap[''].imgList,
         (imgList) =>
           imgList?.length &&
           getAdPageByContent(
             imgList.map((img) => (typeof img === 'string' ? img : img.src)),
-            store.comicMap[''].adList!,
+            imgListMap[''].adList!,
           ),
       );
 
       // 模糊广告页的缩略图
       css(() => {
-        if (!store.comicMap['']?.adList?.size) return '';
-        return [...store.comicMap[''].adList]
+        if (!imgListMap['']?.adList?.size) return '';
+        return [...imgListMap[''].adList]
           .map(
             (i) => `
               .thumb-container:nth-of-type(${i + 1}):not(:hover) {
