@@ -10,8 +10,7 @@ export type LastChapter = {
 };
 
 /** 获取最后阅读记录 */
-export const getLastChapter = (comicName: string) =>
-  mobileApi.eachGet<LastChapter>(
-    `/api/v3/comic2/${comicName}/query?platform=3`,
-    { errorText: '獲取閱讀記錄失敗' },
-  );
+export const getLastChapter = (comicId: string) =>
+  mobileApi.eachGet<LastChapter>(`/api/v3/comic2/${comicId}/query?platform=3`, {
+    errorText: '獲取閱讀記錄失敗',
+  });

@@ -32,19 +32,19 @@ type Chapter2Detail = {
 };
 
 export const getChapterDetail = <T = ChapterDetail>(
-  comicName: string,
+  comicId: string,
   chapterId: string,
 ) =>
-  pcApi.eachGet<T>(
-    `/api/v3/comic/${comicName}/chapter/${chapterId}?platform=3`,
-    { noCheckCode: true, errorText },
-  );
+  pcApi.eachGet<T>(`/api/v3/comic/${comicId}/chapter/${chapterId}?platform=3`, {
+    noCheckCode: true,
+    errorText,
+  });
 
 const getChapter2Detail = <T = Chapter2Detail>(
-  comicName: string,
+  comicId: string,
   chapterId: string,
 ) =>
-  pcApi.eachGet<T>(`/api/v3/comic/${comicName}/chapter2/${chapterId}`, {
+  pcApi.eachGet<T>(`/api/v3/comic/${comicId}/chapter2/${chapterId}`, {
     noCheckCode: true,
     errorText,
   });
@@ -60,12 +60,12 @@ export type ChapterData = {
 
 /** 获取章节图片数据 */
 export const getChapterData = async (
-  comicName: string,
+  comicId: string,
   chapterId: string,
 ): Promise<ChapterData> => {
   // 新版接口
   try {
-    const res = await getChapter2Detail(comicName, chapterId);
+    const res = await getChapter2Detail(comicId, chapterId);
     if (res.status === 200) {
       const { contents, words, name, next, prev } =
         res.response.results.chapter;
@@ -92,7 +92,7 @@ export const getChapterData = async (
       },
       message,
     },
-  } = await getChapterDetail(comicName, chapterId);
+  } = await getChapterDetail(comicId, chapterId);
   return {
     status,
     message,

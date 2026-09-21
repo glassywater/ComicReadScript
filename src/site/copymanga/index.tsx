@@ -1,13 +1,14 @@
-import { setupSiteAdapter, toast } from 'core';
-import { log, querySelector, querySelectorClick } from 'helper';
+import { setupChapters, setupSiteAdapter, toast } from 'core';
+import { log, querySelector } from 'helper';
 import {
   getChapterData,
+  getChapters,
   getComments,
   getImglistByHtml,
   token,
 } from 'userscript/copyApi';
 
-import { buildChapters } from './chapters';
+import { buildCatalog } from './buildCatalog';
 import { type CopymangaPageContext, getPageContext } from './helper';
 import { handleLastChapter } from './lastChapter';
 
@@ -15,81 +16,77 @@ setupSiteAdapter<CopymangaPageContext>({
   name: 'copymanga',
   getPageContext,
   handlers: {
-    manga: ({ setState }, { comicName, id }) => {
+    manga: (coreCtx, { id: comicId, chapterId }) => {
       /** 漫画不存在时才会出现的提示 */
       const titleDom = querySelector('main .img+.title');
-      if (titleDom)
-        titleDom.textContent =
-          'ComicRead 提示您：你訪問的內容暫不存在，請點選右下角按鈕嘗試加載漫畫';
-      /** 通过网页 API 加载漫画（可以获取隐藏漫画） */
-      const getImgListByApi = async () => {
-        const data = await getChapterData(comicName, id);
 
+      /** 通过页面上的标题元素展示加载状态 */
+      const setTip = (text: string) => {
+        if (titleDom) titleDom.textContent = text;
+      };
+
+      /** 加载章节图片列表 */
+      const getChapterImgList = async (id: string) => {
+        // 当前章节优先通过解析网页变量加载，减少等待时间
+        if (id === chapterId) {
+          try {
+            const imgList = await getImglistByHtml(
+              `${location.origin}/comic/${comicId}/chapter/${chapterId}`,
+            );
+            if (imgList.length > 0) {
+              setTip('漫畫加載成功🥳');
+              return imgList;
+            }
+          } catch (error) {
+            log.error(error);
+          }
+        }
+
+        // 隐藏漫画只能通过 api 加载，还失败的话就没办法了
+        const data = await getChapterData(comicId, id);
         if (data.status !== 200) {
           const message = `漫畫加載失敗：${data.message || data.status}`;
-          if (titleDom) titleDom.textContent = message;
+          setTip(message);
           throw new Error(message);
         }
-
-        if (titleDom) {
-          titleDom.textContent = '漫畫加載成功🥳';
+        setTip('漫畫加載成功🥳');
+        if (titleDom)
           document.title = `${data.comicName} - ${data.chapter.name} - 拷貝漫畫 拷贝漫画`;
-        }
-
-        if (titleDom ?? !querySelector('.comicContent-next')) {
-          const { next, prev } = data.chapter;
-
-          setState('manga', {
-            onNext: next
-              ? () => location.assign(`/comic/${comicName}/chapter/${next}`)
-              : undefined,
-            onPrev: prev
-              ? () => location.assign(`/comic/${comicName}/chapter/${prev}`)
-              : undefined,
-          });
-        }
 
         return data.urls;
       };
 
-      setState('comicMap', '', {
-        async getImgList() {
-          if (querySelector('.comicContent-next'))
-            setState('manga', {
-              onNext: querySelectorClick(
-                '.comicContent-next a:not(.prev-null)',
-              ),
-              onPrev: querySelectorClick(
-                '.comicContent-prev:not(.index,.list) a:not(.prev-null)',
-              ),
-            });
+      setTip(
+        'ComicRead 提示您：你訪問的內容暫不存在，請點選右下角按鈕嘗試加載漫畫',
+      );
 
-          // 隐藏漫画只能通过 api 加载，不能的话就没办法了
-          if (titleDom) return getImgListByApi();
-          // 其他普通漫画优先通过解析网页变量加载，避免触发 api 的限制
-          try {
-            const imgList = await getImglistByHtml(
-              `${location.origin}/comic/${comicName}/chapter/${id}`,
-            );
-            if (imgList.length === 0) throw new Error('解析網頁變量失敗');
-            return imgList;
-          } catch (error) {
-            log.error(error);
-            return getImgListByApi();
-          }
-        },
+      // 先注册并加载当前章节的图片
+      coreCtx.setState('imgListMap', '', {
+        getImgList: () => getChapterImgList(chapterId),
       });
 
-      // 评论异步获取，不影响其他功能
-      void (async () => {
-        const chapter_id = location.pathname.split('/').at(-1)!;
-        const comments = await getComments(chapter_id);
-        if (comments.length > 0) setState('manga', 'commentList', comments);
-      })();
+      // 然后再获取章节模式的数据
+      return setupChapters<string>(coreCtx, {
+        currentId: chapterId,
+        getChapterList: async () => {
+          const { groups } = await getChapters(comicId);
+          const groupList = Object.values(groups);
+          return groupList.flatMap((group) =>
+            group.chapters.map(({ id, name }) => ({
+              id,
+              // 多分组时通过标题前缀区分「話/卷/番外篇」等分组
+              title: groupList.length > 1 ? `[${group.name}] ${name}` : name,
+              url: `/comic/${comicId}/chapter/${id}`,
+            })),
+          );
+        },
+        getChapterImgList,
+        getComments,
+      });
     },
 
     // 目录页
-    catalog: async (_, { comicName, hiddenType, isMobile }) => {
+    catalog: async (_, { id, hiddenType, isMobile }) => {
       // 如果漫画被隐藏了，就自己生成目录
       if (hiddenType) {
         // 给屏蔽提示加个删除线
@@ -103,7 +100,7 @@ setupSiteAdapter<CopymangaPageContext>({
         }
 
         try {
-          await buildChapters(comicName, hiddenType);
+          await buildCatalog(id, hiddenType);
         } catch (error) {
           log.error(error);
           if (titleDom)
@@ -112,7 +109,7 @@ setupSiteAdapter<CopymangaPageContext>({
         }
       }
 
-      if (!isMobile && token) handleLastChapter(comicName);
+      if (!isMobile && token) handleLastChapter(id);
     },
   },
 });

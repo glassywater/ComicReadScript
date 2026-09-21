@@ -2,7 +2,7 @@ import { querySelector, wait } from 'helper';
 import { getLastChapter } from 'userscript/copyApi';
 
 /** 在目录页显示上次阅读记录 */
-export const handleLastChapter = (comicName: string) => {
+export const handleLastChapter = (comicId: string) => {
   let a: HTMLAnchorElement;
 
   const stylesheet = new CSSStyleSheet();
@@ -26,7 +26,7 @@ export const handleLastChapter = (comicName: string) => {
     a.textContent = '獲取中';
     a.removeAttribute('href');
     try {
-      const res = await getLastChapter(comicName);
+      const res = await getLastChapter(comicId);
 
       const data = res.response?.results?.browse;
       if (!data) {

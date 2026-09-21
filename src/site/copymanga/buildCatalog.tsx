@@ -6,12 +6,9 @@ import { type ChaptersGroup, getChapters } from 'userscript/copyApi';
 import { type HiddenType } from './helper';
 
 /** 生成目录 */
-export const buildChapters = async (
-  comicName: string,
-  hiddenType: HiddenType,
-) => {
-  const data = await getChapters(comicName);
-  log(data);
+export const buildCatalog = async (comicId: string, hiddenType: HiddenType) => {
+  const data = await getChapters(comicId);
+  if (isDevMode) log(data);
   const {
     build: { type },
     groups,
@@ -74,7 +71,7 @@ export const buildChapters = async (
                               >
                                 <a
                                   class="van-grid-item__content van-grid-item__content--center"
-                                  href={`/comic/${comicName}/chapter/${chapter.id}`}
+                                  href={`/comic/${comicId}/chapter/${chapter.id}`}
                                 >
                                   <span
                                     class="van-grid-item__text"
@@ -119,7 +116,7 @@ export const buildChapters = async (
                 <div class="table-default-right">
                   <span>更新內容：</span>
                   <a
-                    href={`/comic/${comicName}/chapter/${props.last_chapter.comic_id}`}
+                    href={`/comic/${comicId}/chapter/${props.last_chapter.comic_id}`}
                     target="_blank"
                     children={props.last_chapter.name}
                   />
@@ -141,7 +138,7 @@ export const buildChapters = async (
                           <For each={chapters[id]}>
                             {(chapter) => (
                               <a
-                                href={`/comic/${comicName}/chapter/${chapter.id}`}
+                                href={`/comic/${comicId}/chapter/${chapter.id}`}
                                 target="_blank"
                                 title={chapter.name}
                                 style={{ display: 'block' }}
@@ -179,7 +176,7 @@ export const buildChapters = async (
                             classList={{
                               active: props.last_chapter.uuid === chapter.id,
                             }}
-                            href={`/comic/${comicName}/chapter/${chapter.id}`}
+                            href={`/comic/${comicId}/chapter/${chapter.id}`}
                             children={chapter.name}
                           />
                         )}

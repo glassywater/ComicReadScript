@@ -1,3 +1,5 @@
+import { plimit, range } from 'helper';
+
 import { pcApi } from './client';
 import { decryptData } from './decrypt';
 
@@ -26,15 +28,12 @@ export type Chapters = {
  *
  * 会受反爬机制影响返回空数据，因此仅作为备用
  */
-export const getChaptersLegacy = async (
-  comicName: string,
-): Promise<Chapters> => {
+export const getChaptersLegacy = async (comicId: string): Promise<Chapters> => {
   const {
     response: { results },
-  } = await pcApi.get<{ results: string }>(
-    `/comicdetail/${comicName}/chapters`,
-    { errorText },
-  );
+  } = await pcApi.get<{ results: string }>(`/comicdetail/${comicId}/chapters`, {
+    errorText,
+  });
   return decryptData<Chapters>(results);
 };
 
@@ -54,10 +53,10 @@ type GroupChapter = {
 const typeNameMap: Record<number, string> = { 1: '話', 2: '卷', 3: '番外篇' };
 
 /** 获取漫画目录 */
-export const getChaptersByApi = async (comicName: string) => {
+export const getChaptersByApi = async (comicId: string) => {
   const groupsRes = await pcApi.eachGet<{
     results: { groups?: Group[] | Record<string, Group> };
-  }>(`/api/v3/comic2/${comicName}`, { errorText });
+  }>(`/api/v3/comic2/${comicId}`, { errorText });
   const rawGroups = groupsRes.response.results.groups;
   const groups = (
     Array.isArray(rawGroups) ? rawGroups : Object.values(rawGroups ?? {})
@@ -65,26 +64,50 @@ export const getChaptersByApi = async (comicName: string) => {
   // 无 groups 时兜底为一个组
   if (groups.length === 0) groups.push({ path_word: 'default', name: '默认' });
 
-  const chaptersByGroup: { group: Group; list: GroupChapter[] }[] = [];
-  for (const group of groups) {
-    let page: GroupChapter[] = [];
-    let offset = 0;
-    const list: GroupChapter[] = [];
-    do {
-      const res = await pcApi.eachGet<{
-        results: { total: number; list: GroupChapter[] };
-      }>(
-        `/api/v3/comic/${comicName}/group/${group.path_word}/chapters?limit=100&offset=${offset}&_update=true`,
-        { errorText },
-      );
-      page = res.response.results.list;
-      list.push(...page);
-      offset += 100;
-    } while (page.length >= 100);
-    chaptersByGroup.push({ group, list });
+  const getChaptersPage = (pathWord: string, offset: number) =>
+    pcApi.eachGet<{
+      results: { total: number; list: GroupChapter[] };
+    }>(
+      `/api/v3/comic/${comicId}/group/${pathWord}/chapters?limit=100&offset=${offset}&_update=true`,
+      { errorText },
+    );
+
+  // 先取第一页拿到 total，再并发获取剩余分页
+  const firstPageList = await plimit(
+    groups.map((group) => async () => {
+      const res = await getChaptersPage(group.path_word, 0);
+      return res.response.results;
+    }),
+  );
+
+  const restTaskList = firstPageList.flatMap(({ total }, groupIndex) =>
+    total <= 100
+      ? []
+      : range(1, Math.ceil(total / 100)).map((page) => async () => {
+          const res = await getChaptersPage(
+            groups[groupIndex].path_word,
+            page * 100,
+          );
+          return { groupIndex, list: res.response.results.list };
+        }),
+  );
+  const restList = await plimit(restTaskList);
+
+  // 按分组归并剩余页（restList 已按分组、页码顺序排列）
+  const restByGroup = new Map<number, GroupChapter[]>();
+  for (const { groupIndex, list } of restList) {
+    const groupList = restByGroup.get(groupIndex);
+    if (groupList) groupList.push(...list);
+    else restByGroup.set(groupIndex, [...list]);
   }
 
-  return { groups, chaptersByGroup };
+  return {
+    groups,
+    chaptersByGroup: groups.map((group, i) => ({
+      group,
+      list: [...firstPageList[i].list, ...(restByGroup.get(i) ?? [])],
+    })),
+  };
 };
 
 /** 将接口返回数据转换为统一的目录结构 */
@@ -127,10 +150,10 @@ const transformFromGetChaptersByApi = (raw: {
 };
 
 /** 获取漫画目录（优先新接口，失败时用旧接口兜底） */
-export const getChapters = async (comicName: string): Promise<Chapters> => {
+export const getChapters = async (comicId: string): Promise<Chapters> => {
   try {
-    return transformFromGetChaptersByApi(await getChaptersByApi(comicName));
+    return transformFromGetChaptersByApi(await getChaptersByApi(comicId));
   } catch {
-    return getChaptersLegacy(comicName);
+    return getChaptersLegacy(comicId);
   }
 };

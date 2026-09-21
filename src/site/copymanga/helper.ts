@@ -9,19 +9,21 @@ import { querySelector, querySelectorAll, wait } from 'helper';
 export type HiddenType = 'web' | 'mobile' | '404';
 
 export const getPageContext = async () => {
-  let comicName = '';
   let id = '';
+  let chapterId = '';
   if (location.href.includes('/chapter/'))
-    [, , comicName, , id] = location.pathname.split('/');
+    [, , id, , chapterId] = location.pathname.split('/');
   else if (location.href.includes('/comicContent/'))
-    [, , , comicName, id] = location.pathname.split('/');
+    [, , , id, chapterId] = location.pathname.split('/');
 
-  if (comicName && id) return { type: 'manga', comicName, id } as const;
+  if (id && chapterId)
+    // id 是漫画的唯一标识（阅读进度、章节缓存都依赖它），章节 id 用 chapterId
+    return { type: 'manga', id, chapterId } as const;
 
   // 目录页
-  if (!id && location.href.includes('/comic/')) {
-    [, comicName] = location.href.split('/comic/');
-    if (!comicName) return;
+  if (!chapterId && location.href.includes('/comic/')) {
+    [, id] = location.href.split('/comic/');
+    if (!id) return;
 
     const isMobile = location.href.includes('/h5/');
     let hiddenType: HiddenType | undefined;
@@ -68,7 +70,7 @@ export const getPageContext = async () => {
       hiddenType = querySelector('.comicParticulars-title') ? 'web' : '404';
     }
 
-    return { type: 'catalog', comicName, hiddenType, isMobile } as const;
+    return { type: 'catalog', id, hiddenType, isMobile } as const;
   }
 };
 
