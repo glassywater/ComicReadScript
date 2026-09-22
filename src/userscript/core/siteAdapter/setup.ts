@@ -3,7 +3,7 @@ import { log, wait } from 'helper';
 import { type Promisable } from 'type-fest';
 
 import { exitChapterMode, setupChapters } from '../chapters';
-import { type Chapter, type ChapterId, type CoreContext } from '../types';
+import { type ChapterGroup, type ChapterId, type CoreContext } from '../types';
 import { type CleanupFn, setupSiteAdapter } from './setupSiteAdapter';
 
 type BaseSetupOptions<T extends Record<string, any>> = {
@@ -46,7 +46,7 @@ export type SetupOptions<T extends Record<string, any> = Record<string, any>> =
       | {
           /** 多章节模式：获取所有章节并按章节 id 加载图片 */
           getImgList?: undefined;
-          getChapterList: () => Promisable<Chapter[]>;
+          getChapterList: () => Promisable<ChapterGroup[]>;
           /** 返回当前所在章节的 id */
           getCurrentId: () => ChapterId;
           getChapterImgList: (

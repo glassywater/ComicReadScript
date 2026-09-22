@@ -4,6 +4,7 @@ import { isEqual, log, sleep, t } from 'helper';
 import { addShowImgsListener } from '../showImgsChange';
 import {
   type Chapter,
+  type ChapterGroup,
   type ChapterId,
   type ChapterImgListLoader,
   type CoreContext,
@@ -33,6 +34,8 @@ const TRANSFER_TIMEOUT = 10 * 1000;
 /** 章节数据 */
 type ChaptersOptions = {
   comicId: string;
+  groupList: ChapterGroup[];
+  /** groupList 按分组顺序压平后的全部章节（构造时派生，供顺序逻辑使用） */
   chapterList: Chapter[];
   currentId: ChapterId;
   getChapterImgList: ChapterImgListLoader;
@@ -40,7 +43,7 @@ type ChaptersOptions = {
 };
 
 /** 章节目录缓存，key 为 store.comicId（漫画唯一标识） */
-const chapterListCache = new Map<string, Chapter[]>();
+const chapterListCache = new Map<string, ChapterGroup[]>();
 
 /** popstate 监听的注销函数 */
 let stopUrlNavListener: (() => void) | undefined;
@@ -106,7 +109,7 @@ const reuseManager = (
 ): (() => void) | undefined => {
   if (!nowManager) return;
   const {
-    chapterList,
+    groupList,
     coreCtx: {
       store: { imgListMap },
     },
@@ -115,10 +118,10 @@ const reuseManager = (
   } = nowManager;
 
   // 章节列表与现有完全一致
-  if (!isEqual(chapterList, options.chapterList)) return;
+  if (!isEqual(groupList, options.groupList)) return;
   // 各章节在 imgListMap 中注册的 getList 仍是管理器登记的加载函数，未被重置
   if (
-    !chapterList.every(
+    !nowManager.chapterList.every(
       (chapter) =>
         imgListMap[key(chapter.id)]?.getImgList ===
         registrations.get(chapter.id),
@@ -138,7 +141,8 @@ const createManager = (coreCtx: CoreContext, options: ChaptersOptions) => {
     coreCtx,
     comicId: options.comicId,
     key: (id) => `${options.comicId}:${id}`,
-    chapterList: [...options.chapterList],
+    groupList: options.groupList,
+    chapterList: options.chapterList,
     getChapterImgList: options.getChapterImgList,
     getComments: options.getComments,
     cache: new Map(),
@@ -305,20 +309,21 @@ export const setupChapters = <Id extends ChapterId = ChapterId>(
 
   void (async () => {
     try {
-      let chapterList = chapterListCache.get(comicId);
-      if (!chapterList) {
-        chapterList = await options.getChapterList();
+      let groupList = chapterListCache.get(comicId);
+      if (!groupList) {
+        groupList = await options.getChapterList();
         // 失败抛错，不写入缓存，等下次重试
-        if (chapterList.length === 0) {
+        if (groupList.length === 0) {
           log.error(new Error(t('alert.fetch_chapter_list_failed')));
           throw new Error(t('alert.fetch_chapter_list_failed'));
         }
-        chapterListCache.set(comicId, chapterList);
+        chapterListCache.set(comicId, groupList);
       }
       if (cancelled) return;
       exit = initChapters(coreCtx, {
         comicId,
-        chapterList,
+        groupList,
+        chapterList: groupList.flatMap((group) => group.chapters),
         currentId: options.currentId,
         getChapterImgList: options.getChapterImgList as ChapterImgListLoader,
         getComments: options.getComments as ChaptersOptions['getComments'],
@@ -348,9 +353,10 @@ const initChapters = (
   const { store } = coreCtx;
 
   // currentId 不在章节列表中时回退到第一个章节，避免 currentImgListId 指向未注册的章节
+  const { chapterList } = options;
   const currentChapter =
-    options.chapterList.find((chapter) => chapter.id === options.currentId) ??
-    options.chapterList[0];
+    chapterList.find((chapter) => chapter.id === options.currentId) ??
+    chapterList[0];
 
   /** 实际生效的当前章节 id */
   const currentId = currentChapter?.id ?? '';

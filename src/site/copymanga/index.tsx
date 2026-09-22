@@ -70,15 +70,15 @@ setupSiteAdapter<CopymangaPageContext>({
         currentId: chapterId,
         getChapterList: async () => {
           const { groups } = await getChapters(comicId);
-          const groupList = Object.values(groups);
-          return groupList.flatMap((group) =>
-            group.chapters.map(({ id, name }) => ({
+          return Object.values(groups).flatMap((group) => {
+            const chapters = group.chapters.map(({ id, name }) => ({
               id,
-              // 多分组时通过标题前缀区分「話/卷/番外篇」等分组
-              title: groupList.length > 1 ? `[${group.name}] ${name}` : name,
+              title: name,
               url: `/comic/${comicId}/chapter/${id}`,
-            })),
-          );
+            }));
+            // 过滤掉没有章节的分组
+            return chapters.length > 0 ? [{ title: group.name, chapters }] : [];
+          });
         },
         getChapterImgList,
         getComments,

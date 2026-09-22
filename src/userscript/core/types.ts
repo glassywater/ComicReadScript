@@ -38,6 +38,12 @@ export type Chapter<Id extends ChapterId = ChapterId> = {
   url: string;
 };
 
+/** 章节分组 */
+export type ChapterGroup<Id extends ChapterId = ChapterId> = {
+  title: string;
+  chapters: Chapter<Id>[];
+};
+
 export type ChapterImgListLoader<Id extends ChapterId = ChapterId> = (
   chapterId: Id,
   coreCtx: CoreContext,
@@ -46,8 +52,8 @@ export type ChapterImgListLoader<Id extends ChapterId = ChapterId> = (
 export type InitChaptersOptions<Id extends ChapterId = ChapterId> = {
   /** 当前所在章节的 id */
   currentId: Id;
-  /** 获取完整的章节列表 */
-  getChapterList: () => Promisable<Chapter<Id>[]>;
+  /** 获取完整的章节列表（按分组组织，分组顺序即展示和阅读顺序） */
+  getChapterList: () => Promisable<ChapterGroup<Id>[]>;
   /** 获取指定章节下的所有图片 */
   getChapterImgList: ChapterImgListLoader<Id>;
   /** 获取指定章节下的评论 */
