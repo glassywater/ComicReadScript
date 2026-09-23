@@ -198,9 +198,10 @@ try {
       break;
     }
 
-    // #R18（中文）[hanime1](https://hanime1.me)
-    // test: https://hanime1.me/comic/134422
-    case 'hanime1.me': {
+    // #R18（中文）[hanime1](https://hanimeone.me/comics)
+    // test: https://hanimeone.me/comic/134422
+    case 'hanime1.me':
+    case 'hanimeone.me': {
       if (!location.pathname.startsWith('/comic/')) break;
 
       setup({
