@@ -7,6 +7,7 @@ import { IconButton } from '../../IconButton';
 import {
   constantScroll,
   handleEndTurnPage,
+  isAbreastMode,
   isBottom,
   isScrollMode,
   scrollBy,
@@ -39,7 +40,7 @@ const autoScroll = new (class extends AnimationFrame {
   scroll = () => {
     if (isBottom()) return this.scrollEnd();
 
-    if (isScrollMode())
+    if (store.option.scrollMode.enabled)
       return scrollBy(Math.max(1, store.option.autoScroll.distance), true);
     return turnPageAnimation('next');
   };
@@ -62,7 +63,7 @@ const autoScroll = new (class extends AnimationFrame {
   start = () => {
     this.lastTime = 0;
 
-    if (!store.option.autoScroll.continuous || !isScrollMode())
+    if (!store.option.autoScroll.continuous || !store.option.scrollMode.enabled)
       return this.call();
 
     // 开启了持续滚动的话，改用 constantScroll 来滚动页面
@@ -95,6 +96,7 @@ createEffectOn(
     ...Object.values(store.option.autoScroll),
     store.autoScroll.play,
     isScrollMode(),
+    isAbreastMode(),
   ],
   () => {
     autoScroll.cancel();
