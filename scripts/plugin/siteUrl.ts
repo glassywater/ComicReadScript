@@ -28,6 +28,18 @@ const siteUrlFnMap = {
 
     return [...new Set(urls)];
   },
+  async moonchan() {
+    const res = await axios<string>('https://sukebei.moonchan.xyz/');
+    // 页面由前端渲染，需从内联的 servicesData 中提取 exhentai 镜像部分的地址
+    const section =
+      /title:\s*["']exhentai[^"']*["'][\s\S]*?entries:\s*\[(?<list>[\s\S]*?)\]/u.exec(
+        res.data,
+      )?.groups?.list;
+    if (!section) throw new Error('未找到 exhentai 镜像数据');
+    return [...section.matchAll(/(?<=url:\s*")[^"]+(?=")/gu)]
+      .flat()
+      .map((url) => new URL(url).host);
+  },
 };
 
 let siteUrlMap: Record<string, string[]> | undefined;

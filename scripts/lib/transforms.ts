@@ -52,7 +52,7 @@ export const transforms = {
     let indexCode = readFile(pathResolve('src/index.ts'));
     indexCode = await siteUrl.renderChunk(indexCode, chunk);
     const matchList = [
-      ...indexCode.matchAll(/(?<=\n {4}case ').+?(?=':)/gu),
+      ...indexCode.matchAll(/(?<=\n {4}case ['"]).+?(?=['"]:)/gu),
     ].flatMap(([url]) => `// @match           *://${url}/*`);
     code = code.replace(/\/\/ @match \s+ \*:\/\/\*\/\*/u, matchList.join('\n'));
 

@@ -62,8 +62,8 @@ export const categoryMap = new Map<string, string[]>();
 
 export const updateCategoryMap = () => {
   categoryMap.clear();
-  // .slice(7) 跳过 README 中手动维护的前 7 个站点（有专属文档章节的网站）
-  for (const site of getSupportSiteList().slice(7)) {
+  // 无 [xx](url) 链接格式的注释（README 中手动维护的站点）会被下方正则过滤掉
+  for (const site of getSupportSiteList()) {
     const match = /^(?<category>[^[]+)(?<link>\[.+)$/u.exec(site)?.groups;
     if (!match) continue;
     const { category, link } = match;

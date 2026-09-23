@@ -221,6 +221,13 @@ try {
       break;
     }
 
+    // #R18[E-Hentai 镜像站](https://ex.moonchan.xyz/)
+    case 'siteUrl#moonchan':
+    case 'ex.moonchan.xyz': {
+      import('site/ehentai');
+      break;
+    }
+
     // #R18[hitomi](https://hitomi.la)
     // test: https://hitomi.la/reader/3427121.html
     case 'hitomi.la': {
