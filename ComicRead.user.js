@@ -3,9 +3,9 @@
 // @name:en         ComicRead
 // @name:ru         ComicRead
 // @namespace       ComicRead
-// @version         12.14.0
-// @description     为漫画站增加双页阅读、翻译等优化体验的增强功能。百合会（记录阅读历史、自动签到等）、百合会新站、E-Hentai（关联外站、快捷收藏、标签染色、识别广告页等）、nhentai（彻底屏蔽漫画、无限滚动）、Yurifans（自动签到）、拷贝漫画(copymanga)（显示最后阅读记录、解锁隐藏漫画）、再漫画、漫画柜(manhuagui)、动漫屋(dm5)、mangabz、komiic、無限動漫、绅士漫画(wnacg)、禁漫天堂、NoyAcg、熱辣漫畫、hanime1、hitomi、hdoujin、SchaleNetwork、nude-moon、HentaiZap、IMHentai、HentaiEra、HentaiEnvy、EAHentai、HentaiNexus、AsmHentai、3Hentai、MangaDex、welovemanga、kisslove(klz9)、Pawchive、kemono、nekohouse、Pixiv、微博、明日方舟泰拉记事社、Postimages、ニコニコ漫画、最前線、芸能ヌード、Suwayomi、LANraragi
-// @description:en  Add dual-page reading, translation and other enhancements to comic sites. E-Hentai (Associate nhentai, Quick favorite, Colorize tags, Floating tag list, etc.) | nhentai (Totally block comics, Auto page turning) | hitomi | hdoujin | SchaleNetwork | nude-moon | HentaiZap | IMHentai | HentaiEra | HentaiEnvy | EAHentai | HentaiNexus | AsmHentai | 3Hentai | Pawchive | kemono | nekohouse | MangaDex | welovemanga | kisslove(klz9)
+// @version         12.15.0
+// @description     为漫画站增加双页阅读、翻译等优化体验的增强功能。百合会（记录阅读历史、自动签到等）、百合会新站、E-Hentai（关联外站、快捷收藏、标签染色、识别广告页等）、nhentai（彻底屏蔽漫画、无限滚动）、Yurifans（自动签到）、拷贝漫画(copymanga)（显示最后阅读记录、解锁隐藏漫画）、再漫画、漫画柜(manhuagui)、动漫屋(dm5)、mangabz、komiic、無限動漫、绅士漫画(wnacg)、禁漫天堂、NoyAcg、熱辣漫畫、hanime1、E-Hentai 镜像站、hitomi、hdoujin、SchaleNetwork、nude-moon、HentaiZap、IMHentai、HentaiEra、HentaiEnvy、EAHentai、HentaiNexus、AsmHentai、3Hentai、MangaDex、welovemanga、kisslove(klz9)、Pawchive、kemono、nekohouse、Pixiv、微博、明日方舟泰拉记事社、Postimages、ニコニコ漫画、最前線、芸能ヌード、Suwayomi、LANraragi
+// @description:en  Add dual-page reading, translation and other enhancements to comic sites. E-Hentai (Associate nhentai, Quick favorite, Colorize tags, Floating tag list, etc.) | nhentai (Totally block comics, Auto page turning) | E-Hentai 镜像站 | hitomi | hdoujin | SchaleNetwork | nude-moon | HentaiZap | IMHentai | HentaiEra | HentaiEnvy | EAHentai | HentaiNexus | AsmHentai | 3Hentai | Pawchive | kemono | nekohouse | MangaDex | welovemanga | kisslove(klz9)
 // @description:ru  Добавляет расширенные функции для удобства на сайт, такие как двухстраничный режим и перевод.
 // @author          hymbz
 // @license         AGPL-3.0-or-later
@@ -26,22 +26,22 @@
 // @connect         self
 // @connect         127.0.0.1
 // @connect         *
-// @connect         mapi.hotmangasg.com
-// @connect         api.2024manga.com
-// @connect         m.manga2025.com
-// @connect         api.manga2025.com
-// @connect         mapi.fgjfghkk.club
-// @connect         mapi.fgjfghkkcenter.club
 // @connect         mapi.elfgjfghkk.club
+// @connect         mapi.fgjfghkk.club
+// @connect         mapi.hotmangasg.com
 // @connect         mapi.hotmangasd.com
+// @connect         api.2024manga.com
 // @connect         mapi.hotmangasf.com
+// @connect         mapi.fgjfghkkcenter.club
 // @connect         www.manga2026.xyz
 // @connect         www.manga2025.com
+// @connect         api.manga2025.com
+// @connect         m.manga2025.com
+// @connect         api.copy4000.com
+// @connect         api.copy3000.com
+// @connect         api.mangacopy.com
 // @connect         mapi.copy20.com
 // @connect         api.2026copy.com
-// @connect         api.copy4000.com
-// @connect         api.mangacopy.com
-// @connect         api.copy3000.com
 // @grant           GM_addElement
 // @grant           GM_getResourceText
 // @grant           GM_xmlhttpRequest
@@ -102,8 +102,8 @@ exports.setSaveLang = setSaveLang;
 `,
 	"helper": `\nlet helper_languages = require("helper/languages");
 let solid_js = require("solid-js");
-let solid_js_web = require("solid-js/web");
 let solid_js_store = require("solid-js/store");
+let solid_js_web = require("solid-js/web");
 //#region src/helper/logger.ts
 const prefix = ["%cComicRead", "background-color: #607d8b; color: white; padding: 2px 4px; border-radius: 4px;"];
 const log = (...args) => console.log(...prefix, ...args);
@@ -179,6 +179,7 @@ var en_default = {
 	alert: {
 		"comic_load_error": "Comic loading error",
 		"download_failed": "Download failed",
+		"fetch_chapter_list_failed": "Failed to fetch chapters",
 		"fetch_comic_img_failed": "Failed to fetch comic images",
 		"img_load_failed": "Image loading failed",
 		"no_img_download": "No downloadable images",
@@ -188,6 +189,7 @@ var en_default = {
 	},
 	button: {
 		"auto_scroll": "Auto scroll",
+		"chapter_list": "Chapters",
 		"close_current_page_translation": "Close current page translation",
 		"download_completed": "Download completed",
 		"download_completed_error": "Download completed, but {{errorNum}} images failed to download",
@@ -334,7 +336,9 @@ var en_default = {
 			"click_page_turn_enabled": "Click to turn page",
 			"click_page_turn_swap_area": "Swap LR clickable areas",
 			"dark_mode": "Dark mode",
-			"dark_mode_auto": "Follow system dark mode",
+			"dark_mode_dark": "Dark",
+			"dark_mode_light": "Light",
+			"dark_mode_site": "Follow site",
 			"dir_ltr": "LTR (American comics)",
 			"dir_rtl": "RTL (Japanese manga)",
 			"disable_auto_enlarge": "Disable image auto-enlarge",
@@ -547,6 +551,7 @@ var ru_default = {
 	alert: {
 		"comic_load_error": "Ошибка загрузки комикса",
 		"download_failed": "Не удалось скачать",
+		"fetch_chapter_list_failed": "Не удалось загрузить главы",
 		"fetch_comic_img_failed": "Не удалось загрузить изображения",
 		"img_load_failed": "Не удалось загрузить изображение",
 		"no_img_download": "Нет доступных картинок для загрузки",
@@ -556,6 +561,7 @@ var ru_default = {
 	},
 	button: {
 		"auto_scroll": "Автопрокрутка",
+		"chapter_list": "Главы",
 		"close_current_page_translation": "Скрыть перевод текущей страницы",
 		"download_completed": "Загрузка завершена",
 		"download_completed_error": "Загрузка завершена, но {{errorNum}} изображений не удалось загрузить",
@@ -702,7 +708,9 @@ var ru_default = {
 			"click_page_turn_enabled": "Перелистывать по клику",
 			"click_page_turn_swap_area": "Поменять местами правую и левую области переключения страниц",
 			"dark_mode": "Тёмная тема",
-			"dark_mode_auto": "Тёмный режим следует за системой",
+			"dark_mode_dark": "Тёмная",
+			"dark_mode_light": "Светлая",
+			"dark_mode_site": "Как сайт",
 			"dir_ltr": "Чтение слева направо (Американские комиксы)",
 			"dir_rtl": "Чтение справа налево (Японская манга)",
 			"disable_auto_enlarge": "Отключить автоматическое масштабирование изображений",
@@ -915,6 +923,7 @@ var zh_default = {
 	alert: {
 		"comic_load_error": "漫画加载出错",
 		"download_failed": "下载失败",
+		"fetch_chapter_list_failed": "获取章节列表失败",
 		"fetch_comic_img_failed": "获取漫画图片失败",
 		"img_load_failed": "图片加载失败",
 		"no_img_download": "没有能下载的图片",
@@ -924,6 +933,7 @@ var zh_default = {
 	},
 	button: {
 		"auto_scroll": "自动滚动",
+		"chapter_list": "目录",
 		"close_current_page_translation": "关闭当前页的翻译",
 		"download_completed": "下载完成",
 		"download_completed_error": "下载完成，但有 {{errorNum}} 张图片下载失败",
@@ -1070,7 +1080,9 @@ var zh_default = {
 			"click_page_turn_enabled": "点击翻页",
 			"click_page_turn_swap_area": "左右点击区域交换",
 			"dark_mode": "黑暗模式",
-			"dark_mode_auto": "黑暗模式跟随系统",
+			"dark_mode_dark": "深色",
+			"dark_mode_light": "亮色",
+			"dark_mode_site": "跟随网站",
 			"dir_ltr": "从左到右（美漫）",
 			"dir_rtl": "从右到左（日漫）",
 			"disable_auto_enlarge": "禁止图片自动放大",
@@ -1419,490 +1431,6 @@ const t = solid_js.createRoot(() => {
 		if (variables) for (const [k, v] of Object.entries(variables)) text = text.replaceAll(\`{{\${k}}}\`, String(v));
 		return text;
 	};
-});
-//#endregion
-//#region src/helper/asyncControl.ts
-const sleep = (ms) => new Promise((resolve) => {
-	setTimeout(resolve, ms);
-});
-/** 创建一个只会执行一次的函数，并缓存首次调用的返回值 */
-const once = (fn) => {
-	let wrapper = (...args) => {
-		const result = fn(...args);
-		wrapper = () => result;
-		return result;
-	};
-	return (...args) => wrapper(...args);
-};
-/** 确保函数在同一时间下只有一个在运行 */
-const singleThreaded = (callback, initState) => {
-	const state = {
-		running: false,
-		argList: [],
-		continueRun: (...args) => state.argList.length > 0 || state.argList.push(args),
-		...initState
-	};
-	const work = async () => {
-		if (state.argList.length === 0) return;
-		const args = state.argList.shift();
-		try {
-			state.running = true;
-			await callback(state, ...args);
-		} catch (error) {
-			await sleep(100);
-			if (state.argList.length === 0) throw error;
-		} finally {
-			if (state.abandon) state.argList.length = 0;
-			else if (state.latestOnly && state.argList.length > 1) state.argList.splice(0, state.argList.length - 1);
-			if (state.argList.length > 0) setTimeout(work, state.timeout);
-			else state.running = false;
-		}
-	};
-	return (...args) => {
-		state.argList.push(args);
-		if (!state.running) return work();
-	};
-};
-/**
-* 限制 Promise 并发
-* @param fnList 任务函数列表
-* @param callBack 成功执行一个 Promise 后调用，主要用于显示进度
-* @param limit 限制数
-* @returns 所有 Promise 的返回值
-*/
-const plimit = async (fnList, callBack = void 0, limit = 10) => {
-	let doneNum = 0;
-	const totalNum = fnList.length;
-	const resList = [];
-	const execPool = /* @__PURE__ */ new Set();
-	const taskList = fnList.map((fn, i) => {
-		let p;
-		return () => {
-			p = (async () => {
-				resList[i] = await fn();
-				doneNum += 1;
-				execPool.delete(p);
-				callBack?.(doneNum, totalNum, resList, i);
-			})();
-			execPool.add(p);
-		};
-	});
-	while (doneNum !== totalNum) {
-		while (taskList.length > 0 && execPool.size < limit) taskList.shift()();
-		await Promise.race(execPool);
-	}
-	return resList;
-};
-/** Promise 并发队列 */
-var PQueue = class {
-	wait = /* @__PURE__ */ new Set();
-	running = /* @__PURE__ */ new Set();
-	done = /* @__PURE__ */ new Set();
-	handleTask;
-	concurrency;
-	constructor(handleTask, concurrency = 1) {
-		this.handleTask = handleTask;
-		this.concurrency = concurrency;
-	}
-	has = (item) => this.running.has(item) || this.done.has(item) || this.wait.has(item);
-	async processQueue() {
-		if (this.running.size >= this.concurrency || this.wait.size === 0) return;
-		const [item] = this.wait;
-		if (item === void 0) return;
-		this.wait.delete(item);
-		if (!this.running.has(item)) try {
-			this.running.add(item);
-			await this.handleTask(item);
-			this.done.add(item);
-		} catch (error) {
-			console.error(error);
-		} finally {
-			this.running.delete(item);
-		}
-		return this.processQueue();
-	}
-	add(item) {
-		if (this.has(item)) return;
-		this.wait.add(item);
-		this.processQueue();
-	}
-	set(...items) {
-		this.wait.clear();
-		this.wait = new Set(items.filter((item) => !this.has(item)));
-		this.processQueue();
-	}
-	clear() {
-		this.wait.clear();
-		this.done.clear();
-	}
-};
-async function wait(fn, timeout = Infinity, waitTime = 100) {
-	let res = await fn();
-	let _timeout = timeout;
-	while (_timeout > 0 && !res) {
-		await sleep(waitTime);
-		_timeout -= waitTime;
-		res = await fn();
-	}
-	return res;
-}
-//#endregion
-//#region src/helper/components.ts
-const getDom = (id) => {
-	let dom = document.getElementById(id);
-	if (dom) {
-		dom.innerHTML = "";
-		return dom;
-	}
-	dom = document.createElement("div");
-	dom.id = id;
-	document.body.append(dom);
-	return dom;
-};
-/** 挂载 solid-js 组件 */
-const mountComponents = (id, fc) => {
-	const dom = getDom(id);
-	dom.style.setProperty("display", "unset", "important");
-	const shadowDom = dom.attachShadow({ mode: "closed" });
-	solid_js_web.render(fc, shadowDom);
-	return dom;
-};
-//#endregion
-//#region src/helper/domQuery.ts
-/**
-* 对 document.querySelector 的封装
-* 将默认返回类型改为 HTMLElement
-*/
-const querySelector = (selector) => document.querySelector(selector);
-/**
-* 对 document.querySelector 的封装
-* 将默认返回类型改为 HTMLElement
-*/
-const querySelectorAll = (selector) => [...document.querySelectorAll(selector)];
-/**
-* 根据选择器查找元素，若存在则返回点击该元素的函数
-*
-* 调用时（而非返回的点击函数被调用时）立即查找一次元素；
-* 若元素不存在则返回 \`undefined\`
-*
-* \`selector\` 支持两种形式：
-* - 字符串：作为 CSS 选择器查找
-* - 函数：延迟返回元素（适合元素尚未渲染、需要动态获取的场景）
-*   \`\`\`ts
-*   querySelectorClick(() => document.querySelector('.page')?.querySelector('a'));
-*   \`\`\`
-*
-* 传入字符串选择器时，还可通过 \`textContent\` 匹配文本内容，会从所有匹配元素中
-* 找出文本包含 \`textContent\` 的第一个元素（相当于 \`:has-text()\`）：
-* \`\`\`ts
-* querySelectorClick('.tab', '我的收藏')?.();
-* \`\`\`
-*/
-const querySelectorClick = (selector, textContent) => {
-	let getDom;
-	if (typeof selector === "function") getDom = selector;
-	else if (textContent) getDom = () => querySelectorAll(selector).find((e) => e.textContent?.includes(textContent));
-	else getDom = () => querySelector(selector);
-	if (getDom()) return () => getDom()?.click();
-};
-/** 滚动页面到指定元素的所在位置 */
-const scrollIntoView = (selector, behavior = "instant") => querySelector(selector)?.scrollIntoView({ behavior });
-/** 将 HTML 字符串转换为 DOM 对象 */
-const domParse = (html) => new DOMParser().parseFromString(html, "text/html");
-//#endregion
-//#region src/helper/faviconProgress.ts
-var FaviconProgress = class {
-	initLink;
-	color;
-	canvas;
-	ctx;
-	link;
-	constructor(color = "#607D8B") {
-		this.color = color;
-		this.canvas = document.createElement("canvas");
-		this.canvas.width = 32;
-		this.canvas.height = 32;
-		this.ctx = this.canvas.getContext("2d");
-		const existingLink = document.querySelector("link[rel~='icon']");
-		if (existingLink) this.link = existingLink;
-		else {
-			const link = document.createElement("link");
-			link.type = "image/x-icon";
-			link.rel = "icon";
-			document.head.append(link);
-			this.link = link;
-		}
-		this.initLink = this.link.href || "/favicon.ico";
-	}
-	update(progress) {
-		this.ctx.clearRect(0, 0, 32, 32);
-		this.ctx.beginPath();
-		this.ctx.arc(16, 16, 16, 0, Math.PI * 2);
-		this.ctx.fillStyle = "#FAFAFA";
-		this.ctx.fill();
-		const startAngle = -Math.PI / 2;
-		const endAngle = Math.PI * 2 * progress + startAngle;
-		this.ctx.beginPath();
-		this.ctx.moveTo(16, 16);
-		this.ctx.arc(16, 16, 16, startAngle, endAngle);
-		this.ctx.fillStyle = this.color;
-		this.ctx.fill();
-		this.updateFavicon();
-	}
-	updateFavicon() {
-		if (!this.link || !this.canvas) return;
-		this.link.href = this.canvas.toDataURL("image/png");
-	}
-	/** 恢复默认图标 */
-	recover() {
-		if (!this.link || !this.initLink) return;
-		this.link.href = this.initLink;
-	}
-};
-const useFaviconProgress = () => {};
-//#endregion
-//#region src/helper/range.ts
-function range(a, b, c) {
-	switch (typeof b) {
-		case "undefined": return [...Array.from({ length: a }).keys()];
-		case "number": {
-			const list = [];
-			for (let i = a; i < b; i++) list.push(c ? c(i) : i);
-			return list;
-		}
-		case "function": return Array.from({ length: a }, (_, i) => b(i));
-		case "string": return Array.from({ length: a }, () => b);
-	}
-}
-/** 根据范围文本提取指定范围的元素的 index */
-const extractRange = (rangeText, length) => {
-	const list = /* @__PURE__ */ new Set();
-	for (const text of rangeText.replaceAll(/[^\\d,-]/gu, "").split(",")) if (/^\\d+$/u.test(text)) list.add(Number(text) - 1);
-	else if (/^\\d*-\\d*$/u.test(text)) {
-		let [start, end] = text.split("-").map(Number);
-		end ||= length;
-		for (start--, end--; start <= end; start++) list.add(start);
-	}
-	return list;
-};
-/** extractRange 的逆向，按照相同的语法表述一个结果数组 */
-const descRange = (list, length) => {
-	let text = "";
-	const nowRange = [];
-	const pushRange = (newIndex) => {
-		if (nowRange.length === 0) return;
-		if (text.length > 0) text += ", ";
-		if (nowRange.length === 1) text += nowRange[0] + 1;
-		else {
-			const end = newIndex === void 0 && nowRange[1] === length - 1 ? "" : nowRange[1] + 1;
-			text += \`\${nowRange[0] + 1}-\${end}\`;
-		}
-		nowRange.length = 0;
-		if (newIndex !== void 0) nowRange[0] = newIndex;
-	};
-	for (const i of list) switch (nowRange.length) {
-		case 0:
-			nowRange[0] = i;
-			break;
-		case 1:
-			if (i === nowRange[0] + 1) nowRange[1] = i;
-			else pushRange(i);
-			break;
-		case 2: if (i === nowRange[1] + 1) nowRange[1] = i;
-		else pushRange(i);
-	}
-	pushRange();
-	return text;
-};
-//#endregion
-//#region src/helper/other.ts
-/** 将调试变量挂到全局 CRSD 对象上 */
-const exposeToGlobal = (obj) => {};
-const getFileName = (url) => /.+\\/(?<name>[^?]+)/u.exec(url)?.groups?.name;
-/** 找出数组中出现最多次的元素 */
-const getMostItem = (list) => {
-	const counts = /* @__PURE__ */ new Map();
-	for (const val of list) counts.set(val, (counts.get(val) ?? 0) + 1);
-	return [...counts.entries()].reduce((maxItem, item) => maxItem[1] > item[1] ? maxItem : item)[0];
-};
-/** 判断字符串是否为 URL */
-const isUrl = (text) => {
-	try {
-		return Boolean(new URL(text));
-	} catch {
-		return false;
-	}
-};
-/** 将 blob 数据作为文件保存至本地 */
-const saveAs = (blob, name = "download") => {
-	const a = document.createElementNS("http://www.w3.org/1999/xhtml", "a");
-	a.download = name;
-	a.rel = "noopener";
-	a.href = URL.createObjectURL(blob);
-	setTimeout(() => a.dispatchEvent(new MouseEvent("click")));
-};
-/**
-* 判断使用参数颜色作为默认值时是否需要切换为黑暗模式
-* @param hexColor 十六进制颜色。例如 #112233
-*/
-const needDarkMode = (hexColor) => {
-	const r = Number.parseInt(hexColor.slice(1, 3), 16);
-	const g = Number.parseInt(hexColor.slice(3, 5), 16);
-	const b = Number.parseInt(hexColor.slice(5, 7), 16);
-	return (r * 299 + g * 587 + b * 114) / 1e3 < 128;
-};
-const clamp = (min, val, max) => Math.max(Math.min(max, val), min);
-const inRange = (min, val, max) => val >= min && val <= max;
-/** 判断两个数是否在指定误差范围内相等 */
-const approx = (val, target, range = 1) => Math.abs(target - val) <= range;
-function waitDom(selector, count = 1, timeout) {
-	return wait(() => {
-		const elements = document.querySelectorAll(selector);
-		return elements.length >= count ? [...elements] : void 0;
-	}, timeout);
-}
-/** 将指定的布尔值转换为字符串或未定义 */
-const boolDataVal = (val) => val ? "" : void 0;
-const requestIdleCallback$1 = (callback, timeout) => {
-	if (Reflect.has(window, "requestIdleCallback")) return window.requestIdleCallback(callback, { timeout });
-	return window.setTimeout(callback, 16);
-};
-/** 获取键盘事件的编码 */
-const getKeyboardCode = (e) => {
-	let { key } = e;
-	switch (key) {
-		case "Shift":
-		case "Control":
-		case "Alt": return key;
-	}
-	key = key.replaceAll(/\\b[A-Z]\\b/gu, (match) => match.toLowerCase());
-	if (e.ctrlKey) key = \`Ctrl + \${key}\`;
-	if (e.altKey) key = \`Alt + \${key}\`;
-	if (e.shiftKey) key = \`Shift + \${key}\`;
-	return key;
-};
-/** 将快捷键的编码转换成更易读的形式 */
-const keyboardCodeToText = (code) => code.replace("Control", "Ctrl").replace("ArrowUp", "↑").replace("ArrowDown", "↓").replace("ArrowLeft", "←").replace("ArrowRight", "→").replace(/^\\s$/u, "Space");
-/**
-* 劫持修改原网页上的函数
-*
-* 如果传入函数的所需参数为零，将在原函数执行完后自动调用
-*/
-const hijackFn = (fnName, fn) => {
-	const rawFn = unsafeWindow[fnName];
-	unsafeWindow[fnName] = fn.length === 0 ? (...args) => {
-		const res = rawFn(...args);
-		fn();
-		return res;
-	} : (...args) => fn(rawFn, args);
-};
-/**
-* 确保指定 key 的值一定存在
-* 如果对应值不存在，则使用 defaultValue 来设置值，然后返回该值
-* defaultValue 可以是默认值，或者返回默认值的函数
-* 也可以是使用了 GM.setValue 来设置默认值的函数（此时也会返回被设置的值）
-*/
-const ensureGmValue = async (name, defaultValue) => {
-	const value = await GM.getValue(name);
-	if (value !== void 0) return value;
-	if (typeof defaultValue !== "function") {
-		await GM.setValue(name, defaultValue);
-		return defaultValue;
-	}
-	const fnRes = await defaultValue();
-	if (fnRes !== void 0) {
-		await GM.setValue(name, fnRes);
-		return fnRes;
-	}
-	return await GM.getValue(name);
-};
-/** 监听 url 变化 */
-const onUrlChange = (fn, handleUrl = (location) => location.href) => {
-	let lastUrl = "";
-	const refresh = singleThreaded(async () => {
-		if (!await wait(() => handleUrl(location) !== lastUrl, 5e3)) return;
-		const nowUrl = handleUrl(location);
-		await fn(lastUrl, nowUrl);
-		lastUrl = nowUrl;
-	});
-	const controller = new AbortController();
-	for (const eventName of ["click", "popstate"]) window.addEventListener(eventName, refresh, {
-		capture: true,
-		signal: controller.signal
-	});
-	refresh();
-	return () => controller.abort();
-};
-/** wait，但是只在 url 变化时判断 */
-const waitUrlChange = (isValidUrl) => new Promise((resolve) => {
-	const abort = onUrlChange(async () => {
-		const res = await isValidUrl();
-		if (!res) return;
-		resolve(res);
-		abort();
-	});
-});
-var AnimationFrame = class {
-	animationId = 0;
-	call = (force) => {
-		if (!force && this.animationId) return;
-		this.animationId = requestAnimationFrame(this.frame);
-	};
-	cancel = () => {
-		if (!this.animationId) return;
-		cancelAnimationFrame(this.animationId);
-		this.animationId = 0;
-	};
-};
-/** 锁定屏幕禁止自动熄屏 */
-var WakeLock = class {
-	isSupported = false;
-	lock = null;
-	constructor() {
-		if (!("wakeLock" in navigator)) return;
-		this.isSupported = true;
-	}
-	on = async () => {
-		if (!this.isSupported) return null;
-		try {
-			this.lock = await navigator.wakeLock.request("screen");
-			return this.lock.released;
-		} catch {
-			return false;
-		}
-	};
-	off = async () => {
-		if (!this.lock) return;
-		await this.lock.release();
-		this.lock = null;
-	};
-};
-const withEventStop = (handler) => (e) => {
-	e.stopPropagation();
-	e.preventDefault();
-	if (handler) handler(e);
-};
-/** 判断版本号1是否小于版本号2 */
-const versionLt = (version1, version2) => {
-	const v1 = version1.split(".").map(Number);
-	const v2 = version2.split(".").map(Number);
-	for (let i = 0; i < 3; i++) {
-		const num1 = v1[i] ?? 0;
-		const num2 = v2[i] ?? 0;
-		if (num1 !== num2) return num1 < num2;
-	}
-	return false;
-};
-/**
-* 用于书写 GraphQL 查询的模板标签函数
-*
-* 变量值应通过 GraphQL 变量语法（$varName）与 variables 传递
-*/
-const gql = (strings, ...values) => strings.reduce((acc, str, i) => acc + str + (values[i] ?? ""), "");
-/** 尽量模拟 Windows 资源管理器的默认文件名排序行为 */
-const getNaturalCollator = () => new Intl.Collator("ja-JP", {
-	numeric: true,
-	sensitivity: "base"
 });
 //#endregion
 //#region node_modules/.pnpm/@solid-primitives+scheduled@1.5.3_solid-js@1.9.14/node_modules/@solid-primitives/scheduled/dist/index.js
@@ -2344,10 +1872,777 @@ const useStore = (initState) => {
 	};
 };
 //#endregion
+//#region src/helper/asyncControl.ts
+const sleep = (ms) => new Promise((resolve) => {
+	setTimeout(resolve, ms);
+});
+/** 创建一个只会执行一次的函数，并缓存首次调用的返回值 */
+const once = (fn) => {
+	let wrapper = (...args) => {
+		const result = fn(...args);
+		wrapper = () => result;
+		return result;
+	};
+	return (...args) => wrapper(...args);
+};
+/** 确保函数在同一时间下只有一个在运行 */
+const singleThreaded = (callback, initState) => {
+	const state = {
+		running: false,
+		argList: [],
+		continueRun: (...args) => state.argList.length > 0 || state.argList.push(args),
+		...initState
+	};
+	const work = async () => {
+		if (state.argList.length === 0) return;
+		const args = state.argList.shift();
+		try {
+			state.running = true;
+			await callback(state, ...args);
+		} catch (error) {
+			await sleep(100);
+			if (state.argList.length === 0) throw error;
+		} finally {
+			if (state.abandon) state.argList.length = 0;
+			else if (state.latestOnly && state.argList.length > 1) state.argList.splice(0, state.argList.length - 1);
+			if (state.argList.length > 0) setTimeout(work, state.timeout);
+			else state.running = false;
+		}
+	};
+	return (...args) => {
+		state.argList.push(args);
+		if (!state.running) return work();
+	};
+};
+/**
+* 限制 Promise 并发
+* @param fnList 任务函数列表
+* @param callBack 成功执行一个 Promise 后调用，主要用于显示进度
+* @param limit 限制数
+* @returns 所有 Promise 的返回值
+*/
+const plimit = async (fnList, callBack = void 0, limit = 10) => {
+	let doneNum = 0;
+	const totalNum = fnList.length;
+	const resList = [];
+	const execPool = /* @__PURE__ */ new Set();
+	const taskList = fnList.map((fn, i) => {
+		let p;
+		return () => {
+			p = (async () => {
+				resList[i] = await fn();
+				doneNum += 1;
+				execPool.delete(p);
+				callBack?.(doneNum, totalNum, resList, i);
+			})();
+			execPool.add(p);
+		};
+	});
+	while (doneNum !== totalNum) {
+		while (taskList.length > 0 && execPool.size < limit) taskList.shift()();
+		await Promise.race(execPool);
+	}
+	return resList;
+};
+/** Promise 并发队列 */
+var PQueue = class {
+	wait = /* @__PURE__ */ new Set();
+	running = /* @__PURE__ */ new Set();
+	done = /* @__PURE__ */ new Set();
+	handleTask;
+	concurrency;
+	constructor(handleTask, concurrency = 1) {
+		this.handleTask = handleTask;
+		this.concurrency = concurrency;
+	}
+	has = (item) => this.running.has(item) || this.done.has(item) || this.wait.has(item);
+	async processQueue() {
+		if (this.running.size >= this.concurrency || this.wait.size === 0) return;
+		const [item] = this.wait;
+		if (item === void 0) return;
+		this.wait.delete(item);
+		if (!this.running.has(item)) try {
+			this.running.add(item);
+			await this.handleTask(item);
+			this.done.add(item);
+		} catch (error) {
+			log.error(error);
+		} finally {
+			this.running.delete(item);
+		}
+		return this.processQueue();
+	}
+	add(item) {
+		if (this.has(item)) return;
+		this.wait.add(item);
+		this.processQueue();
+	}
+	set(...items) {
+		this.wait.clear();
+		this.wait = new Set(items.filter((item) => !this.has(item)));
+		this.processQueue();
+	}
+	clear() {
+		this.wait.clear();
+		this.done.clear();
+	}
+};
+async function wait(fn, timeout = Infinity, waitTime = 100) {
+	let res = await fn();
+	let _timeout = timeout;
+	while (_timeout > 0 && !res) {
+		await sleep(waitTime);
+		_timeout -= waitTime;
+		res = await fn();
+	}
+	return res;
+}
+//#endregion
+//#region src/helper/other.ts
+/** 将调试变量挂到全局 CRSD 对象上 */
+const exposeToGlobal = (obj) => {};
+const getFileName = (url) => /.+\\/(?<name>[^?]+)/u.exec(url)?.groups?.name;
+/** 找出数组中出现最多次的元素 */
+const getMostItem = (list) => {
+	const counts = /* @__PURE__ */ new Map();
+	for (const val of list) counts.set(val, (counts.get(val) ?? 0) + 1);
+	return [...counts.entries()].reduce((maxItem, item) => maxItem[1] > item[1] ? maxItem : item)[0];
+};
+/** 判断字符串是否为 URL */
+const isUrl = (text) => {
+	try {
+		return Boolean(new URL(text));
+	} catch {
+		return false;
+	}
+};
+/** 将 blob 数据作为文件保存至本地 */
+const saveAs = (blob, name = "download") => {
+	const a = document.createElementNS("http://www.w3.org/1999/xhtml", "a");
+	a.download = name;
+	a.rel = "noopener";
+	a.href = URL.createObjectURL(blob);
+	setTimeout(() => a.dispatchEvent(new MouseEvent("click")));
+};
+/**
+* 判断使用参数颜色作为默认值时是否需要切换为黑暗模式
+* @param hexColor 十六进制颜色。例如 #112233
+*/
+const needDarkMode = (hexColor) => {
+	const r = Number.parseInt(hexColor.slice(1, 3), 16);
+	const g = Number.parseInt(hexColor.slice(3, 5), 16);
+	const b = Number.parseInt(hexColor.slice(5, 7), 16);
+	return (r * 299 + g * 587 + b * 114) / 1e3 < 128;
+};
+const clamp = (min, val, max) => Math.max(Math.min(max, val), min);
+const inRange = (min, val, max) => val >= min && val <= max;
+/** 判断两个数是否在指定误差范围内相等 */
+const approx = (val, target, range = 1) => Math.abs(target - val) <= range;
+function waitDom(selector, count = 1, timeout) {
+	return wait(() => {
+		const elements = document.querySelectorAll(selector);
+		return elements.length >= count ? [...elements] : void 0;
+	}, timeout);
+}
+/** 将指定的布尔值转换为字符串或未定义 */
+const boolDataVal = (val) => val ? "" : void 0;
+const requestIdleCallback$1 = (callback, timeout) => {
+	if (Reflect.has(window, "requestIdleCallback")) return window.requestIdleCallback(callback, { timeout });
+	return window.setTimeout(callback, 16);
+};
+/** 获取键盘事件的编码 */
+const getKeyboardCode = (e) => {
+	let { key } = e;
+	switch (key) {
+		case "Shift":
+		case "Control":
+		case "Alt": return key;
+	}
+	key = key.replaceAll(/\\b[A-Z]\\b/gu, (match) => match.toLowerCase());
+	if (e.ctrlKey) key = \`Ctrl + \${key}\`;
+	if (e.altKey) key = \`Alt + \${key}\`;
+	if (e.shiftKey) key = \`Shift + \${key}\`;
+	return key;
+};
+/** 将快捷键的编码转换成更易读的形式 */
+const keyboardCodeToText = (code) => code.replace("Control", "Ctrl").replace("ArrowUp", "↑").replace("ArrowDown", "↓").replace("ArrowLeft", "←").replace("ArrowRight", "→").replace(/^\\s$/u, "Space");
+/**
+* 劫持修改原网页上的函数
+*
+* 如果传入函数的所需参数为零，将在原函数执行完后自动调用
+*/
+const hijackFn = (fnName, fn) => {
+	const rawFn = unsafeWindow[fnName];
+	unsafeWindow[fnName] = fn.length === 0 ? (...args) => {
+		const res = rawFn(...args);
+		fn();
+		return res;
+	} : (...args) => fn(rawFn, args);
+};
+/**
+* 确保指定 key 的值一定存在
+* 如果对应值不存在，则使用 defaultValue 来设置值，然后返回该值
+* defaultValue 可以是默认值，或者返回默认值的函数
+* 也可以是使用了 GM.setValue 来设置默认值的函数（此时也会返回被设置的值）
+*/
+const ensureGmValue = async (name, defaultValue) => {
+	const value = await GM.getValue(name);
+	if (value !== void 0) return value;
+	if (typeof defaultValue !== "function") {
+		await GM.setValue(name, defaultValue);
+		return defaultValue;
+	}
+	const fnRes = await defaultValue();
+	if (fnRes !== void 0) {
+		await GM.setValue(name, fnRes);
+		return fnRes;
+	}
+	return await GM.getValue(name);
+};
+var AnimationFrame = class {
+	animationId = 0;
+	call = (force) => {
+		if (!force && this.animationId) return;
+		this.animationId = requestAnimationFrame(this.frame);
+	};
+	cancel = () => {
+		if (!this.animationId) return;
+		cancelAnimationFrame(this.animationId);
+		this.animationId = 0;
+	};
+};
+/** 锁定屏幕禁止自动熄屏 */
+var WakeLock = class {
+	isSupported = false;
+	lock = null;
+	constructor() {
+		if (!("wakeLock" in navigator)) return;
+		this.isSupported = true;
+	}
+	on = async () => {
+		if (!this.isSupported) return null;
+		try {
+			this.lock = await navigator.wakeLock.request("screen");
+			return this.lock.released;
+		} catch {
+			return false;
+		}
+	};
+	off = async () => {
+		if (!this.lock) return;
+		await this.lock.release();
+		this.lock = null;
+	};
+};
+const withEventStop = (handler) => (e) => {
+	e.stopPropagation();
+	e.preventDefault();
+	if (handler) handler(e);
+};
+/** 判断版本号1是否小于版本号2 */
+const versionLt = (version1, version2) => {
+	const v1 = version1.split(".").map(Number);
+	const v2 = version2.split(".").map(Number);
+	for (let i = 0; i < 3; i++) {
+		const num1 = v1[i] ?? 0;
+		const num2 = v2[i] ?? 0;
+		if (num1 !== num2) return num1 < num2;
+	}
+	return false;
+};
+/**
+* 用于书写 GraphQL 查询的模板标签函数
+*
+* 变量值应通过 GraphQL 变量语法（$varName）与 variables 传递
+*/
+const gql = (strings, ...values) => strings.reduce((acc, str, i) => acc + str + (values[i] ?? ""), "");
+/** 尽量模拟 Windows 资源管理器的默认文件名排序行为 */
+const getNaturalCollator = () => new Intl.Collator("ja-JP", {
+	numeric: true,
+	sensitivity: "base"
+});
+//#endregion
+//#region src/helper/darkMode/color.ts
+/** 解析逗号或空格分隔的颜色分量 */
+const parseRGBNumbers = (raw, scale) => {
+	const parts = raw.split(/[\\s,/]+/u).filter(Boolean);
+	if (!inRange(3, parts.length, 4)) return;
+	const conv = (part) => {
+		const num = Number.parseFloat(part);
+		if (!Number.isFinite(num)) return;
+		return part.endsWith("%") ? num / 100 * scale : num;
+	};
+	const r = conv(parts[0]);
+	const g = conv(parts[1]);
+	const b = conv(parts[2]);
+	const a = parts.length === 4 ? conv(parts[3]) : 1;
+	if (r === void 0 || g === void 0 || b === void 0 || a === void 0) return;
+	return {
+		r,
+		g,
+		b,
+		a
+	};
+};
+/** 解析 getComputedStyle 返回的颜色值 */
+const parseColor = (text) => {
+	const str = text.trim().toLowerCase();
+	if (str === "transparent") return {
+		r: 0,
+		g: 0,
+		b: 0,
+		a: 0
+	};
+	const rgbText = /^rgba?\\((?<rgb>[^)]+)\\)$/u.exec(str)?.groups?.rgb;
+	if (rgbText) return parseRGBNumbers(rgbText, 255);
+	const srgbText = /^color\\(srgb(?<srgb>[^)]+)\\)$/u.exec(str)?.groups?.srgb;
+	if (srgbText) {
+		const color = parseRGBNumbers(srgbText, 1);
+		if (!color) return;
+		return {
+			r: color.r * 255,
+			g: color.g * 255,
+			b: color.b * 255,
+			a: color.a
+		};
+	}
+};
+/** sRGB 相对亮度（Rec.709 加权） */
+const getSRGBLightness = ({ r, g, b }) => (.2126 * r + .7152 * g + .0722 * b) / 255;
+//#endregion
+//#region src/helper/darkMode/detect.ts
+/** <meta name="color-scheme"> 的严格声明 */
+const getDarkByMeta = () => {
+	const content = document.querySelector("meta[name=\\"color-scheme\\" i]")?.getAttribute("content")?.toLowerCase();
+	if (content === "dark" || content === "only dark") return true;
+	if (content === "light" || content === "only light") return false;
+};
+/** html / body 上的 dark class 或 data-theme 标记 */
+const getDarkByClass = () => {
+	const html = document.documentElement;
+	if (html.classList.contains("dark") || document.body?.classList.contains("dark") || html.dataset.theme?.toLowerCase() === "dark") return true;
+};
+/** 根元素自带反色或颜色方案 */
+const getDarkByRootStyle = () => {
+	const rootStyle = getComputedStyle(document.documentElement);
+	if (rootStyle.filter.includes("invert(1)") || rootStyle.filter.includes("invert(100%)")) return true;
+	if (rootStyle.colorScheme === "dark") return true;
+};
+const getDarkByFastPath = () => getDarkByMeta() ?? getDarkByClass() ?? getDarkByRootStyle();
+const CELL_SIZE = 256;
+const MAX_ROW_COUNT = 4;
+/** 像素级网格采样：在视口上取稀疏采样点统计明暗 */
+const isDarkBySampling = (selfDomSet) => {
+	const winWidth = window.innerWidth;
+	const winHeight = window.innerHeight;
+	const stepX = Math.floor(winWidth / Math.min(MAX_ROW_COUNT, Math.ceil(winWidth / CELL_SIZE)));
+	const stepY = Math.floor(winHeight / Math.min(MAX_ROW_COUNT, Math.ceil(winHeight / CELL_SIZE)));
+	if (stepX <= 0 || stepY <= 0) return false;
+	const rootStyle = getComputedStyle(document.documentElement);
+	/** 同一元素被多格命中只统计一次 */
+	const processedElements = /* @__PURE__ */ new WeakSet();
+	for (let y = Math.floor(stepY / 2); y < winHeight; y += stepY) for (let x = Math.floor(stepX / 2); x < winWidth; x += stepX) {
+		const element = document.elementFromPoint(x, y);
+		if (!element || processedElements.has(element) || selfDomSet.has(element) || element.tagName.toLowerCase() === "img") continue;
+		processedElements.add(element);
+		const style = element === document.documentElement ? rootStyle : getComputedStyle(element);
+		const bgColor = parseColor(style.backgroundColor);
+		if (!bgColor) continue;
+		if (bgColor.a === 1) {
+			if (getSRGBLightness(bgColor) > .6) return false;
+		} else {
+			const textColor = parseColor(style.color);
+			if (!textColor) continue;
+			if (getSRGBLightness(textColor) < .4) return false;
+		}
+	}
+	const rootColor = parseColor(rootStyle.backgroundColor);
+	const bodyColor = document.body ? parseColor(getComputedStyle(document.body).backgroundColor) : void 0;
+	if ((!rootColor || rootColor.a === 0) && (!bodyColor || bodyColor.a === 0)) {
+		const textColor = parseColor(rootStyle.color);
+		return textColor ? getSRGBLightness(textColor) > .5 : false;
+	}
+	const rootLightness = rootColor ? 1 - rootColor.a + rootColor.a * getSRGBLightness(rootColor) : 1;
+	return (bodyColor ? (1 - bodyColor.a) * rootLightness + bodyColor.a * getSRGBLightness(bodyColor) : rootLightness) < .5;
+};
+/** 页面是否已有样式 */
+const hasSomeStyle = () => {
+	if (document.querySelector("style, link[rel~=\\"stylesheet\\" i]")) return true;
+	if (document.querySelector("meta[name=\\"color-scheme\\" i]")) return true;
+	if (parseColor(getComputedStyle(document.documentElement).backgroundColor)?.a) return true;
+	if (document.body) {
+		if (parseColor(getComputedStyle(document.body).backgroundColor)?.a) return true;
+	}
+	return false;
+};
+/** 页面是否已就绪到可以检测 */
+const canCheckForStyle = () => {
+	const { body } = document;
+	if (!body) return false;
+	if (!(body.scrollHeight >= 32 && body.clientHeight >= 32)) return false;
+	if (body.childElementCount === 0) return false;
+	return hasSomeStyle();
+};
+//#endregion
+//#region src/helper/darkMode/detector.ts
+/** 网站色调检测状态机 */
+var SiteDarkDetector = class {
+	selfDomSet = /* @__PURE__ */ new WeakSet();
+	started = false;
+	/** 采样是否正在进行 */
+	sampling = false;
+	/** 上一次结论是否来自快路径；用于识别站点移除主题标记的情况 */
+	lastFromFastPath = false;
+	waitObserver;
+	readyStateHandler;
+	themeObserver;
+	getSiteDark;
+	/** 检测出网站色调时的回调 */
+	onDark;
+	constructor(getSiteDark, onDark) {
+		this.getSiteDark = getSiteDark;
+		this.onDark = onDark;
+	}
+	/** 登记脚本自身挂载的 DOM，避免影响采样 */
+	registerSelfDom = (el) => {
+		this.selfDomSet.add(el);
+	};
+	/** 启动网站色调检测，幂等，重复调用无副作用 */
+	start = () => {
+		if (this.started) return;
+		this.started = true;
+		this.detect();
+	};
+	detect = () => {
+		const fastResult = getDarkByFastPath();
+		if (fastResult !== void 0) {
+			this.lastFromFastPath = true;
+			this.onDark(fastResult);
+			this.startThemeObserver();
+			return;
+		}
+		if (!canCheckForStyle()) return this.waitReady();
+		this.sample();
+	};
+	/** 等到页面就绪后再检测，避免「先白后黑」的误判 */
+	waitReady = () => {
+		if (this.waitObserver) return;
+		this.waitObserver = new MutationObserver(() => {
+			if (canCheckForStyle()) {
+				this.stopWait();
+				this.detect();
+			}
+		});
+		this.waitObserver.observe(document.documentElement, {
+			childList: true,
+			subtree: true
+		});
+		if (document.readyState !== "complete") {
+			this.readyStateHandler = () => {
+				if (document.readyState !== "complete") return;
+				this.stopWait();
+				this.detect();
+			};
+			document.addEventListener("readystatechange", this.readyStateHandler);
+		}
+	};
+	stopWait = () => {
+		this.waitObserver?.disconnect();
+		this.waitObserver = void 0;
+		if (this.readyStateHandler) {
+			document.removeEventListener("readystatechange", this.readyStateHandler);
+			this.readyStateHandler = void 0;
+		}
+	};
+	sample = async () => {
+		if (this.sampling) return;
+		this.sampling = true;
+		try {
+			await new Promise((resolve) => requestIdleCallback$1(() => resolve(), 2e3));
+			this.lastFromFastPath = false;
+			this.onDark(isDarkBySampling(this.selfDomSet));
+			this.startThemeObserver();
+		} finally {
+			this.sampling = false;
+		}
+	};
+	/** 监听 html / body 的主题标记变化，应对站点在检测后才切换主题的情况 */
+	startThemeObserver = () => {
+		if (this.themeObserver) return;
+		const recheck = debounce(() => {
+			if (this.sampling) return;
+			const fastResult = getDarkByFastPath();
+			if (fastResult !== void 0) {
+				this.lastFromFastPath = true;
+				if (fastResult !== this.getSiteDark()) this.onDark(fastResult);
+				return;
+			}
+			if (this.lastFromFastPath) this.sample();
+		}, 500);
+		this.themeObserver = new MutationObserver(recheck);
+		for (const target of [document.documentElement, document.body]) {
+			if (!target) continue;
+			this.themeObserver.observe(target, {
+				attributes: true,
+				attributeFilter: ["class", "data-theme"]
+			});
+		}
+	};
+};
+//#endregion
+//#region src/helper/darkMode/index.ts
+const [getSiteDark, setSiteDark] = solid_js.createSignal(void 0);
+const [getManualDark, setManualDarkSignal] = solid_js.createSignal(void 0);
+/**
+* 网站自身是否为深色调
+*
+* undefined 表示尚未检测出结果
+*/
+const siteDark = getSiteDark;
+/**
+* 用户手动设置的色调
+*
+* undefined 表示未手动设置，将跟随网站色调
+*/
+const manualDark = getManualDark;
+/**
+* 手动设置色调
+*
+* 传入 undefined 清除设置，恢复跟随网站
+*/
+const setManualDark = (val) => setManualDarkSignal(val);
+/** 当前应用应使用的色调 */
+const effectiveDark = createRootMemo(() => manualDark() ?? siteDark() ?? false);
+const detector = new SiteDarkDetector(() => siteDark(), (dark) => setSiteDark(dark));
+/** 登记脚本自身挂载的 DOM，避免影响采样 */
+const registerSelfDom = (el) => detector.registerSelfDom(el);
+/** 启动网站色调检测，幂等，重复调用无副作用 */
+const startDetectSiteDark = () => detector.start();
+//#endregion
+//#region src/helper/components.ts
+const getDom = (id) => {
+	let dom = document.getElementById(id);
+	if (dom) {
+		dom.innerHTML = "";
+		return dom;
+	}
+	dom = document.createElement("div");
+	dom.id = id;
+	document.body.append(dom);
+	return dom;
+};
+/** 挂载 solid-js 组件 */
+const mountComponents = (id, fc) => {
+	const dom = getDom(id);
+	dom.style.setProperty("display", "unset", "important");
+	registerSelfDom(dom);
+	startDetectSiteDark();
+	const shadowDom = dom.attachShadow({ mode: "closed" });
+	solid_js_web.render(fc, shadowDom);
+	createEffectOn(effectiveDark, (dark) => {
+		dom.style.setProperty("color-scheme", dark ? "dark" : "light");
+	});
+	return dom;
+};
+//#endregion
+//#region src/helper/domQuery.ts
+/**
+* 对 document.querySelector 的封装
+* 将默认返回类型改为 HTMLElement
+*/
+const querySelector = (selector) => document.querySelector(selector);
+/**
+* 对 document.querySelector 的封装
+* 将默认返回类型改为 HTMLElement
+*/
+const querySelectorAll = (selector) => [...document.querySelectorAll(selector)];
+/**
+* 根据选择器查找元素，若存在则返回点击该元素的函数
+*
+* 调用时（而非返回的点击函数被调用时）立即查找一次元素；
+* 若元素不存在则返回 \`undefined\`
+*
+* \`selector\` 支持两种形式：
+* - 字符串：作为 CSS 选择器查找
+* - 函数：延迟返回元素（适合元素尚未渲染、需要动态获取的场景）
+*   \`\`\`ts
+*   querySelectorClick(() => document.querySelector('.page')?.querySelector('a'));
+*   \`\`\`
+*
+* 传入字符串选择器时，还可通过 \`textContent\` 匹配文本内容，会从所有匹配元素中
+* 找出文本包含 \`textContent\` 的第一个元素（相当于 \`:has-text()\`）：
+* \`\`\`ts
+* querySelectorClick('.tab', '我的收藏')?.();
+* \`\`\`
+*/
+const querySelectorClick = (selector, textContent) => {
+	let getDom;
+	if (typeof selector === "function") getDom = selector;
+	else if (textContent) getDom = () => querySelectorAll(selector).find((e) => e.textContent?.includes(textContent));
+	else getDom = () => querySelector(selector);
+	if (getDom()) return () => getDom()?.click();
+};
+/** 滚动页面到指定元素的所在位置 */
+const scrollIntoView = (selector, behavior = "instant") => querySelector(selector)?.scrollIntoView({ behavior });
+/** 将 HTML 字符串转换为 DOM 对象 */
+const domParse = (html) => new DOMParser().parseFromString(html, "text/html");
+//#endregion
+//#region src/helper/faviconProgress.ts
+var FaviconProgress = class {
+	initLink;
+	color;
+	canvas;
+	ctx;
+	link;
+	constructor(color = "#607D8B") {
+		this.color = color;
+		this.canvas = document.createElement("canvas");
+		this.canvas.width = 32;
+		this.canvas.height = 32;
+		this.ctx = this.canvas.getContext("2d");
+		const existingLink = document.querySelector("link[rel~='icon']");
+		if (existingLink) this.link = existingLink;
+		else {
+			const link = document.createElement("link");
+			link.type = "image/x-icon";
+			link.rel = "icon";
+			document.head.append(link);
+			this.link = link;
+		}
+		this.initLink = this.link.href || "/favicon.ico";
+	}
+	update(progress) {
+		this.ctx.clearRect(0, 0, 32, 32);
+		this.ctx.beginPath();
+		this.ctx.arc(16, 16, 16, 0, Math.PI * 2);
+		this.ctx.fillStyle = "#FAFAFA";
+		this.ctx.fill();
+		const startAngle = -Math.PI / 2;
+		const endAngle = Math.PI * 2 * progress + startAngle;
+		this.ctx.beginPath();
+		this.ctx.moveTo(16, 16);
+		this.ctx.arc(16, 16, 16, startAngle, endAngle);
+		this.ctx.fillStyle = this.color;
+		this.ctx.fill();
+		this.updateFavicon();
+	}
+	updateFavicon() {
+		if (!this.link || !this.canvas) return;
+		this.link.href = this.canvas.toDataURL("image/png");
+	}
+	/** 恢复默认图标 */
+	recover() {
+		if (!this.link || !this.initLink) return;
+		this.link.href = this.initLink;
+	}
+};
+const useFaviconProgress = () => {};
+//#endregion
+//#region src/helper/range.ts
+function range(a, b, c) {
+	switch (typeof b) {
+		case "undefined": return [...Array.from({ length: a }).keys()];
+		case "number": {
+			const list = [];
+			for (let i = a; i < b; i++) list.push(c ? c(i) : i);
+			return list;
+		}
+		case "function": return Array.from({ length: a }, (_, i) => b(i));
+		case "string": return Array.from({ length: a }, () => b);
+	}
+}
+/** 根据范围文本提取指定范围的元素的 index */
+const extractRange = (rangeText, length) => {
+	const list = /* @__PURE__ */ new Set();
+	for (const text of rangeText.replaceAll(/[^\\d,-]/gu, "").split(",")) if (/^\\d+$/u.test(text)) list.add(Number(text) - 1);
+	else if (/^\\d*-\\d*$/u.test(text)) {
+		let [start, end] = text.split("-").map(Number);
+		end ||= length;
+		for (start--, end--; start <= end; start++) list.add(start);
+	}
+	return list;
+};
+/** extractRange 的逆向，按照相同的语法表述一个结果数组 */
+const descRange = (list, length) => {
+	let text = "";
+	const nowRange = [];
+	const pushRange = (newIndex) => {
+		if (nowRange.length === 0) return;
+		if (text.length > 0) text += ", ";
+		if (nowRange.length === 1) text += nowRange[0] + 1;
+		else {
+			const end = newIndex === void 0 && nowRange[1] === length - 1 ? "" : nowRange[1] + 1;
+			text += \`\${nowRange[0] + 1}-\${end}\`;
+		}
+		nowRange.length = 0;
+		if (newIndex !== void 0) nowRange[0] = newIndex;
+	};
+	for (const i of list) switch (nowRange.length) {
+		case 0:
+			nowRange[0] = i;
+			break;
+		case 1:
+			if (i === nowRange[0] + 1) nowRange[1] = i;
+			else pushRange(i);
+			break;
+		case 2: if (i === nowRange[1] + 1) nowRange[1] = i;
+		else pushRange(i);
+	}
+	pushRange();
+	return text;
+};
+//#endregion
+//#region src/helper/urlChange.ts
+const claimUrlEvent = "comic-read:url-change";
+let expectedUrl;
+/** 标记一次由脚本接管的 url 变更，让 onUrlChange 不将其视为发生了变更 */
+const claimUrlChange = (url) => {
+	expectedUrl = new URL(url, location.origin).href;
+	window.dispatchEvent(new Event(claimUrlEvent));
+};
+/** 监听 url 变化 */
+const onUrlChange = (fn, handleUrl = (location) => location.href) => {
+	let lastUrl = "";
+	const refresh = singleThreaded(async () => {
+		if (!await wait(() => handleUrl(location) !== lastUrl, 5e3)) return;
+		await sleep(0);
+		const nowUrl = handleUrl(location);
+		if (expectedUrl !== void 0) {
+			const hit = expectedUrl === nowUrl;
+			expectedUrl = void 0;
+			if (hit) {
+				lastUrl = nowUrl;
+				return;
+			}
+		}
+		await fn(lastUrl, nowUrl);
+		lastUrl = nowUrl;
+	}, { latestOnly: true });
+	const controller = new AbortController();
+	for (const eventName of [
+		"click",
+		"popstate",
+		claimUrlEvent
+	]) window.addEventListener(eventName, refresh, {
+		capture: true,
+		signal: controller.signal
+	});
+	refresh();
+	return () => controller.abort();
+};
+/** wait，但是只在 url 变化时判断 */
+const waitUrlChange = (isValidUrl) => new Promise((resolve) => {
+	const abort = onUrlChange(async () => {
+		const res = await isValidUrl();
+		if (!res) return;
+		resolve(res);
+		abort();
+	});
+});
+//#endregion
 //#region src/helper/typeGuard.ts
-const isString = (val) => typeof val === "string";
-const isNumber = (val) => typeof val === "number";
-const isArray = (val) => Array.isArray(val);
+const isNumber = (val) => typeof val === "number" && !Number.isNaN(val);
+const isSafeInteger = (val) => Number.isSafeInteger(val);
 /** 判断节点是否为元素节点 */
 const isHTMLElement = (node) => node.nodeType === Node.ELEMENT_NODE;
 /** 判断节点是否为图片元素节点 */
@@ -2363,7 +2658,7 @@ const openDb = (name, version, initSchema) => new Promise((resolve, reject) => {
 	request.onupgradeneeded = () => initSchema(request.result);
 	request.onsuccess = () => resolve(request.result);
 	request.onerror = (error) => {
-		console.error("数据库打开失败", error);
+		log.error("数据库打开失败", error);
 		reject(/* @__PURE__ */ new Error("数据库打开失败"));
 	};
 });
@@ -2477,7 +2772,29 @@ const useDrag = ({ ref, handleDrag, easyMode, handleClick, skip, setCapture, tou
 	});
 };
 //#endregion
-//#region src/helper/useStyle.ts
+//#region src/helper/useStyle/dedupe.ts
+/** 记录已执行过的 css 调用参数，以便跳过重复调用 */
+const cssRecords = [];
+/** 记录本次调用的参数，若与已有记录完全相同，则返回 false 表示重复了 */
+const recordCssArgs = (args) => {
+	for (let i = cssRecords.length - 1; i >= 0; i--) if (cssRecords[i].some((arg) => arg instanceof WeakRef && arg.deref() === void 0)) cssRecords.splice(i, 1);
+	if (cssRecords.some((record) => record.length === args.length && record.every((saved, i) => {
+		if (saved instanceof WeakRef) {
+			const el = saved.deref();
+			return el !== void 0 && el === args[i];
+		}
+		return saved === args[i];
+	}))) return false;
+	const record = args.map((arg) => arg instanceof Element ? new WeakRef(arg) : arg);
+	cssRecords.push(record);
+	if (solid_js.getOwner()) solid_js.onCleanup(() => {
+		const index = cssRecords.indexOf(record);
+		if (index !== -1) cssRecords.splice(index, 1);
+	});
+	return true;
+};
+//#endregion
+//#region src/helper/useStyle/stylesheet.ts
 const useStyleSheet = (e) => {
 	const styleSheet = new CSSStyleSheet();
 	onAutoMount(() => {
@@ -2495,6 +2812,8 @@ const useStyle = (cssText, e) => {
 	if (typeof cssText === "string") styleSheet.replaceSync(cssText);
 	else createEffectOn(createRootMemo(cssText), (style) => styleSheet.replaceSync(style));
 };
+//#endregion
+//#region src/helper/useStyle/styleMap.ts
 /**
 * 将同一帧内的所有 CSS 变更合并为一次 DOM 写入
 *
@@ -2539,10 +2858,21 @@ const useStyleMemo = (selector, styleMapArg, e) => {
 		});
 	}
 };
+//#endregion
+//#region src/helper/useStyle/index.ts
 function css(arg1, arg2, ...rest) {
+	if (!recordCssArgs([
+		arg1,
+		arg2,
+		...rest
+	])) return false;
 	if (typeof arg1 !== "object" || !("raw" in arg1)) {
-		if (arg2 instanceof Element || arg2 === null || arg2 === void 0) return useStyle(arg1, arg2);
-		return useStyleMemo(arg1, arg2, rest[0]);
+		if (arg2 instanceof Element || arg2 === null || arg2 === void 0) {
+			useStyle(arg1, arg2);
+			return true;
+		}
+		useStyleMemo(arg1, arg2, rest[0]);
+		return true;
 	}
 	const [styles, ...values] = [
 		arg1,
@@ -2560,6 +2890,7 @@ function css(arg1, arg2, ...rest) {
 		for (let i = startIdx; i < values.length; i++) text += \`\${typeof values[i] === "function" ? values[i]() : values[i]}\${styles[i + 1]}\`;
 		return text;
 	}, e);
+	return true;
 }
 //#endregion
 exports.AnimationFrame = AnimationFrame;
@@ -2574,6 +2905,7 @@ exports.boolDataVal = boolDataVal;
 exports.byPath = byPath;
 exports.canvasToBlob = canvasToBlob;
 exports.canvasToBlobUrl = canvasToBlobUrl;
+exports.claimUrlChange = claimUrlChange;
 exports.clamp = clamp;
 exports.createEffectOn = createEffectOn;
 exports.createEqualsSignal = createEqualsSignal;
@@ -2587,6 +2919,7 @@ exports.debounce = debounce;
 exports.descRange = descRange;
 exports.difference = difference;
 exports.domParse = domParse;
+exports.effectiveDark = effectiveDark;
 exports.ensureGmValue = ensureGmValue;
 exports.exposeToGlobal = exposeToGlobal;
 exports.extractRange = extractRange;
@@ -2599,16 +2932,16 @@ exports.getNaturalCollator = getNaturalCollator;
 exports.gql = gql;
 exports.hijackFn = hijackFn;
 exports.inRange = inRange;
-exports.isArray = isArray;
 exports.isEqual = dequal;
 exports.isHTMLElement = isHTMLElement;
 exports.isImageElement = isImageElement;
 exports.isNumber = isNumber;
-exports.isString = isString;
+exports.isSafeInteger = isSafeInteger;
 exports.isUrl = isUrl;
 exports.keyboardCodeToText = keyboardCodeToText;
 exports.lang = lang;
 exports.log = log;
+exports.manualDark = manualDark;
 exports.mountComponents = mountComponents;
 exports.needDarkMode = needDarkMode;
 exports.onAutoMount = onAutoMount;
@@ -2620,13 +2953,17 @@ exports.querySelector = querySelector;
 exports.querySelectorAll = querySelectorAll;
 exports.querySelectorClick = querySelectorClick;
 exports.range = range;
+exports.registerSelfDom = registerSelfDom;
 exports.requestIdleCallback = requestIdleCallback$1;
 exports.saveAs = saveAs;
 exports.scrollIntoView = scrollIntoView;
 exports.setInitLang = setInitLang;
 exports.setLang = setLang;
+exports.setManualDark = setManualDark;
 exports.singleThreaded = singleThreaded;
+exports.siteDark = siteDark;
 exports.sleep = sleep;
+exports.startDetectSiteDark = startDetectSiteDark;
 exports.t = t;
 exports.testImgUrl = testImgUrl;
 exports.throttle = throttle;
@@ -2647,7 +2984,7 @@ let helper = require("helper");
 const xmlHttpRequest = (details) => new Promise((resolve, reject) => {
 	const handleError = (error) => {
 		details.onerror?.(error);
-		console.error("GM_xmlhttpRequest Error", error);
+		helper.log.error("GM_xmlhttpRequest Error", error);
 		reject(new Error(error?.responseText || "GM_xmlhttpRequest Error"));
 	};
 	const abort = GM_xmlhttpRequest({
@@ -2740,7 +3077,7 @@ const request = async (url, details = {}, retryNum = 0, errorNum = 0) => {
 			helper.log.error(errorText, res);
 			throw new Error(errorText);
 		}
-		if (details.responseType === "json" && res.responseText && (typeof res.response !== "object" || Object.keys(res.response).length === 0)) try {
+		if (details.responseType === "json" && res.responseText && (typeof res.response !== "object" || Object.keys(res.response ?? {}).length === 0)) try {
 			Reflect.set(res, "response", JSON.parse(res.responseText));
 		} catch {}
 		return res;
@@ -2751,7 +3088,7 @@ const request = async (url, details = {}, retryNum = 0, errorNum = 0) => {
 			return request(url, details, retryNum + 1, errorNum);
 		}
 		if (errorNum >= retryNum) {
-			(details.noTip ? console.error : components_Toast.toast.error)(\`\${errorText}\\nerror: \${error.message}\`);
+			(details.noTip ? helper.log.error : components_Toast.toast.error)(\`\${errorText}\\nerror: \${error.message}\`);
 			throw new Error(errorText, { cause: error });
 		}
 		helper.log.error(errorText, error);
@@ -2962,8 +3299,7 @@ const _defaultOption = {
 	},
 	firstPageFill: true,
 	disableZoom: false,
-	darkMode: false,
-	autoDarkMode: false,
+	darkMode: void 0,
 	swapPageTurnKey: false,
 	scroolEnd: "auto",
 	alwaysLoadAllImg: false,
@@ -3485,15 +3821,6 @@ const bindScrollTop = (dom) => {
 		setState("scrollTop", dom.scrollTop);
 	}, { passive: true });
 };
-const darkModeQuery = matchMedia("(prefers-color-scheme: dark)");
-const autoSwitchDarkMode = (query) => {
-	if (!store.option.autoDarkMode) return;
-	if (query.matches === store.option.darkMode) return;
-	setState("option", "darkMode", query.matches);
-};
-darkModeQuery.addEventListener("change", autoSwitchDarkMode);
-autoSwitchDarkMode(darkModeQuery);
-helper.createEffectOn(() => store.option.autoDarkMode, () => autoSwitchDarkMode(darkModeQuery));
 helper.createEffectOn(() => store.rootSize.width, (width) => {
 	const isMobile = helper.inRange(1, width, 800);
 	if (isMobile === store.isMobile) return;
@@ -3887,7 +4214,14 @@ helper.createEffectOn(() => store.renderRange, () => {
 helper.createEffectOn([() => store.showRange, () => store.option.scrollMode.enabled], ([[firstPage], isScrollMode]) => isScrollMode && setState("activePageIndex", firstPage ?? 0));
 helper.createEffectOn(showImgList, (showImgs) => {
 	if (showImgs.size === 0) return;
-	store.prop.onShowImgsChange?.(showImgs, imgList());
+	store.prop.onShowImgsChange?.({
+		showImgs,
+		imgList: imgList(),
+		showRange: [...store.showRange],
+		pageList: store.pageList,
+		activeImgIndex: activeImgIndex(),
+		fillEffect: solid_js_store.unwrap(store.fillEffect)
+	});
 }, { defer: true });
 /** 将页面移回原位 */
 const resetPage = (state, animation = false) => {
@@ -4514,16 +4848,17 @@ const classes$2 = {
 	"touchArea": "touchArea___F6Hkh",
 	"loadingMask": "loadingMask___jIxGF",
 	"loadingMaskFadeIn": "loadingMaskFadeIn___abNXH",
+	"loadingMaskBlink": "loadingMaskBlink___O8MCV",
 	"hidden": "hidden___rxU-6",
 	"invisible": "invisible___cO-hs",
 	"beautifyScrollbar": "beautifyScrollbar___lb6kJ"
 };
 //#endregion
 //#region src/components/Manga/components/SettingsItem.tsx
-var _tmpl$$45 = /*#__PURE__*/ solid_js_web.template(\`<div><div> <!> \`);
+var _tmpl$$44 = /*#__PURE__*/ solid_js_web.template(\`<div><div> <!> \`);
 /** 设置菜单项 */
 const SettingsItem = (props) => (() => {
-	var _el$ = _tmpl$$45(), _el$2 = _el$.firstChild, _el$5 = _el$2.firstChild.nextSibling;
+	var _el$ = _tmpl$$44(), _el$2 = _el$.firstChild, _el$5 = _el$2.firstChild.nextSibling;
 	_el$5.nextSibling;
 	solid_js_web.insert(_el$2, () => props.name, _el$5);
 	solid_js_web.insert(_el$, () => props.children, null);
@@ -4549,7 +4884,7 @@ const SettingsItem = (props) => (() => {
 })();
 //#endregion
 //#region src/components/Manga/components/SettingsItemSelect.tsx
-var _tmpl$$44 = /*#__PURE__*/ solid_js_web.template(\`<select>\`);
+var _tmpl$$43 = /*#__PURE__*/ solid_js_web.template(\`<select>\`);
 var _tmpl$2$9 = /*#__PURE__*/ solid_js_web.template(\`<option>\`);
 /** 选择器式菜单项 */
 const SettingsItemSelect = (props) => {
@@ -4568,7 +4903,7 @@ const SettingsItemSelect = (props) => {
 			return props.classList;
 		},
 		get children() {
-			var _el$ = _tmpl$$44();
+			var _el$ = _tmpl$$43();
 			solid_js_web.addEventListener(_el$, "click", () => props.onClick?.());
 			_el$.addEventListener("change", (e) => props.onChange(e.target.value));
 			var _ref$ = ref;
@@ -4591,12 +4926,12 @@ const SettingsItemSelect = (props) => {
 };
 //#endregion
 //#region src/components/Manga/actions/translation/translator/Cotrans/settings.tsx
-var _tmpl$$43 = /*#__PURE__*/ solid_js_web.template(\`<blockquote>\`);
+var _tmpl$$42 = /*#__PURE__*/ solid_js_web.template(\`<blockquote>\`);
 const bindOption$3 = (...args) => bindOption("translation", "cotrans", ...args);
 /** Cotrans 设置组件 */
 const cotransSettings = () => [
 	(() => {
-		var _el$ = _tmpl$$43();
+		var _el$ = _tmpl$$42();
 		solid_js_web.effect(() => _el$.innerHTML = helper.t("setting.translation.cotrans_tip"));
 		return _el$;
 	})(),
@@ -4646,7 +4981,7 @@ const cotransSettings = () => [
 ];
 //#endregion
 //#region src/components/NumberInput.tsx
-var _tmpl$$42 = /*#__PURE__*/ solid_js_web.template(\`<span contenteditable data-only-number>\`);
+var _tmpl$$41 = /*#__PURE__*/ solid_js_web.template(\`<span contenteditable data-only-number>\`);
 /** 数值输入框 */
 const NumberInput = (props) => {
 	const handleInput = (e) => {
@@ -4663,7 +4998,7 @@ const NumberInput = (props) => {
 		}
 	};
 	return [(() => {
-		var _el$ = _tmpl$$42();
+		var _el$ = _tmpl$$41();
 		_el$.addEventListener("blur", (e) => {
 			try {
 				props.onChange(Number(e.currentTarget.textContent) || 0);
@@ -4686,7 +5021,7 @@ const NumberInput = (props) => {
 };
 //#endregion
 //#region src/components/Manga/components/SettingsItemNumber.tsx
-var _tmpl$$41 = /*#__PURE__*/ solid_js_web.template(\`<div>\`);
+var _tmpl$$40 = /*#__PURE__*/ solid_js_web.template(\`<div>\`);
 /** 数值输入框菜单项 */
 const SettingsItemNumber = (props) => solid_js_web.createComponent(SettingsItem, {
 	get name() {
@@ -4699,7 +5034,7 @@ const SettingsItemNumber = (props) => solid_js_web.createComponent(SettingsItem,
 		return props.classList;
 	},
 	get children() {
-		var _el$ = _tmpl$$41();
+		var _el$ = _tmpl$$40();
 		solid_js_web.insert(_el$, solid_js_web.createComponent(NumberInput, props));
 		solid_js_web.effect((_$p) => solid_js_web.setStyleProperty(_el$, "margin-right", props.suffix ? ".3em" : ".6em"));
 		return _el$;
@@ -4707,7 +5042,7 @@ const SettingsItemNumber = (props) => solid_js_web.createComponent(SettingsItem,
 });
 //#endregion
 //#region src/components/Manga/components/SettingsItemSwitch.tsx
-var _tmpl$$40 = /*#__PURE__*/ solid_js_web.template(\`<button type=button><div>\`);
+var _tmpl$$39 = /*#__PURE__*/ solid_js_web.template(\`<button type=button><div>\`);
 /** 开关式菜单项 */
 const SettingsItemSwitch = (props) => {
 	const handleClick = () => props.onChange(!props.value);
@@ -4725,7 +5060,7 @@ const SettingsItemSwitch = (props) => {
 			return props.disabled;
 		},
 		get children() {
-			var _el$ = _tmpl$$40(), _el$2 = _el$.firstChild;
+			var _el$ = _tmpl$$39(), _el$2 = _el$.firstChild;
 			solid_js_web.addEventListener(_el$, "click", handleClick);
 			solid_js_web.effect((_p$) => {
 				var _v$ = classes$2.SettingsItemSwitch, _v$2 = props.value, _v$3 = classes$2.SettingsItemSwitchRound;
@@ -4747,7 +5082,7 @@ const SettingsItemSwitch = (props) => {
 /**
 * MangaImageTranslator 翻译服务设置界面
 */
-var _tmpl$$39 = /*#__PURE__*/ solid_js_web.template(\`<input type=url>\`);
+var _tmpl$$38 = /*#__PURE__*/ solid_js_web.template(\`<input type=url>\`);
 const bindOption$2 = (...args) => bindOption("translation", "mit", ...args);
 /** MangaImageTranslator 设置组件 */
 const mitSettings = () => [
@@ -4850,7 +5185,7 @@ const mitSettings = () => [
 			return store.option.translation.mit.localUrl !== void 0;
 		},
 		get children() {
-			var _el$ = _tmpl$$39();
+			var _el$ = _tmpl$$38();
 			_el$.addEventListener("change", (e) => {
 				const url = e.target.value.replace(/\\/$/u, "");
 				setOption("translation", "mit", "localUrl", url);
@@ -5342,50 +5677,6 @@ const jumpToImg = (index) => {
 	setState("activePageIndex", pageNum);
 };
 //#endregion
-//#region src/components/Manga/actions/readProgress.ts
-let cache = void 0;
-const initCache = async () => {
-	cache ||= await helper.useCache({ progress: "id" }, "ReadProgress");
-};
-let lastIndex = -1;
-/** 保存阅读进度 */
-const saveReadProgress = helper.throttle(async () => {
-	await initCache();
-	const index = activeImgIndex();
-	if (index === lastIndex) return;
-	lastIndex = index;
-	if (store.imgList.length < 50 || index >= store.imgList.length - 5) return await cache.del("progress", location.pathname);
-	const imgSize = {};
-	for (const [i, img] of imgList().entries()) if (img.width && img.height) imgSize[i] = [img.width, img.height];
-	await cache.set("progress", {
-		id: location.pathname,
-		time: Date.now(),
-		index,
-		imgSize,
-		fillEffect: solid_js_store.unwrap(store.fillEffect)
-	});
-}, 1e3);
-/** 恢复阅读进度 */
-const resumeReadProgress = async (state) => {
-	await initCache();
-	const progress = await cache.get("progress", location.pathname);
-	if (!progress) return;
-	let i = state.imgList.length;
-	while (i--) {
-		const imgSize = progress.imgSize[i];
-		if (imgSize) updateImgSize(state.imgList[i], ...imgSize, state);
-	}
-	state.fillEffect = progress.fillEffect;
-	updatePageData(state);
-	if (state.option.scrollMode.enabled) setTimeout(scrollViewImg, 500, progress.index);
-	else jumpToImg(progress.index);
-	const nowTime = Date.now();
-	cache.each("progress", async (data, cursor) => {
-		if (nowTime - data.time < 25056e5) return;
-		await helper.promisifyRequest(cursor.delete());
-	});
-};
-//#endregion
 //#region src/components/Manga/actions/jumpToPage.ts
 /** 弹窗跳转到指定页数（页数按图片序号计算，范围为 1 ~ imgList.length） */
 const jumpToPage = async () => {
@@ -5406,7 +5697,6 @@ const jumpToPage = async () => {
 	}
 	if (index === activeImgIndex()) return;
 	jumpToImg(index);
-	setTimeout(() => saveReadProgress());
 };
 //#endregion
 //#region src/components/Manga/actions/switch.ts
@@ -5480,7 +5770,6 @@ const switchImgRecognition = (...path) => {
 const turnPage = withOptionalState((dir, state) => {
 	if (state.option.scrollMode.enabled) return false;
 	if (handleEndTurnPage(dir, state)) return false;
-	saveReadProgress();
 	state.activePageIndex += dir === "next" ? 1 : -1;
 	return true;
 });
@@ -6271,7 +6560,6 @@ const handleScrollModeDrag = ({ type, xy: [x, y], initial: [ix, iy], startTime }
 			calcVelocityAnim.cancel();
 			if (performance.now() - startTime < 50) return;
 			slideAnim.call();
-			saveReadProgress();
 	}
 };
 //#endregion
@@ -6306,7 +6594,7 @@ const handleScrollbarSlider = ({ type, xy, initial }, e) => {
 		closeDrag();
 	}
 	lastType = type;
-	if (type === "up") return saveReadProgress();
+	if (type === "up") return;
 	if (!refs.mangaFlow) return;
 	const scrollbarDom = e.target;
 	/** 点击位置在滚动条上的位置比率 */
@@ -6553,7 +6841,7 @@ function css$1(arg1, arg2, ...rest) {
 }
 //#endregion
 //#region src/components/Manga/components/ComicImg.tsx
-var _tmpl$$38 = /*#__PURE__*/ solid_js_web.template(\`<img draggable=false decoding=async>\`);
+var _tmpl$$37 = /*#__PURE__*/ solid_js_web.template(\`<img draggable=false decoding=async>\`);
 var _tmpl$2$8 = /*#__PURE__*/ solid_js_web.template(\`<div><picture><div>\`);
 const ComicImg = (img) => {
 	const showState = () => store.imgShowState[img.index];
@@ -6642,7 +6930,7 @@ const ComicImg = (img) => {
 					return src();
 				},
 				get children() {
-					var _el$3 = _tmpl$$38();
+					var _el$3 = _tmpl$$37();
 					_el$3.addEventListener("error", (e) => handleImgError(img.src, e.currentTarget));
 					_el$3.addEventListener("load", (e) => handleImgLoaded(img.src, e.currentTarget));
 					solid_js_web.use((el) => {
@@ -6710,34 +6998,6 @@ const ComicImg = (img) => {
 			});
 		}
 	})];
-};
-//#endregion
-//#region src/components/Manga/components/EmptyTip.tsx
-var _tmpl$$37 = /*#__PURE__*/ solid_js_web.template(\`<h1 style=opacity:0>\`);
-const EmptyTip = () => {
-	let ref;
-	helper.onAutoMount(() => {
-		let timeoutId = 0;
-		const observer = new IntersectionObserver(([{ isIntersecting }]) => {
-			if (!isIntersecting) return;
-			timeoutId = window.setTimeout(() => {
-				ref?.style.removeProperty("opacity");
-				timeoutId = 0;
-			}, 2e3);
-		}, { threshold: 1 });
-		observer.observe(ref);
-		return () => {
-			observer.disconnect();
-			if (timeoutId) clearTimeout(timeoutId);
-		};
-	});
-	return (() => {
-		var _el$ = _tmpl$$37();
-		var _ref$ = ref;
-		typeof _ref$ === "function" ? solid_js_web.use(_ref$, _el$) : ref = _el$;
-		_el$.textContent = "NULL";
-		return _el$;
-	})();
 };
 //#endregion
 //#region src/components/Manga/components/ComicImgFlow.tsx
@@ -6850,9 +7110,6 @@ const ComicImgFlow = () => {
 		solid_js_web.insert(_el$2, solid_js_web.createComponent(solid_js.For, {
 			get each() {
 				return renderList();
-			},
-			get fallback() {
-				return solid_js_web.createComponent(EmptyTip, {});
 			},
 			children: (i) => solid_js_web.createComponent(ComicImg, solid_js_web.mergeProps({ index: i }, () => store.imgMap[store.imgList[i]]))
 		}));
@@ -7562,7 +7819,7 @@ const autoScroll = new class extends helper.AnimationFrame {
 	};
 	scroll = () => {
 		if (isBottom()) return this.scrollEnd();
-		if (isScrollMode()) return scrollBy(Math.max(1, store.option.autoScroll.distance), true);
+		if (store.option.scrollMode.enabled) return scrollBy(Math.max(1, store.option.autoScroll.distance), true);
 		return turnPageAnimation("next");
 	};
 	frame = (timestamp) => {
@@ -7580,7 +7837,7 @@ const autoScroll = new class extends helper.AnimationFrame {
 	};
 	start = () => {
 		this.lastTime = 0;
-		if (!store.option.autoScroll.continuous || !isScrollMode()) return this.call();
+		if (!store.option.autoScroll.continuous || !store.option.scrollMode.enabled) return this.call();
 		constantScroll.start(autoScrollSpeed(), (delta) => {
 			if (isBottom()) {
 				this.scrollEnd();
@@ -7599,7 +7856,8 @@ const autoScroll = new class extends helper.AnimationFrame {
 helper.createEffectOn(() => [
 	...Object.values(store.option.autoScroll),
 	store.autoScroll.play,
-	isScrollMode()
+	isScrollMode(),
+	isAbreastMode()
 ], () => {
 	autoScroll.cancel();
 	constantScroll.cancel();
@@ -8383,12 +8641,23 @@ const defaultSettingList = () => [
 		}
 	],
 	[helper.t("setting.option.paragraph_appearance"), () => [
-		solid_js_web.createComponent(SettingsItemSwitch, solid_js_web.mergeProps({ get name() {
-			return helper.t("setting.option.dark_mode");
-		} }, () => bindOption("darkMode"))),
-		solid_js_web.createComponent(SettingsItemSwitch, solid_js_web.mergeProps({ get name() {
-			return helper.t("setting.option.dark_mode_auto");
-		} }, () => bindOption("autoDarkMode"))),
+		solid_js_web.createComponent(SettingsItemSelect, {
+			get name() {
+				return helper.t("setting.option.dark_mode");
+			},
+			get options() {
+				return [
+					["site", helper.t("setting.option.dark_mode_site")],
+					["light", helper.t("setting.option.dark_mode_light")],
+					["dark", helper.t("setting.option.dark_mode_dark")]
+				];
+			},
+			get value() {
+				if (store.option.darkMode === void 0) return "site";
+				return store.option.darkMode ? "dark" : "light";
+			},
+			onChange: (val) => setOption("darkMode", val === "site" ? void 0 : val === "dark")
+		}),
 		solid_js_web.createComponent(SettingsItemNumber, {
 			get name() {
 				return helper.t("setting.option.turn_page_animation_duration");
@@ -8438,7 +8707,7 @@ const defaultSettingList = () => [
 						if (draftOption.customBackground) draftOption.darkMode = helper.needDarkMode(draftOption.customBackground);
 					});
 				}, 20));
-				solid_js_web.effect(() => _el$.value = store.option.customBackground ?? (store.option.darkMode ? "#000000" : "#ffffff"));
+				solid_js_web.effect(() => _el$.value = store.option.customBackground ?? (helper.effectiveDark() ? "#000000" : "#ffffff"));
 				return _el$;
 			}
 		}),
@@ -8734,68 +9003,90 @@ const SettingBlockSubtitle = (props) => (() => {
 	solid_js_web.effect(() => solid_js_web.className(_el$, classes$2.SettingBlockSubtitle));
 	return _el$;
 })();
-/** 菜单面板 */
-const SettingPanel = () => (() => {
-	var _el$2 = _tmpl$$4();
-	solid_js_web.addEventListener(_el$2, "click", stopPropagation);
-	solid_js_web.addEventListener(_el$2, "scroll", stopPropagation);
-	_el$2.addEventListener("wheel", (e) => refs.settingPanel.scrollHeight > refs.settingPanel.clientHeight && e.stopPropagation());
-	var _ref$ = bindRef("settingPanel");
-	typeof _ref$ === "function" && solid_js_web.use(_ref$, _el$2);
-	solid_js_web.insert(_el$2, solid_js_web.createComponent(solid_js.For, {
-		get each() {
-			return store.prop.editSettingList(defaultSettingList());
-		},
-		children: ([name, SettingItem, options], i) => {
-			const initShow = options?.initShow;
-			const [show, setShwo] = solid_js.createSignal(Boolean(initShow));
-			if (typeof initShow === "function") helper.createEffectOn(initShow, (val) => setShwo(val));
-			return solid_js_web.createComponent(solid_js.Show, {
-				get when() {
-					return solid_js_web.memo(() => !!options?.hidden)() ? !options.hidden() : true;
-				},
-				get children() {
-					return [solid_js_web.memo(() => solid_js_web.memo(() => !!i())() ? _tmpl$3() : null), (() => {
-						var _el$3 = _tmpl$2$1(), _el$4 = _el$3.firstChild;
-						solid_js_web.insert(_el$3, solid_js_web.createComponent(SettingBlockSubtitle, {
-							onClick: () => setShwo((prev) => !prev),
-							get children() {
-								return [name, solid_js_web.memo(() => show() ? null : "…")];
-							}
-						}), _el$4);
-						solid_js_web.insert(_el$4, solid_js_web.createComponent(SettingItem, {}));
-						solid_js_web.effect((_p$) => {
-							var _v$3 = classes$2.SettingBlock, _v$4 = show(), _v$5 = classes$2.SettingBlockBody;
-							_v$3 !== _p$.e && solid_js_web.className(_el$3, _p$.e = _v$3);
-							_v$4 !== _p$.t && solid_js_web.setAttribute(_el$3, "data-show", _p$.t = _v$4);
-							_v$5 !== _p$.a && solid_js_web.className(_el$4, _p$.a = _v$5);
-							return _p$;
-						}, {
-							e: void 0,
-							t: void 0,
-							a: void 0
-						});
-						return _el$3;
-					})()];
-				}
-			});
-		}
-	}));
-	solid_js_web.effect((_p$) => {
-		var _v$ = \`\${classes$2.SettingPanel} \${classes$2.beautifyScrollbar}\`, _v$2 = helper.lang() === "zh" ? "15em" : "20em";
-		_v$ !== _p$.e && solid_js_web.className(_el$2, _p$.e = _v$);
-		_v$2 !== _p$.t && solid_js_web.setStyleProperty(_el$2, "width", _p$.t = _v$2);
-		return _p$;
-	}, {
-		e: void 0,
-		t: void 0
-	});
-	return _el$2;
-})();
+/** 侧边面板通用容器 */
+const SettingPanelContainer = (props) => {
+	let panelRef;
+	return (() => {
+		var _el$2 = _tmpl$$4();
+		solid_js_web.addEventListener(_el$2, "click", stopPropagation);
+		solid_js_web.addEventListener(_el$2, "scroll", stopPropagation);
+		_el$2.addEventListener("wheel", (e) => panelRef.scrollHeight > panelRef.clientHeight && e.stopPropagation());
+		solid_js_web.use((e) => {
+			panelRef = e;
+			if (typeof props.ref === "function") props.ref(e);
+		}, _el$2);
+		solid_js_web.insert(_el$2, () => props.children);
+		solid_js_web.effect((_p$) => {
+			var _v$ = [
+				classes$2.SettingPanel,
+				classes$2.beautifyScrollbar,
+				props.class
+			].join(" "), _v$2 = props.style;
+			_v$ !== _p$.e && solid_js_web.className(_el$2, _p$.e = _v$);
+			_p$.t = solid_js_web.style(_el$2, _v$2, _p$.t);
+			return _p$;
+		}, {
+			e: void 0,
+			t: void 0
+		});
+		return _el$2;
+	})();
+};
+/** 设置菜单面板 */
+const SettingPanel = () => solid_js_web.createComponent(SettingPanelContainer, {
+	ref(r$) {
+		var _ref$ = bindRef("settingPanel");
+		typeof _ref$ === "function" && _ref$(r$);
+	},
+	get style() {
+		return { width: helper.lang() === "zh" ? "15em" : "20em" };
+	},
+	get children() {
+		return solid_js_web.createComponent(solid_js.For, {
+			get each() {
+				return store.prop.editSettingList(defaultSettingList());
+			},
+			children: ([name, SettingItem, options], i) => {
+				const initShow = options?.initShow;
+				const [show, setShwo] = solid_js.createSignal(Boolean(initShow));
+				if (typeof initShow === "function") helper.createEffectOn(initShow, (val) => setShwo(val));
+				return solid_js_web.createComponent(solid_js.Show, {
+					get when() {
+						return solid_js_web.memo(() => !!options?.hidden)() ? !options.hidden() : true;
+					},
+					get children() {
+						return [solid_js_web.memo(() => solid_js_web.memo(() => !!i())() ? _tmpl$3() : null), (() => {
+							var _el$3 = _tmpl$2$1(), _el$4 = _el$3.firstChild;
+							solid_js_web.insert(_el$3, solid_js_web.createComponent(SettingBlockSubtitle, {
+								onClick: () => setShwo((prev) => !prev),
+								get children() {
+									return [name, solid_js_web.memo(() => show() ? null : "…")];
+								}
+							}), _el$4);
+							solid_js_web.insert(_el$4, solid_js_web.createComponent(SettingItem, {}));
+							solid_js_web.effect((_p$) => {
+								var _v$3 = classes$2.SettingBlock, _v$4 = show(), _v$5 = classes$2.SettingBlockBody;
+								_v$3 !== _p$.e && solid_js_web.className(_el$3, _p$.e = _v$3);
+								_v$4 !== _p$.t && solid_js_web.setAttribute(_el$3, "data-show", _p$.t = _v$4);
+								_v$5 !== _p$.a && solid_js_web.className(_el$4, _p$.a = _v$5);
+								return _p$;
+							}, {
+								e: void 0,
+								t: void 0,
+								a: void 0
+							});
+							return _el$3;
+						})()];
+					}
+				});
+			}
+		});
+	}
+});
 //#endregion
 //#region src/components/Manga/defaultButtonList.tsx
-var _tmpl$$3 = /*#__PURE__*/ solid_js_web.template(\`<hr>\`);
-var _tmpl$2 = /*#__PURE__*/ solid_js_web.template(\`<div role=button tabindex=-1>\`);
+var _tmpl$$3 = /*#__PURE__*/ solid_js_web.template(\`<div role=button tabindex=-1>\`);
+var _tmpl$2 = /*#__PURE__*/ solid_js_web.template(\`<hr>\`);
 const ZoomButton = () => solid_js_web.createComponent(IconButton$1, {
 	get tip() {
 		return solid_js_web.memo(() => store.option.zoom.ratio === 100)() ? helper.t("button.zoom_in") : helper.t("button.zoom_out");
@@ -8818,6 +9109,53 @@ const ZoomButton = () => solid_js_web.createComponent(IconButton$1, {
 		});
 	}
 });
+/** 设置按钮 */
+const SettingButton = () => {
+	const [showPanel, setShowPanel] = solid_js.createSignal(false);
+	const handleClick = () => {
+		const newVal = !showPanel();
+		setState("show", "toolbar", newVal);
+		setShowPanel(newVal);
+	};
+	helper.createEffectOn(() => store.show.toolbar, (showToolbar) => showToolbar || setShowPanel(false));
+	const Popper = solid_js_web.createComponent(solid_js.Show, {
+		get when() {
+			return showPanel();
+		},
+		get children() {
+			return [solid_js_web.createComponent(SettingPanel, {}), (() => {
+				var _el$ = _tmpl$$3();
+				_el$.addEventListener("wheel", (e) => {
+					if (isScrollMode()) refs.mangaBox.scrollBy({ top: e.deltaY });
+				});
+				solid_js_web.addEventListener(_el$, "click", handleClick);
+				solid_js_web.effect(() => solid_js_web.className(_el$, classes$2.closeCover));
+				return _el$;
+			})()];
+		}
+	});
+	return solid_js_web.createComponent(IconButton$1, {
+		get tip() {
+			return helper.t("other.setting");
+		},
+		get enabled() {
+			return showPanel();
+		},
+		get showTip() {
+			return showPanel();
+		},
+		onClick: handleClick,
+		get popperClassName() {
+			return solid_js_web.memo(() => !!showPanel())() && classes$2.SettingPanelPopper;
+		},
+		get popper() {
+			return showPanel() && Popper;
+		},
+		get children() {
+			return solid_js_web.createComponent(settings_default, {});
+		}
+	});
+};
 /** 工具栏的默认按钮列表 */
 const defaultButtonList = [
 	() => solid_js_web.createComponent(IconButton$1, {
@@ -8865,7 +9203,7 @@ const defaultButtonList = [
 		},
 		get children() {
 			return [
-				_tmpl$$3(),
+				_tmpl$2(),
 				solid_js_web.createComponent(IconButton$1, {
 					get tip() {
 						return solid_js_web.memo(() => !!isTranslatingImage())() ? helper.t("button.close_current_page_translation") : helper.t("button.translate_current_page");
@@ -8901,10 +9239,10 @@ const defaultButtonList = [
 			return store.option.autoScroll.enabled;
 		},
 		get children() {
-			return [_tmpl$$3(), solid_js_web.createComponent(AutoScrollButton, {})];
+			return [_tmpl$2(), solid_js_web.createComponent(AutoScrollButton, {})];
 		}
 	}),
-	() => _tmpl$$3(),
+	() => _tmpl$2(),
 	() => [solid_js_web.createComponent(solid_js.Show, {
 		get when() {
 			return !store.option.scrollMode.enabled;
@@ -8955,53 +9293,8 @@ const defaultButtonList = [
 		}
 	}),
 	DownloadButton,
-	() => {
-		const [showPanel, setShowPanel] = solid_js.createSignal(false);
-		const handleClick = () => {
-			const newVal = !showPanel();
-			setState("show", "toolbar", newVal);
-			setShowPanel(newVal);
-		};
-		helper.createEffectOn(() => store.show.toolbar, (showToolbar) => showToolbar || setShowPanel(false));
-		const Popper = solid_js_web.createComponent(solid_js.Show, {
-			get when() {
-				return showPanel();
-			},
-			get children() {
-				return [solid_js_web.createComponent(SettingPanel, {}), (() => {
-					var _el$4 = _tmpl$2();
-					_el$4.addEventListener("wheel", (e) => {
-						if (isScrollMode()) refs.mangaBox.scrollBy({ top: e.deltaY });
-					});
-					solid_js_web.addEventListener(_el$4, "click", handleClick);
-					solid_js_web.effect(() => solid_js_web.className(_el$4, classes$2.closeCover));
-					return _el$4;
-				})()];
-			}
-		});
-		return solid_js_web.createComponent(IconButton$1, {
-			get tip() {
-				return helper.t("other.setting");
-			},
-			get enabled() {
-				return showPanel();
-			},
-			get showTip() {
-				return showPanel();
-			},
-			onClick: handleClick,
-			get popperClassName() {
-				return solid_js_web.memo(() => !!showPanel())() && classes$2.SettingPanelPopper;
-			},
-			get popper() {
-				return showPanel() && Popper;
-			},
-			get children() {
-				return solid_js_web.createComponent(settings_default, {});
-			}
-		});
-	},
-	() => _tmpl$$3(),
+	SettingButton,
+	() => _tmpl$2(),
 	() => solid_js_web.createComponent(IconButton$1, {
 		get tip() {
 			return helper.t("other.exit");
@@ -9112,7 +9405,7 @@ const getImgFilter = () => {
 };
 const useCssVar = () => {
 	const svg = () => {
-		const fill = store.option.darkMode ? "rgb(156,156,156)" : "rgb(110,110,110)";
+		const fill = helper.effectiveDark() ? "rgb(156,156,156)" : "rgb(110,110,110)";
 		return {
 			"--md-image-not-supported": createSvgIcon(fill, MdImageNotSupported),
 			"--md-cloud-download": createSvgIcon(fill, MdCloudDownload),
@@ -9126,9 +9419,9 @@ const useCssVar = () => {
 	});
 	css$1(\`.\${classes$2.root}\`, [
 		{
-			"--bg": () => store.option.customBackground ?? (store.option.darkMode ? "#000" : "#fff"),
+			"--bg": () => store.option.customBackground ?? (helper.effectiveDark() ? "#000" : "#fff"),
 			"--scroll-mode-spacing": () => store.option.scrollMode.spacing,
-			"color-scheme": () => store.option.darkMode ? "dark" : "light",
+			"color-scheme": () => helper.effectiveDark() ? "dark" : "light",
 			"--img-filter": getImgFilter
 		},
 		() => themeStyle,
@@ -9204,6 +9497,7 @@ const useInit = (props) => {
 			};
 		});
 	});
+	solid_js.createEffect(() => helper.setManualDark(props.show === false ? void 0 : store.option.darkMode));
 	const handleImgList = () => {
 		setState((state) => {
 			const newImgMap = {};
@@ -9236,10 +9530,7 @@ const useInit = (props) => {
 			}
 			const oldImgSet = new Set(state.imgList);
 			const newImgSet = new Set(newImgList);
-			if (oldImgSet.size === 0 && newImgList.length > 0) {
-				resumeReadProgress(state);
-				if (state.option.translation.enabled) updateMitTranslators(true);
-			}
+			if (oldImgSet.size === 0 && newImgList.length > 0 && state.option.translation.enabled) updateMitTranslators(true);
 			/** 被删除的图片 */
 			const deleteList = oldImgSet.difference(newImgSet);
 			for (const url of deleteList) if (state.imgMap[url].blobUrl && state.imgMap[url].blobUrl !== url) URL.revokeObjectURL(state.imgMap[url].blobUrl);
@@ -9264,6 +9555,12 @@ const useInit = (props) => {
 				resetImgState(state);
 				state.activePageIndex = 0;
 				scrollTo(0);
+				const { initialImgIndex } = props;
+				if (helper.isSafeInteger(initialImgIndex) && state.imgList.length > 1) {
+					const index = helper.clamp(0, initialImgIndex, state.imgList.length - 1);
+					if (state.option.scrollMode.enabled) return setTimeout(scrollViewImg, 500, index);
+					jumpToImg(index);
+				}
 				return;
 			}
 			oldActiveImg.some((url) => {
@@ -9292,7 +9589,7 @@ const useInit = (props) => {
 };
 //#endregion
 //#region src/components/Manga/index.module.css?inline
-var index_module_default = ".img___7ajV4 img {\\n  display: block;\\n\\n  width: 100%;\\n  height: 100%;\\n\\n  object-fit: contain;\\n  filter: var(--img-filter, none);\\n}\\n\\n.img___7ajV4 {\\n  position: relative;\\n\\n  align-content: center;\\n\\n  width: 100%;\\n  height: 100%;\\n  margin-right: auto;\\n  margin-left: auto;\\n}\\n\\n.img___7ajV4 > picture {\\n    position: absolute;\\n    inset: 0;\\n\\n    width: auto;\\n    max-width: 100%;\\n    height: auto;\\n    max-height: 100%;\\n    margin-top: auto;\\n    margin-right: inherit;\\n    margin-bottom: auto;\\n    margin-left: inherit;\\n  }\\n\\n.img___7ajV4 > picture,.img___7ajV4 > picture::after {\\n    background-color: var(--hover-bg-color, #fff3);\\n    background-image: var(--md-photo);\\n    background-repeat: no-repeat;\\n    background-position: center;\\n    background-size: 30%;\\n  }\\n\\n/* 已加载完毕的图片不显示灰色背景和图标 */\\n\\n.img___7ajV4:not([data-load-type]) > picture,.img___7ajV4:not([data-load-type]) > picture::after {\\n    background: none;\\n  }\\n\\n/* 遮住默认的出错图片标识 */\\n\\n.img___7ajV4[data-load-type='error'] > picture::after {\\n    pointer-events: none;\\n    content: '';\\n\\n    position: absolute;\\n    top: 0;\\n    right: 0;\\n\\n    width: 100%;\\n    height: 100%;\\n\\n    background-color: #eee;\\n    background-image: var(--md-image-not-supported);\\n  }\\n\\n.img___7ajV4[data-load-type='loading'] > picture {\\n    background-image: var(--md-cloud-download);\\n\\n    /* 加载中的图片先隐藏一下，避免出错图片的元素被直接显示出来 */\\n  }\\n\\n:is(.img___7ajV4[data-load-type='loading'] > picture) img {\\n      animation: show___HzwUa 100ms forwards;\\n    }\\n\\n.img___7ajV4[data-load-type='error'] > picture {\\n    cursor: pointer;\\n  }\\n\\n.mangaFlow___jMZgq[dir='ltr'] .img___7ajV4[data-show='1'],\\n.mangaFlow___jMZgq[dir='rtl'] .img___7ajV4[data-show='0'] {\\n  margin-right: auto;\\n  margin-left: 0;\\n}\\n\\n.mangaFlow___jMZgq[dir='ltr'] .img___7ajV4[data-show='0'],\\n.mangaFlow___jMZgq[dir='rtl'] .img___7ajV4[data-show='1'] {\\n  margin-right: 0;\\n  margin-left: auto;\\n}\\n\\n.mangaFlow___jMZgq {\\n  touch-action: none;\\n  will-change: left, top;\\n  -webkit-user-select: none;\\n          user-select: none;\\n\\n  position: absolute;\\n  transform-origin: 0 0;\\n\\n  contain: layout;\\n  overflow: visible;\\n  display: grid;\\n  grid-auto-columns: 100%;\\n  grid-auto-flow: column;\\n  grid-auto-rows: 100%;\\n  row-gap: 0;\\n  place-items: center;\\n\\n  width: 100%;\\n  height: 100%;\\n\\n  color: var(--text);\\n\\n  backface-visibility: hidden;\\n}\\n\\n.mangaFlow___jMZgq[data-disable-zoom] .img___7ajV4 > picture {\\n    width: fit-content;\\n    height: fit-content;\\n  }\\n\\n.mangaFlow___jMZgq[data-hidden-mouse='true'] {\\n    cursor: none;\\n  }\\n\\n.mangaFlow___jMZgq[data-vertical] {\\n    grid-auto-flow: row;\\n  }\\n\\n.mangaBox___48Jek {\\n  transform-origin: 0 0;\\n\\n  contain: layout style;\\n\\n  width: 100%;\\n  height: 100%;\\n\\n  transition-duration: 0ms;\\n}\\n\\n.mangaBox___48Jek[data-animation='page'] .mangaFlow___jMZgq,.mangaBox___48Jek[data-animation='zoom'] {\\n    transition-duration: 300ms;\\n  }\\n\\n.root___Hf5H2 .mangaBox___48Jek {\\n  /* 隐藏滚动条但不影响滚动 */\\n  scrollbar-width: none;\\n\\n  /* 隐藏滚动条但不影响滚动 */\\n}\\n\\n:is(.root___Hf5H2 .mangaBox___48Jek)::-webkit-scrollbar {\\n    display: none;\\n  }\\n\\n.root___Hf5H2[data-scroll-mode] .mangaBox___48Jek {\\n  overflow: auto;\\n}\\n\\n:is(.root___Hf5H2[data-scroll-mode] .mangaBox___48Jek) .mangaFlow___jMZgq {\\n    touch-action: pan-y;\\n    row-gap: calc(var(--scroll-mode-spacing) * 7px);\\n    height: fit-content;\\n  }\\n\\n[data-abreast-scroll]:is(.root___Hf5H2[data-scroll-mode] .mangaBox___48Jek) {\\n    touch-action: none;\\n    overflow: hidden;\\n  }\\n\\n[data-abreast-scroll]:is(.root___Hf5H2[data-scroll-mode] .mangaBox___48Jek) .mangaFlow___jMZgq {\\n      column-gap: calc(var(--scroll-mode-spacing) * 7px);\\n      align-items: start;\\n      height: 100%;\\n    }\\n\\n:is([data-abreast-scroll]:is(.root___Hf5H2[data-scroll-mode] .mangaBox___48Jek) .mangaFlow___jMZgq) .img___7ajV4 {\\n        width: 100%;\\n        height: auto;\\n      }\\n\\n[data-show]:is(:is([data-abreast-scroll]:is(.root___Hf5H2[data-scroll-mode] .mangaBox___48Jek) .mangaFlow___jMZgq) .img___7ajV4) {\\n          will-change: transform;\\n        }\\n\\n:is(:is([data-abreast-scroll]:is(.root___Hf5H2[data-scroll-mode] .mangaBox___48Jek) .mangaFlow___jMZgq) .img___7ajV4) > picture {\\n          position: relative;\\n        }\\n\\n.pageTip___P7thU {\\n  pointer-events: none;\\n\\n  position: absolute;\\n  z-index: 1;\\n  right: 0.4em;\\n  bottom: 0.4em;\\n\\n  padding: 0.1em 0.4em;\\n  border-radius: 0.25em;\\n\\n  font-size: 1.5em;\\n  line-height: 1.5;\\n  color: var(--text);\\n\\n  opacity: 0;\\n  background-color: color-mix(in srgb, var(--text-bg) 80%, transparent);\\n\\n  transition: opacity 150ms;\\n}\\n\\n.root___Hf5H2[data-page-tip] .pageTip___P7thU {\\n  opacity: 1;\\n}\\n\\n@keyframes show___HzwUa {\\n  0% {\\n    opacity: 0;\\n  }\\n\\n  90% {\\n    opacity: 0;\\n  }\\n\\n  100% {\\n    opacity: 1;\\n  }\\n}\\n\\n.endPage___iOZmk,\\n.endPageBody___g-dz- {\\n  z-index: 10;\\n\\n  display: flex;\\n  align-items: center;\\n  justify-content: center;\\n\\n  width: 100%;\\n  height: 100%;\\n}\\n\\n.endPage___iOZmk {\\n  pointer-events: none;\\n\\n  position: absolute;\\n  top: 0;\\n  left: 0;\\n\\n  color: white;\\n\\n  opacity: 0;\\n  background-color: #333d;\\n\\n  transition: opacity 500ms;\\n}\\n\\n.endPage___iOZmk[data-show] {\\n    pointer-events: all;\\n    opacity: 1;\\n  }\\n\\n.endPage___iOZmk[data-type='start'] .tip___fyxqg {\\n    transform: translateY(-10em);\\n  }\\n\\n.endPage___iOZmk[data-type='end'] .tip___fyxqg {\\n    transform: translateY(10em);\\n  }\\n\\n.endPage___iOZmk .endPageBody___g-dz- {\\n    transform: translate(0, var(--drag-y, 0));\\n    transition: transform 200ms;\\n  }\\n\\n:is(.endPage___iOZmk .endPageBody___g-dz-) button {\\n      cursor: pointer;\\n\\n      transform-origin: center;\\n\\n      font-size: 1.2em;\\n      color: inherit;\\n\\n      background-color: transparent;\\n\\n      animation: jello___wXBLg 0.3s forwards;\\n    }\\n\\n[data-is-end]:is(:is(.endPage___iOZmk .endPageBody___g-dz-) button) {\\n        margin: 2em;\\n        font-size: 3em;\\n      }\\n\\n:is(.endPage___iOZmk .endPageBody___g-dz-) .tip___fyxqg {\\n      position: absolute;\\n      margin: auto;\\n    }\\n\\n.endPage___iOZmk[data-drag] .endPageBody___g-dz- {\\n    transition: transform 00ms;\\n  }\\n\\n.root___Hf5H2[data-mobile] .endPage___iOZmk > button {\\n  width: 1em;\\n}\\n\\n.comments___9ITQv {\\n  position: absolute;\\n  right: 1em;\\n\\n  overflow: auto;\\n  display: flex;\\n  flex-direction: column;\\n  align-items: flex-end;\\n\\n  width: 20em;\\n  max-height: 80%;\\n  padding-right: 0.5em;\\n\\n  opacity: 0.3;\\n}\\n\\n.comments___9ITQv > p {\\n    margin: 0.5em 0.1em;\\n    padding: 0.2em 0.5em;\\n    border-radius: 0.5em;\\n    background-color: #333b;\\n  }\\n\\n.comments___9ITQv:hover {\\n    opacity: 1;\\n  }\\n\\n.root___Hf5H2[data-mobile] .comments___9ITQv {\\n  bottom: 0;\\n  max-height: 15em;\\n  opacity: 0.8;\\n}\\n\\n@keyframes jello___wXBLg {\\n  0%,\\n  11.1%,\\n  100% {\\n    transform: translate3d(0, 0, 0);\\n  }\\n\\n  22.2% {\\n    transform: skewX(-12.5deg) skewY(-12.5deg);\\n  }\\n\\n  33.3% {\\n    transform: skewX(6.25deg) skewY(6.25deg);\\n  }\\n\\n  44.4% {\\n    transform: skewX(-3.125deg) skewY(-3.125deg);\\n  }\\n\\n  55.5% {\\n    transform: skewX(1.5625deg) skewY(1.5625deg);\\n  }\\n\\n  66.6% {\\n    transform: skewX(-0.7812deg) skewY(-0.7812deg);\\n  }\\n\\n  77.7% {\\n    transform: skewX(0.3906deg) skewY(0.3906deg);\\n  }\\n\\n  88.8% {\\n    transform: skewX(-0.1953deg) skewY(-0.1953deg);\\n  }\\n}\\n\\n.toolbar___RMjHL {\\n  position: fixed;\\n  z-index: 9;\\n  top: 0;\\n\\n  display: flex;\\n  align-items: center;\\n  justify-content: flex-start;\\n\\n  height: 100%;\\n}\\n\\n/* 工具栏面板 */\\n.toolbarPanel___XYjgc {\\n  position: relative;\\n  transform: translateX(-100%);\\n\\n  display: flex;\\n  flex-direction: column;\\n\\n  padding: 0.5em;\\n\\n  transition: transform 200ms;\\n}\\n.toolbarPanel___XYjgc > hr {\\n    height: 1em;\\n    margin: 0;\\n    border: none;\\n    visibility: hidden;\\n  }\\n\\n:is(.toolbar___RMjHL[data-show], .toolbar___RMjHL:hover) .toolbarPanel___XYjgc {\\n  transform: none;\\n}\\n\\n.toolbarBg___i4oTA {\\n  position: absolute;\\n  top: 0;\\n  right: 0;\\n\\n  width: 100%;\\n  height: 100%;\\n  border-top-right-radius: 1em;\\n  border-bottom-right-radius: 1em;\\n\\n  background-color: var(--page-bg);\\n  filter: opacity(0.8);\\n}\\n\\n/* 移动端优化 */\\n/* 调大样式 */\\n.root___Hf5H2[data-mobile] .toolbar___RMjHL {\\n    font-size: 1.3em;\\n  }\\n/* 只能通过点击中心来唤出工具栏，防止误触 */\\n.root___Hf5H2[data-mobile] .toolbar___RMjHL:not([data-show]) {\\n    pointer-events: none;\\n  }\\n/* 减少背景的透明度，方便辨识 */\\n.root___Hf5H2[data-mobile] .toolbarBg___i4oTA {\\n    filter: opacity(0.8);\\n  }\\n/* 设置面板所在的悬浮框样式 */\\n.SettingPanelPopper___uEBz3 {\\n  pointer-events: unset !important;\\n  transform: none !important;\\n  height: 0 !important;\\n  padding: 0 !important;\\n}\\n\\n.SettingPanel___ZRvFB {\\n  -webkit-user-select: text;\\n          user-select: text;\\n\\n  position: fixed;\\n  z-index: 1;\\n  top: 0;\\n  bottom: 0;\\n\\n  overflow: auto;\\n\\n  max-width: calc(100% - 5em);\\n  height: fit-content;\\n  max-height: 95%;\\n  margin: auto;\\n  border-radius: 0.3em;\\n\\n  font-size: 1.2em;\\n  color: var(--text);\\n\\n  background-color: var(--page-bg);\\n  box-shadow:\\n    rgb(0 0 0 / 20%) 0 3px 1px -2px,\\n    rgb(0 0 0 / 14%) 0 2px 2px 0,\\n    rgb(0 0 0 / 12%) 0 1px 5px 0;\\n}\\n\\n.SettingPanel___ZRvFB hr {\\n    margin: 0.5em 0;\\n    color: white;\\n  }\\n\\n.SettingPanel___ZRvFB > hr {\\n    margin: 0;\\n  }\\n\\n.SettingBlock___qxNyt {\\n  display: grid;\\n  grid-template-rows: max-content 1fr;\\n  transition: grid-template-rows 200ms ease-out;\\n}\\n\\n.SettingBlock___qxNyt .SettingBlockBody___Wirnd {\\n    z-index: 0;\\n    overflow: hidden;\\n    padding: 0 0.5em;\\n    padding-bottom: 1em;\\n  }\\n\\n:is(.SettingBlock___qxNyt .SettingBlockBody___Wirnd) > div + :is(.SettingBlock___qxNyt .SettingBlockBody___Wirnd) > div {\\n      margin-top: 1em;\\n    }\\n\\n:is(.SettingBlock___qxNyt .SettingBlockBody___Wirnd) input,:is(.SettingBlock___qxNyt .SettingBlockBody___Wirnd) textarea {\\n      width: 97%;\\n      margin-top: 0.3em;\\n    }\\n\\n.SettingBlock___qxNyt[data-show='false'] {\\n    grid-template-rows: max-content 0fr;\\n    padding-bottom: unset;\\n  }\\n\\n.SettingBlock___qxNyt[data-show='false'] .SettingBlockBody___Wirnd {\\n      padding: unset;\\n    }\\n\\n.SettingBlockSubtitle___cv0Ji {\\n  cursor: pointer;\\n\\n  position: sticky;\\n  z-index: 1;\\n  top: 0;\\n\\n  height: 3em;\\n  margin-bottom: 0.1em;\\n\\n  font-size: 0.7em;\\n  line-height: 3em;\\n  color: var(--text-secondary);\\n  text-align: center;\\n\\n  background-color: var(--page-bg);\\n}\\n\\n.SettingBlockBody___Wirnd .SettingBlockSubtitle___cv0Ji {\\n  position: unset;\\n  height: 1em;\\n  line-height: 1em;\\n}\\n\\n.SettingsItem___aJhRD {\\n  position: relative;\\n  display: flex;\\n  align-items: center;\\n  justify-content: space-between;\\n}\\n\\n:is(.SettingsItem___aJhRD,.SettingsShowItem___l-D2E) + .SettingsItem___aJhRD {\\n    margin-top: 1em;\\n  }\\n\\n.SettingsItem___aJhRD[data-disabled] {\\n    opacity: 0.5;\\n  }\\n\\n.SettingsItem___aJhRD[data-disabled] button {\\n      cursor: not-allowed;\\n    }\\n\\n.SettingsItemName___UP6zJ {\\n  max-width: calc(100% - 4em);\\n\\n  font-size: 0.9em;\\n  text-align: start;\\n  overflow-wrap: anywhere;\\n  white-space: pre-wrap;\\n}\\n\\n/* 开关式设置项 */\\n.SettingsItemSwitch___LVGr9 {\\n  cursor: pointer;\\n\\n  display: inline-flex;\\n  align-items: center;\\n\\n  width: 2.3em;\\n  height: 0.8em;\\n  margin: 0.3em;\\n  padding: 0;\\n  border: 0;\\n  border-radius: 1em;\\n\\n  background-color: var(--switch-bg);\\n}\\n\\n/* 开关里的圆形按钮 */\\n.SettingsItemSwitchRound___Ds0B8 {\\n  transform: translateX(-10%);\\n\\n  width: 1.15em;\\n  height: 1.15em;\\n  border-radius: 100%;\\n\\n  background: var(--switch);\\n  box-shadow:\\n    0 2px 1px -1px rgb(0 0 0 / 20%),\\n    0 1px 1px 0 rgb(0 0 0 / 14%),\\n    0 1px 3px 0 rgb(0 0 0 / 12%);\\n\\n  transition: transform 100ms;\\n}\\n\\n.SettingsItemSwitch___LVGr9[data-checked='true'] {\\n  background: var(--secondary-bg);\\n}\\n\\n.SettingsItemSwitch___LVGr9[data-checked='true'] .SettingsItemSwitchRound___Ds0B8 {\\n    transform: translateX(110%);\\n    background: var(--secondary);\\n  }\\n\\n/* 图标按钮式设置项 */\\n.SettingsItemIconButton___Cs7BQ {\\n  cursor: pointer;\\n\\n  position: absolute;\\n  right: 0;\\n\\n  height: 1em;\\n  border: none;\\n\\n  font-size: 1.5em;\\n  color: var(--text);\\n\\n  background-color: transparent;\\n}\\n\\n/* 选择器设置项 */\\n.SettingsItemSelect___CvFKx {\\n  cursor: pointer;\\n\\n  max-width: 6.5em;\\n  margin: 0;\\n  padding: 0.3em;\\n  border: none;\\n  border-radius: 5px;\\n\\n  font-size: 0.9em;\\n  color: var(--text);\\n\\n  background-color: var(--hover-bg-color);\\n  outline: none;\\n}\\n.SettingsItemSelect___CvFKx::picker(select) {\\n    color: var(--text);\\n    background-color: var(--page-bg);\\n  }\\n.SettingsItemSelect___CvFKx option {\\n    color: var(--text);\\n    background-color: var(--page-bg);\\n  }\\n\\n/* 关闭设置弹窗的遮罩 */\\n.closeCover___qLIp5 {\\n  position: fixed;\\n  top: 0;\\n  left: 0;\\n\\n  width: 100%;\\n  height: 100%;\\n}\\n\\n.SettingsShowItem___l-D2E {\\n  display: grid;\\n  transition: grid-template-rows 200ms ease-out;\\n}\\n\\n.SettingsShowItem___l-D2E > .SettingsShowItemBody___bgxxq {\\n    overflow: hidden;\\n    display: flex;\\n    flex-direction: column;\\n  }\\n\\n:is(.SettingsShowItem___l-D2E > .SettingsShowItemBody___bgxxq) > .SettingsItem___aJhRD {\\n      margin-top: 1em;\\n    }\\n\\n:is(.SettingsShowItem___l-D2E > .SettingsShowItemBody___bgxxq) > :is(textarea,input) {\\n      margin: 0.4em 0.2em 0;\\n      line-height: 1.2;\\n    }\\n\\n[data-only-number] {\\n  padding: 0 0.2em;\\n}\\n\\n[data-only-number] + span {\\n    margin-left: -0.1em;\\n  }\\n\\n.hotkeys___uu-Xe {\\n  position: relative;\\n  z-index: 1;\\n\\n  display: flex;\\n  flex-grow: 1;\\n  flex-wrap: wrap;\\n  align-items: center;\\n\\n  padding: 0.2em;\\n  padding-top: 2em;\\n  border-bottom: 1px solid var(--secondary-bg);\\n\\n  font-size: 0.9em;\\n  color: var(--text);\\n}\\n\\n.hotkeys___uu-Xe + .hotkeys___uu-Xe {\\n    margin-top: 0.5em;\\n  }\\n\\n.hotkeys___uu-Xe:last-child {\\n    border-bottom: none;\\n  }\\n\\n.hotkeysItem___d9IKS {\\n  cursor: pointer;\\n\\n  display: flex;\\n  align-items: center;\\n\\n  box-sizing: content-box;\\n  height: 1em;\\n  margin: 0.3em;\\n  padding: 0.2em 1.2em;\\n  border-radius: 0.3em;\\n\\n  font-family: serif;\\n\\n  outline: 1px solid;\\n  outline-color: var(--secondary-bg);\\n}\\n\\n.hotkeysItem___d9IKS > svg {\\n    display: none;\\n\\n    height: 1em;\\n    margin-left: 0.4em;\\n    border-radius: 1em;\\n\\n    color: var(--page-bg);\\n\\n    opacity: 0.5;\\n    background-color: var(--text);\\n  }\\n\\n:is(.hotkeysItem___d9IKS > svg):hover {\\n      opacity: 0.9;\\n    }\\n\\n.hotkeysItem___d9IKS:hover {\\n    padding: 0.2em 0.5em;\\n  }\\n\\n.hotkeysItem___d9IKS:hover > svg {\\n      display: unset;\\n    }\\n\\n.hotkeysItem___d9IKS:focus,.hotkeysItem___d9IKS:focus-visible {\\n    outline: var(--text) solid 2px;\\n  }\\n\\n.hotkeysHeader___jU7vr {\\n  position: absolute;\\n  top: 0;\\n  left: 0;\\n\\n  display: flex;\\n  align-items: center;\\n\\n  box-sizing: border-box;\\n  width: 100%;\\n  padding: 0 0.5em;\\n}\\n\\n.hotkeysHeader___jU7vr > p {\\n    line-height: 1em;\\n    text-align: start;\\n    overflow-wrap: anywhere;\\n    white-space: pre-wrap;\\n\\n    background-color: var(--page-bg);\\n  }\\n\\n.hotkeysHeader___jU7vr > div[title] {\\n    cursor: pointer;\\n\\n    transform: scale(0);\\n\\n    display: flex;\\n\\n    background-color: var(--page-bg);\\n\\n    transition: transform 100ms;\\n  }\\n\\n:is(.hotkeysHeader___jU7vr > div[title]) > svg {\\n      width: 1.6em;\\n    }\\n\\n.hotkeys___uu-Xe:hover div[title] {\\n  transform: scale(1);\\n}\\n\\n.scrollbar___hLToV {\\n  --arrow-y: clamp(\\n    0.45em,\\n    calc(var(--slider-midpoint)),\\n    calc(var(--scroll-length) - 0.45em)\\n  );\\n\\n  touch-action: none;\\n  -webkit-user-select: none;\\n          user-select: none;\\n\\n  position: absolute;\\n  z-index: 9;\\n  top: 1%;\\n  right: 3px;\\n\\n  display: flex;\\n  flex-direction: column;\\n\\n  width: 5px;\\n  height: 98%;\\n\\n  /* 扩大触发范围 */\\n  border-left: max(6vw, 1em) solid transparent;\\n}\\n\\n.scrollbar___hLToV > div {\\n    pointer-events: none;\\n\\n    display: flex;\\n    flex-direction: column;\\n    flex-grow: 1;\\n    align-items: center;\\n    justify-content: center;\\n  }\\n\\n.scrollbarPage___qghUs {\\n  transform-origin: bottom;\\n  transform: scaleY(1);\\n\\n  flex-grow: 1;\\n\\n  width: 100%;\\n  height: 100%;\\n\\n  background-color: var(--secondary);\\n\\n  transition: transform 1s;\\n}\\n\\n.scrollbarPage___qghUs[data-type='loaded'] {\\n    transform: scaleY(0);\\n  }\\n\\n.scrollbarPage___qghUs[data-upscale] {\\n    transform: scaleY(1);\\n    background-color: #b39ddb;\\n  }\\n\\n.scrollbarPage___qghUs[data-upscale='loading'] {\\n    background-color: #d1c4e9;\\n  }\\n\\n.scrollbarPage___qghUs[data-translation-type] {\\n    transform-origin: top;\\n    transform: scaleY(1);\\n    background-color: transparent;\\n  }\\n\\n.scrollbarPage___qghUs[data-translation-type='wait'] {\\n    background-color: #81c784;\\n  }\\n\\n.scrollbarPage___qghUs[data-translation-type='show'] {\\n    background-color: #4caf50;\\n  }\\n\\n.scrollbarPage___qghUs[data-translation-type='error'] {\\n    background-color: #f005;\\n  }\\n\\n.scrollbarPage___qghUs[data-type='wait'] {\\n    opacity: 0.4;\\n  }\\n\\n.scrollbarPage___qghUs[data-type='error'] {\\n    background-color: #f005;\\n  }\\n\\n/* 滚动条滑块 */\\n.scrollbarSlider___r1fWf {\\n  position: absolute;\\n  z-index: 1;\\n  transform: translateY(var(--slider-top));\\n\\n  justify-content: center;\\n\\n  width: 100%;\\n  height: var(--slider-height);\\n  border-radius: 1em;\\n\\n  opacity: 1;\\n  background-color: #fff5;\\n\\n  transition:\\n    transform 150ms,\\n    opacity 150ms;\\n}\\n\\n/* 悬浮框 */\\n.scrollbarPoper___XK5Rk {\\n  --poper-top: clamp(\\n    0%,\\n    calc(var(--slider-midpoint) - 50%),\\n    calc(var(--scroll-length) - 100%)\\n  );\\n\\n  position: absolute;\\n  right: 2em;\\n  transform: translateY(var(--poper-top));\\n\\n  width: fit-content;\\n  min-width: 1em;\\n  min-height: 1.5em;\\n  padding: 0.2em 0.5em;\\n  border-radius: 0.3em;\\n\\n  font-size: 0.8em;\\n  line-height: 1.5em;\\n  color: white;\\n  text-align: center;\\n  white-space: pre;\\n\\n  background-color: #303030;\\n}\\n\\n/* 悬浮框箭头 */\\n.scrollbar___hLToV::before {\\n  content: '';\\n\\n  position: absolute;\\n  right: 2em;\\n  transform: translate(140%, calc(var(--arrow-y) - 50%));\\n\\n  border: 0.4em solid transparent;\\n  border-left: 0.5em solid #303030;\\n\\n  background-color: transparent;\\n}\\n\\n/*\\n * 滚动条部件的显隐\\n */\\n\\n/* 悬浮提示默认隐藏 */\\n.scrollbar___hLToV::before,\\n.scrollbarPoper___XK5Rk {\\n  opacity: 0;\\n  transition:\\n    opacity 150ms,\\n    transform 150ms;\\n}\\n\\n/* 控制滚动条悬浮提示的显示 */\\n:is(.scrollbar___hLToV:hover,.scrollbar___hLToV[data-force-show]) .scrollbarPoper___XK5Rk,:is(.scrollbar___hLToV:hover,.scrollbar___hLToV[data-force-show]) .scrollbarSlider___r1fWf,:is(.scrollbar___hLToV:hover,.scrollbar___hLToV[data-force-show])::before {\\n    opacity: 1;\\n  }\\n\\n/* 拖动滚动条时取消移动过渡动画，确保跟手 */\\n.scrollbar___hLToV[data-drag]::before,.scrollbar___hLToV[data-drag] .scrollbarPoper___XK5Rk,.scrollbar___hLToV[data-drag] .scrollbarSlider___r1fWf {\\n    transition: opacity 150ms;\\n  }\\n\\n/* 实现自动隐藏 */\\n.scrollbar___hLToV[data-auto-hidden]:not([data-force-show]) .scrollbarSlider___r1fWf {\\n    opacity: 0;\\n  }\\n.scrollbar___hLToV[data-auto-hidden]:not([data-force-show]):hover .scrollbarSlider___r1fWf {\\n    opacity: 1;\\n  }\\n\\n/*\\n * 滚动条位置\\n */\\n\\n.scrollbar___hLToV[data-position='hidden'] {\\n  display: none;\\n}\\n\\n.scrollbar___hLToV[data-position='top'] {\\n  top: 1px;\\n\\n  /* 扩大触发范围 */\\n  border-bottom: max(6vh, 1em) solid transparent;\\n}\\n\\n.scrollbar___hLToV[data-position='top']::before {\\n    top: 1.2em;\\n    right: 0;\\n    transform: translate(var(--arrow-x), -120%);\\n    border-bottom: 0.5em solid #303030;\\n  }\\n\\n.scrollbar___hLToV[data-position='top'] .scrollbarPoper___XK5Rk {\\n    top: 1.2em;\\n  }\\n\\n.scrollbar___hLToV[data-position='bottom'] {\\n  top: unset;\\n  bottom: 1px;\\n\\n  /* 扩大触发范围 */\\n  border-top: max(6vh, 1em) solid transparent;\\n}\\n\\n.scrollbar___hLToV[data-position='bottom']::before {\\n    right: 0;\\n    bottom: 1.2em;\\n    transform: translate(var(--arrow-x), 120%);\\n    border-top: 0.5em solid #303030;\\n  }\\n\\n.scrollbar___hLToV[data-position='bottom'] .scrollbarPoper___XK5Rk {\\n    bottom: 1.2em;\\n  }\\n\\n.scrollbar___hLToV[data-position='top'],\\n.scrollbar___hLToV[data-position='bottom'] {\\n  --arrow-x: calc(var(--arrow-y) * -1 + 50%);\\n\\n  right: 1%;\\n\\n  flex-direction: row-reverse;\\n\\n  width: 98%;\\n  height: 5px;\\n  border-left: none;\\n}\\n\\n:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom'])::before {\\n    border-left: 0.4em solid transparent;\\n  }\\n\\n/* stylelint-disable-next-line no-descending-specificity */\\n\\n:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom']) .scrollbarSlider___r1fWf {\\n    transform: translateX(calc(var(--slider-top) * -1));\\n    width: var(--slider-height);\\n    height: 100%;\\n  }\\n\\n:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom']) .scrollbarPoper___XK5Rk {\\n    right: unset;\\n    transform: translateX(calc(var(--poper-top) * -1));\\n    padding: 0.1em 0.3em;\\n  }\\n\\n[data-dir='ltr']:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom']) {\\n    --arrow-x: calc(var(--arrow-y) - 50%);\\n\\n    flex-direction: row;\\n  }\\n\\n[data-dir='ltr']:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom'])::before {\\n      right: unset;\\n      left: 0;\\n    }\\n\\n/* stylelint-disable-next-line no-descending-specificity */\\n\\n[data-dir='ltr']:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom']) .scrollbarSlider___r1fWf {\\n      transform: translateX(var(--top));\\n    }\\n\\n[data-dir='ltr']:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom']) .scrollbarPoper___XK5Rk {\\n      transform: translateX(var(--poper-top));\\n    }\\n\\n/* 将 scaleY 改成 scaleX */\\n\\n:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom']) .scrollbarPage___qghUs {\\n    transform: scaleX(1);\\n  }\\n\\n[data-type='loaded']:is(:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom']) .scrollbarPage___qghUs) {\\n      transform: scaleX(0);\\n    }\\n\\n[data-translation-type]:is(:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom']) .scrollbarPage___qghUs) {\\n      transform: scaleX(1);\\n    }\\n\\n/* stylelint-disable-next-line no-descending-specificity */\\n\\n.scrollbar___hLToV[data-is-abreast-mode] .scrollbarPoper___XK5Rk {\\n    writing-mode: vertical-rl;\\n    line-height: 1.5em;\\n    text-orientation: upright;\\n  }\\n\\n.scrollbar___hLToV[data-is-abreast-mode][data-dir='ltr'] .scrollbarPoper___XK5Rk {\\n    writing-mode: vertical-lr;\\n  }\\n\\n/* 卷轴模式下取消滚动条的位移动画 */\\n.root___Hf5H2[data-scroll-mode] .scrollbar___hLToV::before,\\n.root___Hf5H2[data-scroll-mode] :is(.scrollbarSlider___r1fWf, .scrollbarPoper___XK5Rk) {\\n  transition: opacity 150ms;\\n}\\n\\n/* 移动端下禁用悬浮显示 */\\n:is(.root___Hf5H2[data-mobile] .scrollbar___hLToV:hover)::before,:is(.root___Hf5H2[data-mobile] .scrollbar___hLToV:hover) .scrollbarPoper___XK5Rk {\\n      opacity: 0;\\n    }\\n.touchAreaRoot___UN-W1 {\\n  pointer-events: none;\\n  -webkit-user-select: none;\\n          user-select: none;\\n\\n  position: absolute;\\n  top: 0;\\n\\n  display: grid;\\n  grid-template-columns: 1fr min(30%, 10em) 1fr;\\n  grid-template-rows: 1fr min(20%, 10em) 1fr;\\n\\n  width: 100%;\\n  height: 100%;\\n\\n  font-size: 3em;\\n  color: white;\\n  letter-spacing: 0.5em;\\n\\n  opacity: 0;\\n\\n  transition: opacity 400ms;\\n}\\n.touchAreaRoot___UN-W1[data-show] {\\n    opacity: 1;\\n  }\\n.touchAreaRoot___UN-W1 .touchArea___F6Hkh {\\n    display: flex;\\n    align-items: center;\\n    justify-content: center;\\n    text-align: center;\\n  }\\n[data-area='prev']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh),[data-area='PREV']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh) {\\n      background-color: #95e1d3e6;\\n    }\\n[data-area='menu']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh),[data-area='MENU']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh) {\\n      background-color: #fce38ae6;\\n    }\\n[data-area='next']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh),[data-area='NEXT']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh) {\\n      background-color: #f38181e6;\\n    }\\n[data-area='PREV']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh)::after {\\n      content: var(--i18n-touch-area-prev);\\n    }\\n[data-area='MENU']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh)::after {\\n      content: var(--i18n-touch-area-menu);\\n    }\\n[data-area='NEXT']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh)::after {\\n      content: var(--i18n-touch-area-next);\\n    }\\n.touchAreaRoot___UN-W1[data-vert='true'] {\\n    flex-direction: column !important;\\n  }\\n.touchAreaRoot___UN-W1:not([data-turn-page]) .touchArea___F6Hkh[data-area='next'],.touchAreaRoot___UN-W1:not([data-turn-page]) .touchArea___F6Hkh[data-area='NEXT'],.touchAreaRoot___UN-W1:not([data-turn-page]) .touchArea___F6Hkh[data-area='prev'],.touchAreaRoot___UN-W1:not([data-turn-page]) .touchArea___F6Hkh[data-area='PREV'] {\\n      visibility: hidden;\\n    }\\n.touchAreaRoot___UN-W1[data-shrink-menu] {\\n    grid-template-columns: 1fr 2em 1fr;\\n  }\\n.touchAreaRoot___UN-W1[data-shrink-menu] .touchArea___F6Hkh[data-area='MENU'] {\\n      letter-spacing: 0;\\n    }\\n\\n.root___Hf5H2[data-mobile] .touchAreaRoot___UN-W1 {\\n    flex-direction: column !important;\\n    letter-spacing: 0;\\n  }\\n\\n.root___Hf5H2[data-mobile] [data-area]::after {\\n    font-size: 0.8em;\\n  }\\n\\n.loadingMask___jIxGF {\\n  position: absolute;\\n  z-index: 20;\\n  inset: 0;\\n\\n  display: flex;\\n  align-items: center;\\n  justify-content: center;\\n\\n  color: var(--text);\\n\\n  background-color: var(--bg);\\n\\n  animation: loadingMaskFadeIn___abNXH 300ms;\\n}\\n\\n.loadingMask___jIxGF p {\\n    font-size: 1.5em;\\n    opacity: 0.8;\\n  }\\n\\n@keyframes loadingMaskFadeIn___abNXH {\\n  from {\\n    opacity: 0;\\n  }\\n}\\n\\n.root___Hf5H2 {\\n  position: relative;\\n\\n  overflow: hidden;\\n\\n  width: 100%;\\n  height: 100%;\\n\\n  font-size: 1em;\\n\\n  background-color: var(--bg);\\n  outline: 0;\\n}\\n\\n.root___Hf5H2 a {\\n    color: var(--text-secondary);\\n  }\\n\\n.root___Hf5H2[data-mobile] {\\n    font-size: 0.8em;\\n  }\\n\\n.hidden___rxU-6 {\\n  display: none !important;\\n}\\n\\n.invisible___cO-hs {\\n  visibility: hidden !important;\\n}\\n\\n.beautifyScrollbar___lb6kJ {\\n  /* 火狐的滚动条样式 */\\n  scrollbar-color: var(--scrollbar-slider) transparent;\\n  scrollbar-width: thin;\\n\\n  /* chrome 的滚动条样式 */\\n}\\n\\n.beautifyScrollbar___lb6kJ::-webkit-scrollbar {\\n    width: 5px;\\n    height: 10px;\\n  }\\n\\n.beautifyScrollbar___lb6kJ::-webkit-scrollbar-track {\\n    background: transparent;\\n  }\\n\\n.beautifyScrollbar___lb6kJ::-webkit-scrollbar-thumb {\\n    background: var(--scrollbar-slider);\\n  }\\n\\np,\\nimg {\\n  margin: 0;\\n}\\n\\n:where(div, div:focus, div:focus-within, div:focus-visible, button) {\\n  border: none;\\n  outline: none;\\n}\\n\\nblockquote {\\n  margin: 0.5em 0;\\n  padding: 0;\\n  padding-left: 1em;\\n  border-left: 0.25em solid var(--text-secondary, #607d8b);\\n\\n  font-size: 0.9em;\\n  font-style: italic;\\n  line-height: 1.2em;\\n  color: var(--text-secondary);\\n  text-align: start;\\n  overflow-wrap: anywhere;\\n  white-space: pre-wrap;\\n}\\n\\nsvg {\\n  width: 1em;\\n}\\n";
+var index_module_default = ".img___7ajV4 img {\\n  display: block;\\n\\n  width: 100%;\\n  height: 100%;\\n\\n  object-fit: contain;\\n  filter: var(--img-filter, none);\\n}\\n\\n.img___7ajV4 {\\n  position: relative;\\n\\n  align-content: center;\\n\\n  width: 100%;\\n  height: 100%;\\n  margin-right: auto;\\n  margin-left: auto;\\n}\\n\\n.img___7ajV4 > picture {\\n    position: absolute;\\n    inset: 0;\\n\\n    width: auto;\\n    max-width: 100%;\\n    height: auto;\\n    max-height: 100%;\\n    margin-top: auto;\\n    margin-right: inherit;\\n    margin-bottom: auto;\\n    margin-left: inherit;\\n  }\\n\\n.img___7ajV4 > picture,.img___7ajV4 > picture::after {\\n    background-color: var(--hover-bg-color, #fff3);\\n    background-image: var(--md-photo);\\n    background-repeat: no-repeat;\\n    background-position: center;\\n    background-size: 30%;\\n  }\\n\\n/* 已加载完毕的图片不显示灰色背景和图标 */\\n\\n.img___7ajV4:not([data-load-type]) > picture,.img___7ajV4:not([data-load-type]) > picture::after {\\n    background: none;\\n  }\\n\\n/* 遮住默认的出错图片标识 */\\n\\n.img___7ajV4[data-load-type='error'] > picture::after {\\n    pointer-events: none;\\n    content: '';\\n\\n    position: absolute;\\n    top: 0;\\n    right: 0;\\n\\n    width: 100%;\\n    height: 100%;\\n\\n    background-color: #eee;\\n    background-image: var(--md-image-not-supported);\\n  }\\n\\n.img___7ajV4[data-load-type='loading'] > picture {\\n    background-image: var(--md-cloud-download);\\n\\n    /* 加载中的图片先隐藏一下，避免出错图片的元素被直接显示出来 */\\n  }\\n\\n:is(.img___7ajV4[data-load-type='loading'] > picture) img {\\n      animation: show___HzwUa 100ms forwards;\\n    }\\n\\n.img___7ajV4[data-load-type='error'] > picture {\\n    cursor: pointer;\\n  }\\n\\n.mangaFlow___jMZgq[dir='ltr'] .img___7ajV4[data-show='1'],\\n.mangaFlow___jMZgq[dir='rtl'] .img___7ajV4[data-show='0'] {\\n  margin-right: auto;\\n  margin-left: 0;\\n}\\n\\n.mangaFlow___jMZgq[dir='ltr'] .img___7ajV4[data-show='0'],\\n.mangaFlow___jMZgq[dir='rtl'] .img___7ajV4[data-show='1'] {\\n  margin-right: 0;\\n  margin-left: auto;\\n}\\n\\n.mangaFlow___jMZgq {\\n  touch-action: none;\\n  will-change: left, top;\\n  -webkit-user-select: none;\\n          user-select: none;\\n\\n  position: absolute;\\n  transform-origin: 0 0;\\n\\n  contain: layout;\\n  overflow: visible;\\n  display: grid;\\n  grid-auto-columns: 100%;\\n  grid-auto-flow: column;\\n  grid-auto-rows: 100%;\\n  row-gap: 0;\\n  place-items: center;\\n\\n  width: 100%;\\n  height: 100%;\\n\\n  color: var(--text);\\n\\n  backface-visibility: hidden;\\n}\\n\\n.mangaFlow___jMZgq[data-disable-zoom] .img___7ajV4 > picture {\\n    width: fit-content;\\n    height: fit-content;\\n  }\\n\\n.mangaFlow___jMZgq[data-hidden-mouse='true'] {\\n    cursor: none;\\n  }\\n\\n.mangaFlow___jMZgq[data-vertical] {\\n    grid-auto-flow: row;\\n  }\\n\\n.mangaBox___48Jek {\\n  transform-origin: 0 0;\\n\\n  contain: layout style;\\n\\n  width: 100%;\\n  height: 100%;\\n\\n  transition-duration: 0ms;\\n}\\n\\n.mangaBox___48Jek[data-animation='page'] .mangaFlow___jMZgq,.mangaBox___48Jek[data-animation='zoom'] {\\n    transition-duration: 300ms;\\n  }\\n\\n.root___Hf5H2 .mangaBox___48Jek {\\n  /* 隐藏滚动条但不影响滚动 */\\n  scrollbar-width: none;\\n\\n  /* 隐藏滚动条但不影响滚动 */\\n}\\n\\n:is(.root___Hf5H2 .mangaBox___48Jek)::-webkit-scrollbar {\\n    display: none;\\n  }\\n\\n.root___Hf5H2[data-scroll-mode] .mangaBox___48Jek {\\n  overflow: auto;\\n}\\n\\n:is(.root___Hf5H2[data-scroll-mode] .mangaBox___48Jek) .mangaFlow___jMZgq {\\n    touch-action: pan-y;\\n    row-gap: calc(var(--scroll-mode-spacing) * 7px);\\n    height: fit-content;\\n  }\\n\\n[data-abreast-scroll]:is(.root___Hf5H2[data-scroll-mode] .mangaBox___48Jek) {\\n    touch-action: none;\\n    overflow: hidden;\\n  }\\n\\n[data-abreast-scroll]:is(.root___Hf5H2[data-scroll-mode] .mangaBox___48Jek) .mangaFlow___jMZgq {\\n      column-gap: calc(var(--scroll-mode-spacing) * 7px);\\n      align-items: start;\\n      height: 100%;\\n    }\\n\\n:is([data-abreast-scroll]:is(.root___Hf5H2[data-scroll-mode] .mangaBox___48Jek) .mangaFlow___jMZgq) .img___7ajV4 {\\n        width: 100%;\\n        height: auto;\\n      }\\n\\n[data-show]:is(:is([data-abreast-scroll]:is(.root___Hf5H2[data-scroll-mode] .mangaBox___48Jek) .mangaFlow___jMZgq) .img___7ajV4) {\\n          will-change: transform;\\n        }\\n\\n:is(:is([data-abreast-scroll]:is(.root___Hf5H2[data-scroll-mode] .mangaBox___48Jek) .mangaFlow___jMZgq) .img___7ajV4) > picture {\\n          position: relative;\\n        }\\n\\n.pageTip___P7thU {\\n  pointer-events: none;\\n\\n  position: absolute;\\n  z-index: 1;\\n  right: 0.4em;\\n  bottom: 0.4em;\\n\\n  padding: 0.1em 0.4em;\\n  border-radius: 0.25em;\\n\\n  font-size: 1.5em;\\n  line-height: 1.5;\\n  color: var(--text);\\n\\n  opacity: 0;\\n  background-color: color-mix(in srgb, var(--text-bg) 80%, transparent);\\n\\n  transition: opacity 150ms;\\n}\\n\\n.root___Hf5H2[data-page-tip] .pageTip___P7thU {\\n  opacity: 1;\\n}\\n\\n@keyframes show___HzwUa {\\n  0% {\\n    opacity: 0;\\n  }\\n\\n  90% {\\n    opacity: 0;\\n  }\\n\\n  100% {\\n    opacity: 1;\\n  }\\n}\\n\\n.endPage___iOZmk,\\n.endPageBody___g-dz- {\\n  z-index: 10;\\n\\n  display: flex;\\n  align-items: center;\\n  justify-content: center;\\n\\n  width: 100%;\\n  height: 100%;\\n}\\n\\n.endPage___iOZmk {\\n  pointer-events: none;\\n\\n  position: absolute;\\n  top: 0;\\n  left: 0;\\n\\n  color: white;\\n\\n  opacity: 0;\\n  background-color: #333d;\\n\\n  transition: opacity 500ms;\\n}\\n\\n.endPage___iOZmk[data-show] {\\n    pointer-events: all;\\n    opacity: 1;\\n  }\\n\\n.endPage___iOZmk[data-type='start'] .tip___fyxqg {\\n    transform: translateY(-10em);\\n  }\\n\\n.endPage___iOZmk[data-type='end'] .tip___fyxqg {\\n    transform: translateY(10em);\\n  }\\n\\n.endPage___iOZmk .endPageBody___g-dz- {\\n    transform: translate(0, var(--drag-y, 0));\\n    transition: transform 200ms;\\n  }\\n\\n:is(.endPage___iOZmk .endPageBody___g-dz-) button {\\n      cursor: pointer;\\n\\n      transform-origin: center;\\n\\n      font-size: 1.2em;\\n      color: inherit;\\n\\n      background-color: transparent;\\n\\n      animation: jello___wXBLg 0.3s forwards;\\n    }\\n\\n[data-is-end]:is(:is(.endPage___iOZmk .endPageBody___g-dz-) button) {\\n        margin: 2em;\\n        font-size: 3em;\\n      }\\n\\n:is(.endPage___iOZmk .endPageBody___g-dz-) .tip___fyxqg {\\n      position: absolute;\\n      margin: auto;\\n    }\\n\\n.endPage___iOZmk[data-drag] .endPageBody___g-dz- {\\n    transition: transform 00ms;\\n  }\\n\\n.root___Hf5H2[data-mobile] .endPage___iOZmk > button {\\n  width: 1em;\\n}\\n\\n.comments___9ITQv {\\n  position: absolute;\\n  right: 1em;\\n\\n  overflow: auto;\\n  display: flex;\\n  flex-direction: column;\\n  align-items: flex-end;\\n\\n  width: 20em;\\n  max-height: 80%;\\n  padding-right: 0.5em;\\n\\n  opacity: 0.3;\\n}\\n\\n.comments___9ITQv > p {\\n    margin: 0.5em 0.1em;\\n    padding: 0.2em 0.5em;\\n    border-radius: 0.5em;\\n    background-color: #333b;\\n  }\\n\\n.comments___9ITQv:hover {\\n    opacity: 1;\\n  }\\n\\n.root___Hf5H2[data-mobile] .comments___9ITQv {\\n  bottom: 0;\\n  max-height: 15em;\\n  opacity: 0.8;\\n}\\n\\n@keyframes jello___wXBLg {\\n  0%,\\n  11.1%,\\n  100% {\\n    transform: translate3d(0, 0, 0);\\n  }\\n\\n  22.2% {\\n    transform: skewX(-12.5deg) skewY(-12.5deg);\\n  }\\n\\n  33.3% {\\n    transform: skewX(6.25deg) skewY(6.25deg);\\n  }\\n\\n  44.4% {\\n    transform: skewX(-3.125deg) skewY(-3.125deg);\\n  }\\n\\n  55.5% {\\n    transform: skewX(1.5625deg) skewY(1.5625deg);\\n  }\\n\\n  66.6% {\\n    transform: skewX(-0.7812deg) skewY(-0.7812deg);\\n  }\\n\\n  77.7% {\\n    transform: skewX(0.3906deg) skewY(0.3906deg);\\n  }\\n\\n  88.8% {\\n    transform: skewX(-0.1953deg) skewY(-0.1953deg);\\n  }\\n}\\n\\n.toolbar___RMjHL {\\n  position: fixed;\\n  z-index: 9;\\n  top: 0;\\n\\n  display: flex;\\n  align-items: center;\\n  justify-content: flex-start;\\n\\n  height: 100%;\\n}\\n\\n/* 工具栏面板 */\\n.toolbarPanel___XYjgc {\\n  position: relative;\\n  transform: translateX(-100%);\\n\\n  display: flex;\\n  flex-direction: column;\\n\\n  padding: 0.5em;\\n\\n  transition: transform 200ms;\\n}\\n.toolbarPanel___XYjgc > hr {\\n    height: 1em;\\n    margin: 0;\\n    border: none;\\n    visibility: hidden;\\n  }\\n\\n:is(.toolbar___RMjHL[data-show], .toolbar___RMjHL:hover) .toolbarPanel___XYjgc {\\n  transform: none;\\n}\\n\\n.toolbarBg___i4oTA {\\n  position: absolute;\\n  top: 0;\\n  right: 0;\\n\\n  width: 100%;\\n  height: 100%;\\n  border-top-right-radius: 1em;\\n  border-bottom-right-radius: 1em;\\n\\n  background-color: var(--page-bg);\\n  filter: opacity(0.8);\\n}\\n\\n/* 移动端优化 */\\n/* 调大样式 */\\n.root___Hf5H2[data-mobile] .toolbar___RMjHL {\\n    font-size: 1.3em;\\n  }\\n/* 只能通过点击中心来唤出工具栏，防止误触 */\\n.root___Hf5H2[data-mobile] .toolbar___RMjHL:not([data-show]) {\\n    pointer-events: none;\\n  }\\n/* 减少背景的透明度，方便辨识 */\\n.root___Hf5H2[data-mobile] .toolbarBg___i4oTA {\\n    filter: opacity(0.8);\\n  }\\n/* 设置面板所在的悬浮框样式 */\\n.SettingPanelPopper___uEBz3 {\\n  pointer-events: unset !important;\\n  transform: none !important;\\n  height: 0 !important;\\n  padding: 0 !important;\\n}\\n\\n.SettingPanel___ZRvFB {\\n  -webkit-user-select: text;\\n          user-select: text;\\n\\n  position: fixed;\\n  z-index: 1;\\n  top: 0;\\n  bottom: 0;\\n\\n  overflow: auto;\\n\\n  max-width: calc(100% - 5em);\\n  height: fit-content;\\n  max-height: 95%;\\n  margin: auto;\\n  border-radius: 0.3em;\\n\\n  font-size: 1.2em;\\n  color: var(--text);\\n\\n  background-color: var(--page-bg);\\n  box-shadow:\\n    rgb(0 0 0 / 20%) 0 3px 1px -2px,\\n    rgb(0 0 0 / 14%) 0 2px 2px 0,\\n    rgb(0 0 0 / 12%) 0 1px 5px 0;\\n}\\n\\n.SettingPanel___ZRvFB hr {\\n    margin: 0.5em 0;\\n    color: white;\\n  }\\n\\n.SettingPanel___ZRvFB > hr {\\n    margin: 0;\\n  }\\n\\n.SettingBlock___qxNyt {\\n  display: grid;\\n  grid-template-rows: max-content 1fr;\\n  transition: grid-template-rows 200ms ease-out;\\n}\\n\\n.SettingBlock___qxNyt .SettingBlockBody___Wirnd {\\n    z-index: 0;\\n    overflow: hidden;\\n    padding: 0 0.5em;\\n    padding-bottom: 1em;\\n  }\\n\\n:is(.SettingBlock___qxNyt .SettingBlockBody___Wirnd) > div + :is(.SettingBlock___qxNyt .SettingBlockBody___Wirnd) > div {\\n      margin-top: 1em;\\n    }\\n\\n:is(.SettingBlock___qxNyt .SettingBlockBody___Wirnd) input,:is(.SettingBlock___qxNyt .SettingBlockBody___Wirnd) textarea {\\n      width: 97%;\\n      margin-top: 0.3em;\\n    }\\n\\n.SettingBlock___qxNyt[data-show='false'] {\\n    grid-template-rows: max-content 0fr;\\n    padding-bottom: unset;\\n  }\\n\\n.SettingBlock___qxNyt[data-show='false'] .SettingBlockBody___Wirnd {\\n      padding: unset;\\n    }\\n\\n.SettingBlockSubtitle___cv0Ji {\\n  cursor: pointer;\\n\\n  position: sticky;\\n  z-index: 1;\\n  top: 0;\\n\\n  height: 3em;\\n  margin-bottom: 0.1em;\\n\\n  font-size: 0.7em;\\n  line-height: 3em;\\n  color: var(--text-secondary);\\n  text-align: center;\\n\\n  background-color: var(--page-bg);\\n}\\n\\n.SettingBlockBody___Wirnd .SettingBlockSubtitle___cv0Ji {\\n  position: unset;\\n  height: 1em;\\n  line-height: 1em;\\n}\\n\\n.SettingsItem___aJhRD {\\n  position: relative;\\n  display: flex;\\n  align-items: center;\\n  justify-content: space-between;\\n}\\n\\n:is(.SettingsItem___aJhRD,.SettingsShowItem___l-D2E) + .SettingsItem___aJhRD {\\n    margin-top: 1em;\\n  }\\n\\n.SettingsItem___aJhRD[data-disabled] {\\n    opacity: 0.5;\\n  }\\n\\n.SettingsItem___aJhRD[data-disabled] button {\\n      cursor: not-allowed;\\n    }\\n\\n.SettingsItemName___UP6zJ {\\n  max-width: calc(100% - 4em);\\n\\n  font-size: 0.9em;\\n  text-align: start;\\n  overflow-wrap: anywhere;\\n  white-space: pre-wrap;\\n}\\n\\n/* 开关式设置项 */\\n.SettingsItemSwitch___LVGr9 {\\n  cursor: pointer;\\n\\n  display: inline-flex;\\n  align-items: center;\\n\\n  width: 2.3em;\\n  height: 0.8em;\\n  margin: 0.3em;\\n  padding: 0;\\n  border: 0;\\n  border-radius: 1em;\\n\\n  background-color: var(--switch-bg);\\n}\\n\\n/* 开关里的圆形按钮 */\\n.SettingsItemSwitchRound___Ds0B8 {\\n  transform: translateX(-10%);\\n\\n  width: 1.15em;\\n  height: 1.15em;\\n  border-radius: 100%;\\n\\n  background: var(--switch);\\n  box-shadow:\\n    0 2px 1px -1px rgb(0 0 0 / 20%),\\n    0 1px 1px 0 rgb(0 0 0 / 14%),\\n    0 1px 3px 0 rgb(0 0 0 / 12%);\\n\\n  transition: transform 100ms;\\n}\\n\\n.SettingsItemSwitch___LVGr9[data-checked='true'] {\\n  background: var(--secondary-bg);\\n}\\n\\n.SettingsItemSwitch___LVGr9[data-checked='true'] .SettingsItemSwitchRound___Ds0B8 {\\n    transform: translateX(110%);\\n    background: var(--secondary);\\n  }\\n\\n/* 图标按钮式设置项 */\\n.SettingsItemIconButton___Cs7BQ {\\n  cursor: pointer;\\n\\n  position: absolute;\\n  right: 0;\\n\\n  height: 1em;\\n  border: none;\\n\\n  font-size: 1.5em;\\n  color: var(--text);\\n\\n  background-color: transparent;\\n}\\n\\n/* 选择器设置项 */\\n.SettingsItemSelect___CvFKx {\\n  cursor: pointer;\\n\\n  max-width: 6.5em;\\n  margin: 0;\\n  padding: 0.3em;\\n  border: none;\\n  border-radius: 5px;\\n\\n  font-size: 0.9em;\\n  color: var(--text);\\n\\n  background-color: var(--hover-bg-color);\\n  outline: none;\\n}\\n.SettingsItemSelect___CvFKx::picker(select) {\\n    color: var(--text);\\n    background-color: var(--page-bg);\\n  }\\n.SettingsItemSelect___CvFKx option {\\n    color: var(--text);\\n    background-color: var(--page-bg);\\n  }\\n\\n/* 关闭设置弹窗的遮罩 */\\n.closeCover___qLIp5 {\\n  position: fixed;\\n  top: 0;\\n  left: 0;\\n\\n  width: 100%;\\n  height: 100%;\\n}\\n\\n.SettingsShowItem___l-D2E {\\n  display: grid;\\n  transition: grid-template-rows 200ms ease-out;\\n}\\n\\n.SettingsShowItem___l-D2E > .SettingsShowItemBody___bgxxq {\\n    overflow: hidden;\\n    display: flex;\\n    flex-direction: column;\\n  }\\n\\n:is(.SettingsShowItem___l-D2E > .SettingsShowItemBody___bgxxq) > .SettingsItem___aJhRD {\\n      margin-top: 1em;\\n    }\\n\\n:is(.SettingsShowItem___l-D2E > .SettingsShowItemBody___bgxxq) > :is(textarea,input) {\\n      margin: 0.4em 0.2em 0;\\n      line-height: 1.2;\\n    }\\n\\n[data-only-number] {\\n  padding: 0 0.2em;\\n}\\n\\n[data-only-number] + span {\\n    margin-left: -0.1em;\\n  }\\n\\n.hotkeys___uu-Xe {\\n  position: relative;\\n  z-index: 1;\\n\\n  display: flex;\\n  flex-grow: 1;\\n  flex-wrap: wrap;\\n  align-items: center;\\n\\n  padding: 0.2em;\\n  padding-top: 2em;\\n  border-bottom: 1px solid var(--secondary-bg);\\n\\n  font-size: 0.9em;\\n  color: var(--text);\\n}\\n\\n.hotkeys___uu-Xe + .hotkeys___uu-Xe {\\n    margin-top: 0.5em;\\n  }\\n\\n.hotkeys___uu-Xe:last-child {\\n    border-bottom: none;\\n  }\\n\\n.hotkeysItem___d9IKS {\\n  cursor: pointer;\\n\\n  display: flex;\\n  align-items: center;\\n\\n  box-sizing: content-box;\\n  height: 1em;\\n  margin: 0.3em;\\n  padding: 0.2em 1.2em;\\n  border-radius: 0.3em;\\n\\n  font-family: serif;\\n\\n  outline: 1px solid;\\n  outline-color: var(--secondary-bg);\\n}\\n\\n.hotkeysItem___d9IKS > svg {\\n    display: none;\\n\\n    height: 1em;\\n    margin-left: 0.4em;\\n    border-radius: 1em;\\n\\n    color: var(--page-bg);\\n\\n    opacity: 0.5;\\n    background-color: var(--text);\\n  }\\n\\n:is(.hotkeysItem___d9IKS > svg):hover {\\n      opacity: 0.9;\\n    }\\n\\n.hotkeysItem___d9IKS:hover {\\n    padding: 0.2em 0.5em;\\n  }\\n\\n.hotkeysItem___d9IKS:hover > svg {\\n      display: unset;\\n    }\\n\\n.hotkeysItem___d9IKS:focus,.hotkeysItem___d9IKS:focus-visible {\\n    outline: var(--text) solid 2px;\\n  }\\n\\n.hotkeysHeader___jU7vr {\\n  position: absolute;\\n  top: 0;\\n  left: 0;\\n\\n  display: flex;\\n  align-items: center;\\n\\n  box-sizing: border-box;\\n  width: 100%;\\n  padding: 0 0.5em;\\n}\\n\\n.hotkeysHeader___jU7vr > p {\\n    line-height: 1em;\\n    text-align: start;\\n    overflow-wrap: anywhere;\\n    white-space: pre-wrap;\\n\\n    background-color: var(--page-bg);\\n  }\\n\\n.hotkeysHeader___jU7vr > div[title] {\\n    cursor: pointer;\\n\\n    transform: scale(0);\\n\\n    display: flex;\\n\\n    background-color: var(--page-bg);\\n\\n    transition: transform 100ms;\\n  }\\n\\n:is(.hotkeysHeader___jU7vr > div[title]) > svg {\\n      width: 1.6em;\\n    }\\n\\n.hotkeys___uu-Xe:hover div[title] {\\n  transform: scale(1);\\n}\\n\\n.scrollbar___hLToV {\\n  --arrow-y: clamp(\\n    0.45em,\\n    calc(var(--slider-midpoint)),\\n    calc(var(--scroll-length) - 0.45em)\\n  );\\n\\n  touch-action: none;\\n  -webkit-user-select: none;\\n          user-select: none;\\n\\n  position: absolute;\\n  z-index: 9;\\n  top: 1%;\\n  right: 3px;\\n\\n  display: flex;\\n  flex-direction: column;\\n\\n  width: 5px;\\n  height: 98%;\\n\\n  /* 扩大触发范围 */\\n  border-left: max(6vw, 1em) solid transparent;\\n}\\n\\n.scrollbar___hLToV > div {\\n    pointer-events: none;\\n\\n    display: flex;\\n    flex-direction: column;\\n    flex-grow: 1;\\n    align-items: center;\\n    justify-content: center;\\n  }\\n\\n.scrollbarPage___qghUs {\\n  transform-origin: bottom;\\n  transform: scaleY(1);\\n\\n  flex-grow: 1;\\n\\n  width: 100%;\\n  height: 100%;\\n\\n  background-color: var(--secondary);\\n\\n  transition: transform 1s;\\n}\\n\\n.scrollbarPage___qghUs[data-type='loaded'] {\\n    transform: scaleY(0);\\n  }\\n\\n.scrollbarPage___qghUs[data-upscale] {\\n    transform: scaleY(1);\\n    background-color: #b39ddb;\\n  }\\n\\n.scrollbarPage___qghUs[data-upscale='loading'] {\\n    background-color: #d1c4e9;\\n  }\\n\\n.scrollbarPage___qghUs[data-translation-type] {\\n    transform-origin: top;\\n    transform: scaleY(1);\\n    background-color: transparent;\\n  }\\n\\n.scrollbarPage___qghUs[data-translation-type='wait'] {\\n    background-color: #81c784;\\n  }\\n\\n.scrollbarPage___qghUs[data-translation-type='show'] {\\n    background-color: #4caf50;\\n  }\\n\\n.scrollbarPage___qghUs[data-translation-type='error'] {\\n    background-color: #f005;\\n  }\\n\\n.scrollbarPage___qghUs[data-type='wait'] {\\n    opacity: 0.4;\\n  }\\n\\n.scrollbarPage___qghUs[data-type='error'] {\\n    background-color: #f005;\\n  }\\n\\n/* 滚动条滑块 */\\n.scrollbarSlider___r1fWf {\\n  position: absolute;\\n  z-index: 1;\\n  transform: translateY(var(--slider-top));\\n\\n  justify-content: center;\\n\\n  width: 100%;\\n  height: var(--slider-height);\\n  border-radius: 1em;\\n\\n  opacity: 1;\\n  background-color: #fff5;\\n\\n  transition:\\n    transform 150ms,\\n    opacity 150ms;\\n}\\n\\n/* 悬浮框 */\\n.scrollbarPoper___XK5Rk {\\n  --poper-top: clamp(\\n    0%,\\n    calc(var(--slider-midpoint) - 50%),\\n    calc(var(--scroll-length) - 100%)\\n  );\\n\\n  position: absolute;\\n  right: 2em;\\n  transform: translateY(var(--poper-top));\\n\\n  width: fit-content;\\n  min-width: 1em;\\n  min-height: 1.5em;\\n  padding: 0.2em 0.5em;\\n  border-radius: 0.3em;\\n\\n  font-size: 0.8em;\\n  line-height: 1.5em;\\n  color: white;\\n  text-align: center;\\n  white-space: pre;\\n\\n  background-color: #303030;\\n}\\n\\n/* 悬浮框箭头 */\\n.scrollbar___hLToV::before {\\n  content: '';\\n\\n  position: absolute;\\n  right: 2em;\\n  transform: translate(140%, calc(var(--arrow-y) - 50%));\\n\\n  border: 0.4em solid transparent;\\n  border-left: 0.5em solid #303030;\\n\\n  background-color: transparent;\\n}\\n\\n/*\\n * 滚动条部件的显隐\\n */\\n\\n/* 悬浮提示默认隐藏 */\\n.scrollbar___hLToV::before,\\n.scrollbarPoper___XK5Rk {\\n  opacity: 0;\\n  transition:\\n    opacity 150ms,\\n    transform 150ms;\\n}\\n\\n/* 控制滚动条悬浮提示的显示 */\\n:is(.scrollbar___hLToV:hover,.scrollbar___hLToV[data-force-show]) .scrollbarPoper___XK5Rk,:is(.scrollbar___hLToV:hover,.scrollbar___hLToV[data-force-show]) .scrollbarSlider___r1fWf,:is(.scrollbar___hLToV:hover,.scrollbar___hLToV[data-force-show])::before {\\n    opacity: 1;\\n  }\\n\\n/* 拖动滚动条时取消移动过渡动画，确保跟手 */\\n.scrollbar___hLToV[data-drag]::before,.scrollbar___hLToV[data-drag] .scrollbarPoper___XK5Rk,.scrollbar___hLToV[data-drag] .scrollbarSlider___r1fWf {\\n    transition: opacity 150ms;\\n  }\\n\\n/* 实现自动隐藏 */\\n.scrollbar___hLToV[data-auto-hidden]:not([data-force-show]) .scrollbarSlider___r1fWf {\\n    opacity: 0;\\n  }\\n.scrollbar___hLToV[data-auto-hidden]:not([data-force-show]):hover .scrollbarSlider___r1fWf {\\n    opacity: 1;\\n  }\\n\\n/*\\n * 滚动条位置\\n */\\n\\n.scrollbar___hLToV[data-position='hidden'] {\\n  display: none;\\n}\\n\\n.scrollbar___hLToV[data-position='top'] {\\n  top: 1px;\\n\\n  /* 扩大触发范围 */\\n  border-bottom: max(6vh, 1em) solid transparent;\\n}\\n\\n.scrollbar___hLToV[data-position='top']::before {\\n    top: 1.2em;\\n    right: 0;\\n    transform: translate(var(--arrow-x), -120%);\\n    border-bottom: 0.5em solid #303030;\\n  }\\n\\n.scrollbar___hLToV[data-position='top'] .scrollbarPoper___XK5Rk {\\n    top: 1.2em;\\n  }\\n\\n.scrollbar___hLToV[data-position='bottom'] {\\n  top: unset;\\n  bottom: 1px;\\n\\n  /* 扩大触发范围 */\\n  border-top: max(6vh, 1em) solid transparent;\\n}\\n\\n.scrollbar___hLToV[data-position='bottom']::before {\\n    right: 0;\\n    bottom: 1.2em;\\n    transform: translate(var(--arrow-x), 120%);\\n    border-top: 0.5em solid #303030;\\n  }\\n\\n.scrollbar___hLToV[data-position='bottom'] .scrollbarPoper___XK5Rk {\\n    bottom: 1.2em;\\n  }\\n\\n.scrollbar___hLToV[data-position='top'],\\n.scrollbar___hLToV[data-position='bottom'] {\\n  --arrow-x: calc(var(--arrow-y) * -1 + 50%);\\n\\n  right: 1%;\\n\\n  flex-direction: row-reverse;\\n\\n  width: 98%;\\n  height: 5px;\\n  border-left: none;\\n}\\n\\n:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom'])::before {\\n    border-left: 0.4em solid transparent;\\n  }\\n\\n/* stylelint-disable-next-line no-descending-specificity */\\n\\n:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom']) .scrollbarSlider___r1fWf {\\n    transform: translateX(calc(var(--slider-top) * -1));\\n    width: var(--slider-height);\\n    height: 100%;\\n  }\\n\\n:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom']) .scrollbarPoper___XK5Rk {\\n    right: unset;\\n    transform: translateX(calc(var(--poper-top) * -1));\\n    padding: 0.1em 0.3em;\\n  }\\n\\n[data-dir='ltr']:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom']) {\\n    --arrow-x: calc(var(--arrow-y) - 50%);\\n\\n    flex-direction: row;\\n  }\\n\\n[data-dir='ltr']:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom'])::before {\\n      right: unset;\\n      left: 0;\\n    }\\n\\n/* stylelint-disable-next-line no-descending-specificity */\\n\\n[data-dir='ltr']:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom']) .scrollbarSlider___r1fWf {\\n      transform: translateX(var(--top));\\n    }\\n\\n[data-dir='ltr']:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom']) .scrollbarPoper___XK5Rk {\\n      transform: translateX(var(--poper-top));\\n    }\\n\\n/* 将 scaleY 改成 scaleX */\\n\\n:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom']) .scrollbarPage___qghUs {\\n    transform: scaleX(1);\\n  }\\n\\n[data-type='loaded']:is(:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom']) .scrollbarPage___qghUs) {\\n      transform: scaleX(0);\\n    }\\n\\n[data-translation-type]:is(:is(.scrollbar___hLToV[data-position='top'],.scrollbar___hLToV[data-position='bottom']) .scrollbarPage___qghUs) {\\n      transform: scaleX(1);\\n    }\\n\\n/* stylelint-disable-next-line no-descending-specificity */\\n\\n.scrollbar___hLToV[data-is-abreast-mode] .scrollbarPoper___XK5Rk {\\n    writing-mode: vertical-rl;\\n    line-height: 1.5em;\\n    text-orientation: upright;\\n  }\\n\\n.scrollbar___hLToV[data-is-abreast-mode][data-dir='ltr'] .scrollbarPoper___XK5Rk {\\n    writing-mode: vertical-lr;\\n  }\\n\\n/* 卷轴模式下取消滚动条的位移动画 */\\n.root___Hf5H2[data-scroll-mode] .scrollbar___hLToV::before,\\n.root___Hf5H2[data-scroll-mode] :is(.scrollbarSlider___r1fWf, .scrollbarPoper___XK5Rk) {\\n  transition: opacity 150ms;\\n}\\n\\n/* 移动端下禁用悬浮显示 */\\n:is(.root___Hf5H2[data-mobile] .scrollbar___hLToV:hover)::before,:is(.root___Hf5H2[data-mobile] .scrollbar___hLToV:hover) .scrollbarPoper___XK5Rk {\\n      opacity: 0;\\n    }\\n.touchAreaRoot___UN-W1 {\\n  pointer-events: none;\\n  -webkit-user-select: none;\\n          user-select: none;\\n\\n  position: absolute;\\n  top: 0;\\n\\n  display: grid;\\n  grid-template-columns: 1fr min(30%, 10em) 1fr;\\n  grid-template-rows: 1fr min(20%, 10em) 1fr;\\n\\n  width: 100%;\\n  height: 100%;\\n\\n  font-size: 3em;\\n  color: white;\\n  letter-spacing: 0.5em;\\n\\n  opacity: 0;\\n\\n  transition: opacity 400ms;\\n}\\n.touchAreaRoot___UN-W1[data-show] {\\n    opacity: 1;\\n  }\\n.touchAreaRoot___UN-W1 .touchArea___F6Hkh {\\n    display: flex;\\n    align-items: center;\\n    justify-content: center;\\n    text-align: center;\\n  }\\n[data-area='prev']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh),[data-area='PREV']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh) {\\n      background-color: #95e1d3e6;\\n    }\\n[data-area='menu']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh),[data-area='MENU']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh) {\\n      background-color: #fce38ae6;\\n    }\\n[data-area='next']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh),[data-area='NEXT']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh) {\\n      background-color: #f38181e6;\\n    }\\n[data-area='PREV']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh)::after {\\n      content: var(--i18n-touch-area-prev);\\n    }\\n[data-area='MENU']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh)::after {\\n      content: var(--i18n-touch-area-menu);\\n    }\\n[data-area='NEXT']:is(.touchAreaRoot___UN-W1 .touchArea___F6Hkh)::after {\\n      content: var(--i18n-touch-area-next);\\n    }\\n.touchAreaRoot___UN-W1[data-vert='true'] {\\n    flex-direction: column !important;\\n  }\\n.touchAreaRoot___UN-W1:not([data-turn-page]) .touchArea___F6Hkh[data-area='next'],.touchAreaRoot___UN-W1:not([data-turn-page]) .touchArea___F6Hkh[data-area='NEXT'],.touchAreaRoot___UN-W1:not([data-turn-page]) .touchArea___F6Hkh[data-area='prev'],.touchAreaRoot___UN-W1:not([data-turn-page]) .touchArea___F6Hkh[data-area='PREV'] {\\n      visibility: hidden;\\n    }\\n.touchAreaRoot___UN-W1[data-shrink-menu] {\\n    grid-template-columns: 1fr 2em 1fr;\\n  }\\n.touchAreaRoot___UN-W1[data-shrink-menu] .touchArea___F6Hkh[data-area='MENU'] {\\n      letter-spacing: 0;\\n    }\\n\\n.root___Hf5H2[data-mobile] .touchAreaRoot___UN-W1 {\\n    flex-direction: column !important;\\n    letter-spacing: 0;\\n  }\\n\\n.root___Hf5H2[data-mobile] [data-area]::after {\\n    font-size: 0.8em;\\n  }\\n\\n.loadingMask___jIxGF {\\n  position: absolute;\\n  z-index: 20;\\n  inset: 0;\\n\\n  display: flex;\\n  align-items: center;\\n  justify-content: center;\\n\\n  color: var(--text);\\n\\n  background-color: var(--bg);\\n\\n  animation: loadingMaskFadeIn___abNXH 300ms;\\n}\\n\\n.loadingMask___jIxGF p {\\n    font-size: 1.5em;\\n    animation: loadingMaskBlink___O8MCV 1.5s infinite;\\n  }\\n\\n@keyframes loadingMaskFadeIn___abNXH {\\n  from {\\n    opacity: 0;\\n  }\\n}\\n\\n@keyframes loadingMaskBlink___O8MCV {\\n  0% {\\n    opacity: 0.2;\\n  }\\n\\n  50% {\\n    opacity: 0.9;\\n  }\\n\\n  100% {\\n    opacity: 0.2;\\n  }\\n}\\n\\n.root___Hf5H2 {\\n  position: relative;\\n\\n  overflow: hidden;\\n\\n  width: 100%;\\n  height: 100%;\\n\\n  font-size: 1em;\\n\\n  background-color: var(--bg);\\n  outline: 0;\\n}\\n\\n.root___Hf5H2 a {\\n    color: var(--text-secondary);\\n  }\\n\\n.root___Hf5H2[data-mobile] {\\n    font-size: 0.8em;\\n  }\\n\\n.hidden___rxU-6 {\\n  display: none !important;\\n}\\n\\n.invisible___cO-hs {\\n  visibility: hidden !important;\\n}\\n\\n.beautifyScrollbar___lb6kJ {\\n  /* 火狐的滚动条样式 */\\n  scrollbar-color: var(--scrollbar-slider) transparent;\\n  scrollbar-width: thin;\\n\\n  /* chrome 的滚动条样式 */\\n}\\n\\n.beautifyScrollbar___lb6kJ::-webkit-scrollbar {\\n    width: 5px;\\n    height: 10px;\\n  }\\n\\n.beautifyScrollbar___lb6kJ::-webkit-scrollbar-track {\\n    background: transparent;\\n  }\\n\\n.beautifyScrollbar___lb6kJ::-webkit-scrollbar-thumb {\\n    background: var(--scrollbar-slider);\\n  }\\n\\np,\\nimg {\\n  margin: 0;\\n}\\n\\n:where(div, div:focus, div:focus-within, div:focus-visible, button) {\\n  border: none;\\n  outline: none;\\n}\\n\\nblockquote {\\n  margin: 0.5em 0;\\n  padding: 0;\\n  padding-left: 1em;\\n  border-left: 0.25em solid var(--text-secondary, #607d8b);\\n\\n  font-size: 0.9em;\\n  font-style: italic;\\n  line-height: 1.2em;\\n  color: var(--text-secondary);\\n  text-align: start;\\n  overflow-wrap: anywhere;\\n  white-space: pre-wrap;\\n}\\n\\nsvg {\\n  width: 1em;\\n}\\n";
 //#endregion
 //#region src/components/Manga/index.tsx
 var _tmpl$ = /*#__PURE__*/ solid_js_web.template(\`<div>\`);
@@ -9350,9 +9647,12 @@ const Manga = (props) => {
 };
 //#endregion
 exports.DRAG_TURN_ANIMATION_DURATION = DRAG_TURN_ANIMATION_DURATION;
+exports.DownloadButton = DownloadButton;
 exports.Manga = Manga;
 exports.SettingBlockSubtitle = SettingBlockSubtitle;
+exports.SettingButton = SettingButton;
 exports.SettingHotkeys = SettingHotkeys;
+exports.SettingPanelContainer = SettingPanelContainer;
 exports.SettingsItem = SettingsItem;
 exports.SettingsItemButton = SettingsItemButton;
 exports.SettingsItemNumber = SettingsItemNumber;
@@ -9448,8 +9748,6 @@ exports.renderImgList = renderImgList;
 exports.resetImgState = resetImgState;
 exports.resetPage = resetPage;
 exports.resetUI = resetUI;
-exports.resumeReadProgress = resumeReadProgress;
-exports.saveReadProgress = saveReadProgress;
 exports.saveScrollProgress = saveScrollProgress;
 exports.scrollBy = scrollBy;
 exports.scrollDomLength = scrollDomLength;
@@ -9755,7 +10053,7 @@ const classes = {
 };
 //#endregion
 //#region src/components/Toast/index.module.css?inline
-var index_module_default = ".root___AXj2H {\\n  pointer-events: none;\\n\\n  position: fixed;\\n  z-index: 2147483647;\\n  right: 0;\\n  bottom: 0;\\n\\n  display: flex;\\n  flex-direction: column;\\n  align-items: flex-end;\\n\\n  font-size: 16px;\\n}\\n\\n.item___eASYv {\\n  pointer-events: auto;\\n  cursor: pointer;\\n\\n  position: relative;\\n\\n  overflow: hidden;\\n  display: flex;\\n  align-items: center;\\n\\n  width: fit-content;\\n  max-width: min(30em, 100vw);\\n  margin: 1em;\\n  padding: 0.8em 1em;\\n  border-radius: 4px;\\n\\n  color: #000;\\n\\n  background: #fff;\\n  box-shadow:\\n    0 1px 10px 0 #0000001a,\\n    0 2px 15px 0 #0000000d;\\n\\n  animation: bounceInRight___94v9w 0.5s 1;\\n}\\n\\n.item___eASYv > svg {\\n    width: 1.5em;\\n    margin-right: 0.5em;\\n    color: var(--theme);\\n  }\\n\\n.item___eASYv[data-exit] {\\n    animation: bounceOutRight___0RcOn 0.5s 1;\\n  }\\n\\n.schedule___AWwkh {\\n  position: absolute;\\n  bottom: 0;\\n  left: 0;\\n  transform-origin: left;\\n\\n  width: 100%;\\n  height: 0.2em;\\n\\n  background-color: var(--theme);\\n}\\n\\n.item___eASYv[data-schedule] .schedule___AWwkh {\\n  transition: transform 100ms;\\n}\\n\\n.item___eASYv:not([data-schedule]) .schedule___AWwkh {\\n  animation: schedule___AWwkh linear 1 forwards;\\n}\\n\\n:is(.item___eASYv:hover, .item___eASYv[data-schedule], .root___AXj2H[data-paused]) .schedule___AWwkh {\\n  animation-play-state: paused;\\n}\\n\\n.msg___pGOp2 {\\n  width: fit-content;\\n\\n  line-height: 1.4em;\\n  text-align: start;\\n  overflow-wrap: anywhere;\\n  white-space: break-spaces;\\n}\\n\\n.msg___pGOp2 h2 {\\n    margin: 0;\\n  }\\n\\n.msg___pGOp2 h3 {\\n    margin: 0.7em 0;\\n  }\\n\\n.msg___pGOp2 ul {\\n    margin: 0;\\n    text-align: left;\\n  }\\n\\n.msg___pGOp2 button {\\n    cursor: pointer;\\n\\n    margin: 0 0.5em;\\n    padding: 0.2em 0.6em;\\n    border: none;\\n    border-radius: 0.4em;\\n\\n    font-size: inherit;\\n\\n    background-color: #eee;\\n    outline: none;\\n  }\\n\\n:is(.msg___pGOp2 button):hover {\\n      background: #e0e0e0;\\n    }\\n\\np {\\n  margin: 0;\\n}\\n\\n@keyframes schedule___AWwkh {\\n  0% {\\n    transform: scaleX(1);\\n  }\\n\\n  100% {\\n    transform: scaleX(0);\\n  }\\n}\\n\\n@keyframes bounceInRight___94v9w {\\n  0%,\\n  60%,\\n  75%,\\n  90%,\\n  100% {\\n    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);\\n  }\\n\\n  0% {\\n    transform: translate3d(3000px, 0, 0) scaleX(3);\\n    opacity: 0;\\n  }\\n\\n  60% {\\n    transform: translate3d(-25px, 0, 0) scaleX(1);\\n    opacity: 1;\\n  }\\n\\n  75% {\\n    transform: translate3d(10px, 0, 0) scaleX(0.98);\\n  }\\n\\n  90% {\\n    transform: translate3d(-5px, 0, 0) scaleX(0.995);\\n  }\\n\\n  100% {\\n    transform: translate3d(0, 0, 0);\\n  }\\n}\\n\\n@keyframes bounceOutRight___0RcOn {\\n  20% {\\n    transform: translate3d(-20px, 0, 0) scaleX(0.9);\\n    opacity: 1;\\n  }\\n\\n  100% {\\n    transform: translate3d(2000px, 0, 0) scaleX(2);\\n    opacity: 0;\\n  }\\n}\\n";
+var index_module_default = ".root___AXj2H {\\n  pointer-events: none;\\n\\n  position: fixed;\\n  z-index: 2147483647;\\n  right: 0;\\n  bottom: 0;\\n\\n  display: flex;\\n  flex-direction: column;\\n  align-items: flex-end;\\n\\n  font-size: 16px;\\n}\\n\\n.item___eASYv {\\n  pointer-events: auto;\\n  cursor: pointer;\\n\\n  position: relative;\\n\\n  overflow: hidden;\\n  display: flex;\\n  align-items: center;\\n\\n  width: fit-content;\\n  max-width: min(30em, 100vw);\\n  margin: 1em;\\n  padding: 0.8em 1em;\\n  border-radius: 4px;\\n\\n  color: light-dark(#000, #eee);\\n\\n  background: light-dark(#fff, #323232);\\n  box-shadow:\\n    0 1px 10px 0 #0000001a,\\n    0 2px 15px 0 #0000000d;\\n\\n  animation: bounceInRight___94v9w 0.5s 1;\\n}\\n\\n.item___eASYv > svg {\\n    width: 1.5em;\\n    margin-right: 0.5em;\\n    color: var(--theme);\\n  }\\n\\n.item___eASYv[data-exit] {\\n    animation: bounceOutRight___0RcOn 0.5s 1;\\n  }\\n\\n.schedule___AWwkh {\\n  position: absolute;\\n  bottom: 0;\\n  left: 0;\\n  transform-origin: left;\\n\\n  width: 100%;\\n  height: 0.2em;\\n\\n  background-color: var(--theme);\\n}\\n\\n.item___eASYv[data-schedule] .schedule___AWwkh {\\n  transition: transform 100ms;\\n}\\n\\n.item___eASYv:not([data-schedule]) .schedule___AWwkh {\\n  animation: schedule___AWwkh linear 1 forwards;\\n}\\n\\n:is(.item___eASYv:hover, .item___eASYv[data-schedule], .root___AXj2H[data-paused]) .schedule___AWwkh {\\n  animation-play-state: paused;\\n}\\n\\n.msg___pGOp2 {\\n  width: fit-content;\\n\\n  line-height: 1.4em;\\n  text-align: start;\\n  overflow-wrap: anywhere;\\n  white-space: break-spaces;\\n}\\n\\n.msg___pGOp2 h2 {\\n    margin: 0;\\n  }\\n\\n.msg___pGOp2 h3 {\\n    margin: 0.7em 0;\\n  }\\n\\n.msg___pGOp2 ul {\\n    margin: 0;\\n    text-align: left;\\n  }\\n\\n.msg___pGOp2 button {\\n    cursor: pointer;\\n\\n    margin: 0 0.5em;\\n    padding: 0.2em 0.6em;\\n    border: none;\\n    border-radius: 0.4em;\\n\\n    font-size: inherit;\\n\\n    background-color: light-dark(#eee, #3a3a3a);\\n    outline: none;\\n  }\\n\\n:is(.msg___pGOp2 button):hover {\\n      background: light-dark(#e0e0e0, #4a4a4a);\\n    }\\n\\np {\\n  margin: 0;\\n}\\n\\n@keyframes schedule___AWwkh {\\n  0% {\\n    transform: scaleX(1);\\n  }\\n\\n  100% {\\n    transform: scaleX(0);\\n  }\\n}\\n\\n@keyframes bounceInRight___94v9w {\\n  0%,\\n  60%,\\n  75%,\\n  90%,\\n  100% {\\n    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);\\n  }\\n\\n  0% {\\n    transform: translate3d(3000px, 0, 0) scaleX(3);\\n    opacity: 0;\\n  }\\n\\n  60% {\\n    transform: translate3d(-25px, 0, 0) scaleX(1);\\n    opacity: 1;\\n  }\\n\\n  75% {\\n    transform: translate3d(10px, 0, 0) scaleX(0.98);\\n  }\\n\\n  90% {\\n    transform: translate3d(-5px, 0, 0) scaleX(0.995);\\n  }\\n\\n  100% {\\n    transform: translate3d(0, 0, 0);\\n  }\\n}\\n\\n@keyframes bounceOutRight___0RcOn {\\n  20% {\\n    transform: translate3d(-20px, 0, 0) scaleX(0.9);\\n    opacity: 1;\\n  }\\n\\n  100% {\\n    transform: translate3d(2000px, 0, 0) scaleX(2);\\n    opacity: 0;\\n  }\\n}\\n";
 //#endregion
 //#region node_modules/.pnpm/@material-design-icons+svg@0.14.15/node_modules/@material-design-icons/svg/round/check_circle.svg
 var _tmpl$$5 = /*#__PURE__*/ solid_js_web.template(\`<svg xmlns=http://www.w3.org/2000/svg viewBox="0 0 24 24"stroke=currentColor fill=currentColor stroke-width=0><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2M9.29 16.29 5.7 12.7a.996.996 0 1 1 1.41-1.41L10 14.17l6.88-6.88a.996.996 0 1 1 1.41 1.41l-7.59 7.59a.996.996 0 0 1-1.41 0">\`);
@@ -10004,7 +10302,7 @@ const classes = {
 };
 //#endregion
 //#region src/components/InputDialog/index.module.css?inline
-var index_module_default = ".dialog___3dkwn {\\n  --pd-bg: #fff;\\n  --pd-text: #1f1f1f;\\n  --pd-muted: #666;\\n  --pd-btn: #eee;\\n  --pd-primary: #607d8b;\\n  --pd-focus: #afbec5;\\n\\n  box-sizing: border-box;\\n  width: max-content;\\n  min-width: 12em;\\n  max-width: 80vw;\\n  padding: 1.5em;\\n  border: none;\\n  border-radius: 1em;\\n\\n  line-height: 1.4;\\n  color: var(--pd-text);\\n\\n  background: var(--pd-bg);\\n  box-shadow: 0 8px 24px rgb(0 0 0 / 30%);\\n}\\n\\n.dialog___3dkwn::backdrop {\\n    background: rgb(0 0 0 / 50%);\\n    backdrop-filter: none;\\n  }\\n\\n@media (prefers-color-scheme: dark) {\\n\\n.dialog___3dkwn {\\n    --pd-bg: #2b2b2b;\\n    --pd-text: #eee;\\n    --pd-muted: #aaa;\\n    --pd-btn: #3a3a3a;\\n    --pd-focus: #4a4a4a;\\n}\\n  }\\n\\n.form___cFANn {\\n  text-align: right;\\n}\\n\\n.message___67JlD {\\n  margin: 0 0 0.125em;\\n  color: var(--pd-muted);\\n  text-align: left;\\n}\\n\\n.tip___FZ4Zy {\\n  margin: 0 0 0.75em;\\n\\n  font-size: 0.85em;\\n  color: var(--pd-muted);\\n  text-align: left;\\n  overflow-wrap: break-word;\\n}\\n\\n.input___8wTHj {\\n  display: block;\\n\\n  box-sizing: border-box;\\n  width: 100%;\\n  padding: 0.5em 0.8em;\\n  border: 1px solid var(--pd-btn);\\n  border-radius: 0.5em;\\n\\n  font-size: 1em;\\n  color: var(--pd-text);\\n\\n  appearance: none;\\n  background: transparent;\\n  outline: none;\\n}\\n\\n.input___8wTHj::placeholder {\\n    color: var(--pd-muted);\\n  }\\n\\n.input___8wTHj:focus {\\n    border-color: var(--pd-primary);\\n    box-shadow: 0 0 0 2px var(--pd-focus);\\n  }\\n\\n.button___c-YbK {\\n  cursor: pointer;\\n\\n  margin-top: 1em;\\n  padding: 0.55em 1.25em;\\n  border: none;\\n  border-radius: 0.5em;\\n\\n  font-size: 1em;\\n  color: var(--pd-text);\\n\\n  appearance: none;\\n  background: var(--pd-btn);\\n}\\n\\n.button___c-YbK + .button___c-YbK {\\n    margin-left: 0.75em;\\n  }\\n\\n.button___c-YbK:hover {\\n    background: var(--pd-focus);\\n  }\\n\\n.button___c-YbK:focus-visible {\\n    box-shadow: 0 0 0 2px var(--pd-focus);\\n  }\\n\\n.primary___pZIVN {\\n  color: #fff;\\n  background: var(--pd-primary);\\n}\\n\\n.primary___pZIVN:hover {\\n    filter: brightness(1.1);\\n  }\\n";
+var index_module_default = ".dialog___3dkwn {\\n  --pd-bg: light-dark(#fff, #2b2b2b);\\n  --pd-text: light-dark(#1f1f1f, #eee);\\n  --pd-muted: light-dark(#666, #aaa);\\n  --pd-btn: light-dark(#eee, #3a3a3a);\\n  --pd-primary: #607d8b;\\n  --pd-focus: light-dark(#afbec5, #4a4a4a);\\n\\n  box-sizing: border-box;\\n  width: max-content;\\n  min-width: 12em;\\n  max-width: 80vw;\\n  padding: 1.5em;\\n  border: none;\\n  border-radius: 1em;\\n\\n  line-height: 1.4;\\n  color: var(--pd-text);\\n\\n  background: var(--pd-bg);\\n  box-shadow: 0 8px 24px rgb(0 0 0 / 30%);\\n}\\n\\n.dialog___3dkwn::backdrop {\\n    background: rgb(0 0 0 / 50%);\\n    backdrop-filter: none;\\n  }\\n\\n.form___cFANn {\\n  text-align: right;\\n}\\n\\n.message___67JlD {\\n  margin: 0 0 0.125em;\\n  color: var(--pd-muted);\\n  text-align: left;\\n}\\n\\n.tip___FZ4Zy {\\n  margin: 0 0 0.75em;\\n\\n  font-size: 0.85em;\\n  color: var(--pd-muted);\\n  text-align: left;\\n  overflow-wrap: break-word;\\n}\\n\\n.input___8wTHj {\\n  display: block;\\n\\n  box-sizing: border-box;\\n  width: 100%;\\n  padding: 0.5em 0.8em;\\n  border: 1px solid var(--pd-btn);\\n  border-radius: 0.5em;\\n\\n  font-size: 1em;\\n  color: var(--pd-text);\\n\\n  appearance: none;\\n  background: transparent;\\n  outline: none;\\n}\\n\\n.input___8wTHj::placeholder {\\n    color: var(--pd-muted);\\n  }\\n\\n.input___8wTHj:focus {\\n    border-color: var(--pd-primary);\\n    box-shadow: 0 0 0 2px var(--pd-focus);\\n  }\\n\\n.button___c-YbK {\\n  cursor: pointer;\\n\\n  margin-top: 1em;\\n  padding: 0.55em 1.25em;\\n  border: none;\\n  border-radius: 0.5em;\\n\\n  font-size: 1em;\\n  color: var(--pd-text);\\n\\n  appearance: none;\\n  background: var(--pd-btn);\\n}\\n\\n.button___c-YbK + .button___c-YbK {\\n    margin-left: 0.75em;\\n  }\\n\\n.button___c-YbK:hover {\\n    background: var(--pd-focus);\\n  }\\n\\n.button___c-YbK:focus-visible {\\n    box-shadow: 0 0 0 2px var(--pd-focus);\\n  }\\n\\n.primary___pZIVN {\\n  color: #fff;\\n  background: var(--pd-primary);\\n}\\n\\n.primary___pZIVN:hover {\\n    filter: brightness(1.1);\\n  }\\n";
 //#endregion
 //#region src/components/InputDialog/index.tsx
 var _tmpl$ = /*#__PURE__*/ solid_js_web.template(\`<p>\`);
@@ -10137,11 +10435,11 @@ const mobileApi = new class {
 		...details
 	}, ...args);
 	eachGet = (url, details) => request.eachApi(url, [
-		"https://mapi.copy20.com",
-		"https://api.2026copy.com",
 		"https://api.copy4000.com",
+		"https://api.copy3000.com",
 		"https://api.mangacopy.com",
-		"https://api.copy3000.com"
+		"https://mapi.copy20.com",
+		"https://api.2026copy.com"
 	], {
 		responseType: "json",
 		headers: {
@@ -10170,17 +10468,17 @@ const pcApi = new class {
 		...details
 	}, ...args);
 	eachGet = (url, details) => request.eachApi(url, [
-		"https://mapi.hotmangasg.com",
-		"https://api.2024manga.com",
-		"https://m.manga2025.com",
-		"https://api.manga2025.com",
-		"https://mapi.fgjfghkk.club",
-		"https://mapi.fgjfghkkcenter.club",
 		"https://mapi.elfgjfghkk.club",
+		"https://mapi.fgjfghkk.club",
+		"https://mapi.hotmangasg.com",
 		"https://mapi.hotmangasd.com",
+		"https://api.2024manga.com",
 		"https://mapi.hotmangasf.com",
+		"https://mapi.fgjfghkkcenter.club",
 		"https://www.manga2026.xyz",
-		"https://www.manga2025.com"
+		"https://www.manga2025.com",
+		"https://api.manga2025.com",
+		"https://m.manga2025.com"
 	], {
 		responseType: "json",
 		headers: this.headers,
@@ -10244,18 +10542,18 @@ const getImglistByHtml = async (pageUrl) => {
 //#region src/userscript/copyApi/chapterImages.ts
 /** 章节图片获取失败的统一错误提示 */
 const errorText$1 = "加載章節圖片失敗";
-const getChapterDetail = (comicName, chapterId) => pcApi.eachGet(\`/api/v3/comic/\${comicName}/chapter/\${chapterId}?platform=3\`, {
+const getChapterDetail = (comicId, chapterId) => pcApi.eachGet(\`/api/v3/comic/\${comicId}/chapter/\${chapterId}?platform=3\`, {
 	noCheckCode: true,
 	errorText: errorText$1
 });
-const getChapter2Detail = (comicName, chapterId) => pcApi.eachGet(\`/api/v3/comic/\${comicName}/chapter2/\${chapterId}\`, {
+const getChapter2Detail = (comicId, chapterId) => pcApi.eachGet(\`/api/v3/comic/\${comicId}/chapter2/\${chapterId}\`, {
 	noCheckCode: true,
 	errorText: errorText$1
 });
 /** 获取章节图片数据 */
-const getChapterData = async (comicName, chapterId) => {
+const getChapterData = async (comicId, chapterId) => {
 	try {
-		const res = await getChapter2Detail(comicName, chapterId);
+		const res = await getChapter2Detail(comicId, chapterId);
 		if (res.status === 200) {
 			const { contents, words, name, next, prev } = res.response.results.chapter;
 			const urls = contents.map(({ url }, i) => ({
@@ -10274,7 +10572,7 @@ const getChapterData = async (comicName, chapterId) => {
 			};
 		}
 	} catch {}
-	const { status, response: { results: { chapter, comic: { name } }, message } } = await getChapterDetail(comicName, chapterId);
+	const { status, response: { results: { chapter, comic: { name } }, message } } = await getChapterDetail(comicId, chapterId);
 	return {
 		status,
 		message,
@@ -10292,8 +10590,8 @@ const errorText = "加載漫畫目錄失敗";
 *
 * 会受反爬机制影响返回空数据，因此仅作为备用
 */
-const getChaptersLegacy = async (comicName) => {
-	const { response: { results } } = await pcApi.get(\`/comicdetail/\${comicName}/chapters\`, { errorText });
+const getChaptersLegacy = async (comicId) => {
+	const { response: { results } } = await pcApi.get(\`/comicdetail/\${comicId}/chapters\`, { errorText });
 	return decryptData(results);
 };
 const typeNameMap = {
@@ -10302,31 +10600,36 @@ const typeNameMap = {
 	3: "番外篇"
 };
 /** 获取漫画目录 */
-const getChaptersByApi = async (comicName) => {
-	const rawGroups = (await pcApi.eachGet(\`/api/v3/comic2/\${comicName}\`, { errorText })).response.results.groups;
+const getChaptersByApi = async (comicId) => {
+	const rawGroups = (await pcApi.eachGet(\`/api/v3/comic2/\${comicId}\`, { errorText })).response.results.groups;
 	const groups = (Array.isArray(rawGroups) ? rawGroups : Object.values(rawGroups ?? {})).filter(({ path_word }) => path_word);
 	if (groups.length === 0) groups.push({
 		path_word: "default",
 		name: "默认"
 	});
-	const chaptersByGroup = [];
-	for (const group of groups) {
-		let page = [];
-		let offset = 0;
-		const list = [];
-		do {
-			page = (await pcApi.eachGet(\`/api/v3/comic/\${comicName}/group/\${group.path_word}/chapters?limit=100&offset=\${offset}&_update=true\`, { errorText })).response.results.list;
-			list.push(...page);
-			offset += 100;
-		} while (page.length >= 100);
-		chaptersByGroup.push({
-			group,
-			list
-		});
+	const getChaptersPage = (pathWord, offset) => pcApi.eachGet(\`/api/v3/comic/\${comicId}/group/\${pathWord}/chapters?limit=100&offset=\${offset}&_update=true\`, { errorText });
+	const firstPageList = await helper.plimit(groups.map((group) => async () => {
+		return (await getChaptersPage(group.path_word, 0)).response.results;
+	}));
+	const restTaskList = firstPageList.flatMap(({ total }, groupIndex) => total <= 100 ? [] : helper.range(1, Math.ceil(total / 100)).map((page) => async () => {
+		return {
+			groupIndex,
+			list: (await getChaptersPage(groups[groupIndex].path_word, page * 100)).response.results.list
+		};
+	}));
+	const restList = await helper.plimit(restTaskList);
+	const restByGroup = /* @__PURE__ */ new Map();
+	for (const { groupIndex, list } of restList) {
+		const groupList = restByGroup.get(groupIndex);
+		if (groupList) groupList.push(...list);
+		else restByGroup.set(groupIndex, [...list]);
 	}
 	return {
 		groups,
-		chaptersByGroup
+		chaptersByGroup: groups.map((group, i) => ({
+			group,
+			list: [...firstPageList[i].list, ...restByGroup.get(i) ?? []]
+		}))
 	};
 };
 /** 将接口返回数据转换为统一的目录结构 */
@@ -10366,11 +10669,11 @@ const transformFromGetChaptersByApi = (raw) => {
 	};
 };
 /** 获取漫画目录（优先新接口，失败时用旧接口兜底） */
-const getChapters = async (comicName) => {
+const getChapters = async (comicId) => {
 	try {
-		return transformFromGetChaptersByApi(await getChaptersByApi(comicName));
+		return transformFromGetChaptersByApi(await getChaptersByApi(comicId));
 	} catch {
-		return getChaptersLegacy(comicName);
+		return getChaptersLegacy(comicId);
 	}
 };
 //#endregion
@@ -10389,7 +10692,7 @@ const getComments = async (chapterId, list = []) => {
 //#endregion
 //#region src/userscript/copyApi/record.ts
 /** 获取最后阅读记录 */
-const getLastChapter = (comicName) => mobileApi.eachGet(\`/api/v3/comic2/\${comicName}/query?platform=3\`, { errorText: "獲取閱讀記錄失敗" });
+const getLastChapter = (comicId) => mobileApi.eachGet(\`/api/v3/comic2/\${comicId}/query?platform=3\`, { errorText: "獲取閱讀記錄失敗" });
 //#endregion
 exports.getChapterData = getChapterData;
 exports.getChapterDetail = getChapterDetail;
@@ -10489,18 +10792,615 @@ exports.getAdPageByFileName = getAdPageByFileName;
 exports.isAdImg = isAdImg;
 `,
 	"core": `\nlet helper = require("helper");
-let userscript_autoImageScanner = require("userscript/autoImageScanner");
-let solid_js_web = require("solid-js/web");
-let components_Manga = require("components/Manga");
 let components_Toast = require("components/Toast");
 let solid_js = require("solid-js");
-let components_Fab = require("components/Fab");
+let solid_js_web = require("solid-js/web");
 let components_IconButton = require("components/IconButton");
+let components_Manga = require("components/Manga");
+let components_Fab = require("components/Fab");
+let userscript_autoImageScanner = require("userscript/autoImageScanner");
 let request = require("request");
+//#region src/userscript/core/showImgsChange.ts
+const listeners = /* @__PURE__ */ new Set();
+/** 对 manga.onShowImgsChange 的包装，以便能让多个模块同时监听显示图片变化 */
+const addShowImgsListener = (listener) => {
+	listeners.add(listener);
+	return () => listeners.delete(listener);
+};
+/** 将显示图片变化分发给所有已注册的监听器 */
+const dispatchShowImgsChange = (info) => {
+	for (const listener of listeners) listener(info);
+};
+//#endregion
+//#region src/userscript/core/chapters/state.ts
+const [getChapterManager, setChapterManager] = solid_js.createSignal();
+//#endregion
+//#region src/userscript/core/chapters/actions.ts
+/** 加载指定章节评论 */
+const loadComments = async (manager, chapterId) => {
+	const { getComments, key, coreCtx: { store, setState } } = manager;
+	if (!getComments || store.imgListMap[key(chapterId)]?.commentList) return;
+	try {
+		const commentList = await getComments(chapterId);
+		const entryKey = key(chapterId);
+		if (!Reflect.has(store.imgListMap, entryKey)) return;
+		setState("imgListMap", entryKey, { commentList });
+	} catch (error) {
+		helper.log.error(error);
+	}
+};
+/** 加载并缓存指定章节的图片列表 */
+const loadChapterImgList = (manager, chapterId) => {
+	const { cache, coreCtx, key, getChapterImgList } = manager;
+	const cached = cache.get(chapterId);
+	if (cached) return cached;
+	const safePromise = (async () => {
+		const imgList = await getChapterImgList(chapterId, coreCtx);
+		if (imgList.length === 0) throw new Error(helper.t("alert.fetch_comic_img_failed"));
+		if (getChapterManager() !== manager) return imgList;
+		coreCtx.setState("imgListMap", key(chapterId), { imgList });
+		return imgList;
+	})().catch((error) => {
+		cache.delete(chapterId);
+		throw error;
+	});
+	cache.set(chapterId, safePromise);
+	return safePromise;
+};
+/** 将章节注册到 imgListMap 中 */
+const registerChapter = (manager, chapter) => {
+	const { registrations, coreCtx, key } = manager;
+	let getImgList = registrations.get(chapter.id);
+	if (!getImgList) {
+		getImgList = () => loadChapterImgList(manager, chapter.id);
+		registrations.set(chapter.id, getImgList);
+	}
+	coreCtx.setState("imgListMap", key(chapter.id), { getImgList });
+};
+/** 更新上下话按钮 */
+const updateChapterNav = (state, manager, chapterId) => {
+	const index = manager.chapterList.findIndex((chapter) => chapter.id === chapterId);
+	const maxIndex = manager.chapterList.length - 1;
+	state.onPrev = index > 0 ? () => void switchChapter(manager.chapterList[index - 1].id) : void 0;
+	state.onNext = index !== -1 && index < maxIndex ? () => void switchChapter(manager.chapterList[index + 1].id) : void 0;
+};
+/** 切章序号，连续快速切章（如连续后退）时只让最后一次生效，防止慢请求覆盖新状态 */
+let switchSeq = 0;
+/** 切换章节 */
+const switchChapter = async (chapterId, updateUrl = true) => {
+	const manager = getChapterManager();
+	if (!manager) return;
+	const { chapterList, coreCtx: { store, setState, showComic }, key } = manager;
+	const index = chapterList.findIndex((chapter) => chapter.id === chapterId);
+	if (index === -1) return;
+	const chapter = chapterList[index];
+	const seq = ++switchSeq;
+	if (!store.imgListMap[key(chapterId)]?.imgList?.length) try {
+		await loadChapterImgList(manager, chapterId);
+	} catch (error) {
+		helper.log.error(error);
+		if (getChapterManager() === manager && seq === switchSeq) components_Toast.toast.error(error.message);
+		return;
+	}
+	if (getChapterManager() !== manager || seq !== switchSeq) return;
+	if (updateUrl && chapter.url) try {
+		history.pushState(null, "", chapter.url);
+		helper.claimUrlChange(chapter.url);
+	} catch (error) {
+		helper.log.error(error);
+	}
+	setState((state) => {
+		state.manga.title = chapter.title;
+		updateChapterNav(state.manga, manager, chapterId);
+	});
+	await showComic(key(chapterId));
+	loadComments(manager, chapterId);
+};
+/** 规范化 url 便于比较，无效时返回 null */
+const normalizeUrl = (url) => {
+	try {
+		return new URL(url, location.origin).href;
+	} catch {
+		return null;
+	}
+};
+/** 根据 url 查找对应章节，找不到时返回 undefined */
+const findChapterByUrl = ({ chapterList }, url) => {
+	const targetUrl = normalizeUrl(url);
+	if (!targetUrl) return;
+	return chapterList.find((chapter) => chapter.url && normalizeUrl(chapter.url) === targetUrl);
+};
+/** 接管用户触发的前进/后退 */
+const handleUrlNavigation = (url) => {
+	const manager = getChapterManager();
+	if (!manager) return;
+	const chapter = findChapterByUrl(manager, url);
+	if (!chapter) return;
+	switchChapter(chapter.id, false);
+};
+//#endregion
+//#region node_modules/.pnpm/@material-design-icons+svg@0.14.15/node_modules/@material-design-icons/svg/round/toc.svg
+var _tmpl$$19 = /*#__PURE__*/ solid_js_web.template(\`<svg xmlns=http://www.w3.org/2000/svg viewBox="0 0 24 24"stroke=currentColor fill=currentColor stroke-width=0><path d="M4 9h12c.55 0 1-.45 1-1s-.45-1-1-1H4c-.55 0-1 .45-1 1s.45 1 1 1m0 4h12c.55 0 1-.45 1-1s-.45-1-1-1H4c-.55 0-1 .45-1 1s.45 1 1 1m0 4h12c.55 0 1-.45 1-1s-.45-1-1-1H4c-.55 0-1 .45-1 1s.45 1 1 1m15 0h2v-2h-2zm0-10v2h2V7zm0 6h2v-2h-2z">\`);
+var toc_default = (props = {}) => (() => {
+	var _el$ = _tmpl$$19();
+	solid_js_web.spread(_el$, props, true, true);
+	return _el$;
+})();
+//#endregion
+//#region src/userscript/core/chapters/panel.tsx
+var _tmpl$$18 = /*#__PURE__*/ solid_js_web.template(\`<div class=chapterPanelList>\`);
+var _tmpl$2$2 = /*#__PURE__*/ solid_js_web.template(\`<button type=button class=chapterGroupHeader>\`);
+var _tmpl$3$1 = /*#__PURE__*/ solid_js_web.template(\`<button type=button class=chapterPanelItem>\`);
+var _tmpl$4 = /*#__PURE__*/ solid_js_web.template(\`<div class=chapterPanelCloseCover role=button tabindex=-1>\`);
+/** 注入目录面板所需的样式 */
+const injectChapterStyles = () => {
+	if (!components_Manga.refs.root) return;
+	const listMaxWidth = helper.lang() === "zh" ? "12em" : "22em";
+	helper.css\`
+    \${components_Manga.refs.root}
+    .chapterPanelPopper {
+      pointer-events: unset !important;
+      transform: none !important;
+      height: 0 !important;
+      padding: 0 !important;
+    }
+
+    .chapterPanelCloseCover {
+      position: fixed;
+      inset: 0;
+    }
+
+    .chapterPanelList {
+      min-width: 10em;
+      max-width: \${listMaxWidth};
+      white-space: normal;
+    }
+
+    .chapterGroupHeader {
+      cursor: pointer;
+
+      position: sticky;
+      z-index: 1;
+      top: 0;
+
+      display: block;
+
+      box-sizing: border-box;
+      width: 100%;
+      padding: 0.6em 0.8em;
+      border: 0;
+
+      font-size: 0.9em;
+      font-weight: 600;
+      line-height: 1.4;
+      color: var(--text);
+      text-align: start;
+      overflow-wrap: anywhere;
+
+      background-color: var(--page-bg);
+    }
+
+    .chapterGroupHeader:hover {
+      /* --hover-bg-color 是半透明色，直接作背景会透出底下的列表项，
+         因此将其叠加在 --page-bg 之上合成不透明色 */
+      background-image: linear-gradient(
+        var(--hover-bg-color),
+        var(--hover-bg-color)
+      );
+    }
+
+    .chapterPanelItem {
+      cursor: pointer;
+      content-visibility: auto;
+      contain-intrinsic-size: 2.5em;
+
+      display: block;
+
+      box-sizing: border-box;
+      width: 100%;
+      padding: 0.6em 0.8em;
+      border: 0;
+
+      font-size: 0.9em;
+      line-height: 1.4;
+      color: var(--text);
+      text-align: start;
+      overflow-wrap: anywhere;
+
+      background: transparent;
+    }
+
+    .chapterPanelItem:hover {
+      background-color: var(--hover-bg-color);
+    }
+
+    .chapterPanelItem[data-current] {
+      color: var(--text-bg);
+      background-color: var(--text);
+    }
+  \`;
+};
+/** 已收起的分组下标集合。跨面板开闭保留，manager 替换（章节数据变更）时重置 */
+const collapsedGroups = new helper.ReactiveSet();
+/** 目录面板 */
+const ChapterPanel = (props) => solid_js_web.createComponent(components_Manga.SettingPanelContainer, { get children() {
+	var _el$ = _tmpl$$18();
+	solid_js_web.insert(_el$, solid_js_web.createComponent(solid_js.For, {
+		get each() {
+			return getChapterManager()?.groupList ?? [];
+		},
+		children: (group, i) => {
+			const isCollapsed = () => collapsedGroups.has(i());
+			const toggleCollapsed = () => {
+				if (collapsedGroups.has(i())) collapsedGroups.delete(i());
+				else collapsedGroups.add(i());
+			};
+			return [(() => {
+				var _el$2 = _tmpl$2$2();
+				solid_js_web.addEventListener(_el$2, "click", toggleCollapsed);
+				solid_js_web.insert(_el$2, () => \`\${group.title} (\${group.chapters.length})\`);
+				solid_js_web.effect(() => solid_js_web.setAttribute(_el$2, "aria-expanded", !isCollapsed()));
+				return _el$2;
+			})(), solid_js_web.createComponent(solid_js.Show, {
+				get when() {
+					return !isCollapsed();
+				},
+				get children() {
+					return solid_js_web.createComponent(solid_js.For, {
+						get each() {
+							return group.chapters;
+						},
+						children: (chapter) => {
+							let ref;
+							const isCurrent = () => {
+								const manager = getChapterManager();
+								return manager?.key(chapter.id) === manager?.coreCtx.store.currentImgListId;
+							};
+							solid_js.onMount(() => {
+								if (!isCurrent()) return;
+								requestAnimationFrame(() => ref?.scrollIntoView({ block: "nearest" }));
+							});
+							return (() => {
+								var _el$3 = _tmpl$3$1();
+								solid_js_web.addEventListener(_el$3, "click", () => {
+									if (!isCurrent()) switchChapter(chapter.id);
+									props.onClose();
+								});
+								var _ref$ = ref;
+								typeof _ref$ === "function" ? solid_js_web.use(_ref$, _el$3) : ref = _el$3;
+								solid_js_web.insert(_el$3, () => chapter.title);
+								solid_js_web.effect(() => solid_js_web.setAttribute(_el$3, "data-current", isCurrent() ? "" : void 0));
+								return _el$3;
+							})();
+						}
+					});
+				}
+			})];
+		}
+	}));
+	return _el$;
+} });
+/** 目录按钮 */
+const ChapterListButton = () => {
+	const [showPanel, setShowPanel] = solid_js.createSignal(false);
+	const handleClick = () => {
+		const newVal = !showPanel();
+		components_Manga.setState("show", "toolbar", newVal);
+		setShowPanel(newVal);
+	};
+	helper.createEffectOn(() => components_Manga.store.show.toolbar, (showToolbar) => showToolbar || setShowPanel(false));
+	helper.createEffectOn(getChapterManager, () => collapsedGroups.clear());
+	const Popper = solid_js_web.createComponent(solid_js.Show, {
+		get when() {
+			return showPanel();
+		},
+		get children() {
+			return [solid_js_web.createComponent(ChapterPanel, { onClose: handleClick }), (() => {
+				var _el$4 = _tmpl$4();
+				_el$4.addEventListener("wheel", (e) => {
+					if (components_Manga.isScrollMode()) components_Manga.refs.mangaBox.scrollBy({ top: e.deltaY });
+				});
+				solid_js_web.addEventListener(_el$4, "click", handleClick);
+				return _el$4;
+			})()];
+		}
+	});
+	return solid_js_web.createComponent(components_IconButton.IconButton, {
+		get tip() {
+			return helper.t("button.chapter_list");
+		},
+		get enabled() {
+			return showPanel();
+		},
+		get showTip() {
+			return showPanel();
+		},
+		onClick: handleClick,
+		get popperClassName() {
+			return showPanel() && "chapterPanelPopper";
+		},
+		get popper() {
+			return showPanel() && Popper;
+		},
+		get children() {
+			return solid_js_web.createComponent(toc_default, {});
+		}
+	});
+};
+/** 将目录按钮注入工具栏（放在下载按钮之后、设置按钮之前） */
+const injectChapterButton = (manager) => {
+	manager.coreCtx.setState("manga", { editButtonList(list) {
+		const settingIndex = list.indexOf(components_Manga.SettingButton);
+		const downloadIndex = list.indexOf(components_Manga.DownloadButton);
+		let index = list.length;
+		if (settingIndex !== -1) index = settingIndex;
+		else if (downloadIndex !== -1) index = downloadIndex + 1;
+		return list.toSpliced(index, 0, ChapterListButton);
+	} });
+};
+//#endregion
+//#region src/userscript/core/chapters/prefetch.ts
+/** 距离章节开头/结尾多少页时预加载相邻章节 */
+const NEAR_EDGE_PAGE_NUM = 3;
+/** 章节预加载器 */
+var ChapterPrefetcher = class {
+	/** 已预加载过的章节 id */
+	prefetched = /* @__PURE__ */ new Set();
+	preloadImg(url) {
+		const img = new Image();
+		img.src = url.replace(/^http:/u, "");
+	}
+	/** 预加载指定章节的图片 */
+	preloadChapter(manager, chapterId) {
+		if (this.prefetched.has(chapterId)) return;
+		this.prefetched.add(chapterId);
+		loadChapterImgList(manager, chapterId).then(([first]) => {
+			const url = typeof first === "string" ? first : first?.src;
+			return url && this.preloadImg(url);
+		}).catch((error) => helper.log.error(error));
+	}
+	/** 设置接近章节开头/末尾时预加载相邻章节第一张图的回调 */
+	setup(manager) {
+		this.prefetched.clear();
+		return ({ showRange, pageList }) => {
+			if (pageList.length === 0) return;
+			const { chapterList, coreCtx, key } = manager;
+			const index = chapterList.findIndex((chapter) => key(chapter.id) === coreCtx.store.currentImgListId);
+			if (showRange[1] >= pageList.length - NEAR_EDGE_PAGE_NUM) {
+				const nextChapter = chapterList[index + 1];
+				if (nextChapter) this.preloadChapter(manager, nextChapter.id);
+			}
+			if (showRange[0] >= 0 && showRange[0] < NEAR_EDGE_PAGE_NUM) {
+				const prevChapter = chapterList[index - 1];
+				if (prevChapter) this.preloadChapter(manager, prevChapter.id);
+			}
+		};
+	}
+};
+/** 全局单例章节预加载器 */
+const chapterPrefetcher = new ChapterPrefetcher();
+//#endregion
+//#region src/userscript/core/chapters/index.ts
+/** 等待当前章节（临时条目）加载完成的超时时间 */
+const TRANSFER_TIMEOUT = 1e4;
+/** 章节目录缓存，key 为 store.comicId（漫画唯一标识） */
+const chapterListCache = /* @__PURE__ */ new Map();
+/** popstate 监听的注销函数 */
+let stopUrlNavListener;
+/** 确保接管用户前进/后退的 popstate 监听已注册，返回清理函数 */
+const ensureUrlNavListener = () => {
+	if (!stopUrlNavListener) {
+		const onPopState = () => handleUrlNavigation(location.href);
+		window.addEventListener("popstate", onPopState);
+		stopUrlNavListener = () => window.removeEventListener("popstate", onPopState);
+	}
+	return () => {
+		stopUrlNavListener?.();
+		stopUrlNavListener = void 0;
+	};
+};
+/** 进入章节模式并注册相关监听器，返回退出章节模式并注销监听器的清理函数 */
+const enterChapterMode = (manager) => {
+	manager.coreCtx.setState("flag", "isChapterMode", true);
+	const stopPrefetcher = addShowImgsListener(chapterPrefetcher.setup(manager));
+	const stopUrlNav = ensureUrlNavListener();
+	return () => {
+		stopPrefetcher();
+		stopUrlNav();
+		manager.coreCtx.setState("flag", "isChapterMode", false);
+	};
+};
+/**
+* 退出章节模式并清空所有章节相关状态
+*
+* 在「确定不再处于章节模式」时调用，
+* 同漫画章节间切换走复用/重建逻辑，不调用此函数，以便保留缓存。
+*
+* 监听器的注销由 setupChapters 的收尾函数负责，
+* onUrlChange 的串行队列保证调用时机在其之后。
+*/
+const exitChapterMode = () => {
+	const manager = getChapterManager();
+	if (!manager) return;
+	setChapterManager(void 0);
+	manager.coreCtx.setState((state) => {
+		state.currentImgListId = "";
+		state.manga.title = "";
+		state.manga.onPrev = void 0;
+		state.manga.onNext = void 0;
+		state.manga.editButtonList = void 0;
+	});
+};
+/**
+* SPA 重入且章节列表与现有完全一致时，复用现有管理器；
+* 否则返回 undefined，由后续流程创建新管理器
+*/
+const reuseManager = (nowManager, options) => {
+	if (!nowManager) return;
+	const { groupList, coreCtx: { store: { imgListMap } }, registrations, key } = nowManager;
+	if (!helper.isEqual(groupList, options.groupList)) return;
+	if (!nowManager.chapterList.every((chapter) => imgListMap[key(chapter.id)]?.getImgList === registrations.get(chapter.id))) return;
+	nowManager.getChapterImgList = options.getChapterImgList;
+	nowManager.getComments = options.getComments;
+	loadComments(nowManager, options.currentId);
+	return enterChapterMode(nowManager);
+};
+/** 创建章节管理器并注册全部章节（会替换现有管理器） */
+const createManager = (coreCtx, options) => {
+	const manager = {
+		coreCtx,
+		comicId: options.comicId,
+		key: (id) => \`\${options.comicId}:\${id}\`,
+		groupList: options.groupList,
+		chapterList: options.chapterList,
+		getChapterImgList: options.getChapterImgList,
+		getComments: options.getComments,
+		cache: /* @__PURE__ */ new Map(),
+		registrations: /* @__PURE__ */ new Map()
+	};
+	setChapterManager(manager);
+	for (const chapter of manager.chapterList) registerChapter(manager, chapter);
+	return manager;
+};
+/**
+* 激活章节模式：先接管导航和目录，再等待当前章节数据就绪后才切换显示状态，
+* 避免加载失败后阅读器内容与标题脱节。加载失败且阅读器正在显示其他内容时
+* 不切换显示状态，用户仍可通过 popstate、目录按钮重试。返回收尾函数。
+*
+* @param oldManager 被替换的旧管理器，切换成功后清理其章节数据
+*/
+const activateManager = (manager, chapter, oldManager) => {
+	const { coreCtx: { setState, store }, key } = manager;
+	const currentId = chapter?.id ?? "";
+	let cancelled = false;
+	const stopChapterMode = enterChapterMode(manager);
+	(async () => {
+		if (chapter && !store.imgListMap[key(chapter.id)]?.imgList?.length) try {
+			await loadChapterImgList(manager, chapter.id);
+		} catch (error) {
+			helper.log.error(error);
+			if (!cancelled && getChapterManager() === manager) components_Toast.toast.error(error.message);
+			if (store.manga.show) return;
+		}
+		if (cancelled || getChapterManager() !== manager) return;
+		setState((state) => {
+			state.currentImgListId = chapter ? key(chapter.id) : "";
+			state.manga.title = chapter?.title ?? "";
+			updateChapterNav(state.manga, manager, currentId);
+			if (oldManager) {
+				const deleteKeys = oldManager.chapterList.map(({ id }) => oldManager.key(id)).filter((entryKey) => Reflect.has(state.imgListMap, entryKey));
+				for (const entryKey of deleteKeys) delete state.imgListMap[entryKey];
+			}
+		});
+		if (chapter) {
+			injectChapterButton(manager);
+			if (store.flag.needAutoShow && store.options.autoShow && !store.manga.show) manager.coreCtx.showComic();
+		}
+		loadComments(manager, currentId);
+	})();
+	return () => {
+		cancelled = true;
+		stopChapterMode();
+	};
+};
+/**
+* 转移场景：站点先设置 imgListMap[''] 让当前章节立即开始加载，拿到完整章节
+* 列表后才调用 setupChapters。此时等待当前章节加载完成，再把结果无感转移到
+* 正式章节条目上（引用相同，切换 currentImgListId 不会触发阅读器重置）
+*/
+const transferToChapters = (coreCtx, options, currentChapter) => {
+	const currentId = currentChapter.id;
+	const manager = createManager(coreCtx, options);
+	const { store, setState } = manager.coreCtx;
+	let cancelled = false;
+	let exit = () => {};
+	const cleanup = () => {
+		cancelled = true;
+		exit();
+	};
+	(async () => {
+		const deadline = Date.now() + TRANSFER_TIMEOUT;
+		let { imgList } = store.imgListMap[""];
+		while (!imgList?.length && Date.now() < deadline) {
+			if (cancelled || getChapterManager() !== manager) return;
+			await helper.sleep(100);
+			({imgList} = store.imgListMap[""]);
+		}
+		if (cancelled || getChapterManager() !== manager || store.currentImgListId !== "") return;
+		if (imgList?.length) {
+			manager.cache.set(currentId, Promise.resolve(imgList));
+			setState("imgListMap", manager.key(currentId), { imgList });
+		}
+		exit = activateManager(manager, currentChapter);
+	})();
+	return cleanup;
+};
+/**
+* 设置章节模式，返回本次章节模式的收尾函数。
+*
+* 不再需要当次章节数据时（如切换到其他漫画、离开漫画页）必须调用收尾函数：
+* - 章节模式已激活时调用将退出章节模式并注销相关监听器；
+* - 尚未激活（章节列表未就绪，或数据转移未完成）是调用将让本次章节模式作废。
+*/
+const setupChapters = (coreCtx, options) => {
+	const { comicId } = coreCtx.store;
+	if (!comicId) {
+		helper.log.error(/* @__PURE__ */ new Error("缺少漫画 id，无法进入章节模式"));
+		exitChapterMode();
+		return () => {};
+	}
+	if (coreCtx.store.imgListMap[""].imgList) coreCtx.setState("imgListMap", "", "imgList", void 0);
+	requestAnimationFrame(injectChapterStyles);
+	/** 数据加载完成并激活后才绑定的清理函数 */
+	let exit = () => {};
+	let cancelled = false;
+	(async () => {
+		try {
+			let groupList = chapterListCache.get(comicId);
+			if (!groupList) {
+				groupList = await options.getChapterList();
+				if (groupList.length === 0) {
+					helper.log.error(new Error(helper.t("alert.fetch_chapter_list_failed")));
+					throw new Error(helper.t("alert.fetch_chapter_list_failed"));
+				}
+				chapterListCache.set(comicId, groupList);
+			}
+			if (cancelled) return;
+			exit = initChapters(coreCtx, {
+				comicId,
+				groupList,
+				chapterList: groupList.flatMap((group) => group.chapters),
+				currentId: options.currentId,
+				getChapterImgList: options.getChapterImgList,
+				getComments: options.getComments
+			});
+		} catch (error) {
+			if (cancelled) return;
+			components_Toast.toast.error(error.message);
+			helper.log.error(error);
+		}
+	})();
+	return () => {
+		cancelled = true;
+		exit();
+	};
+};
+/** 目录数据就绪后，复用或创建管理器并激活章节模式，返回清理函数 */
+const initChapters = (coreCtx, options) => {
+	const nowManager = getChapterManager();
+	const reused = reuseManager(nowManager, options);
+	if (reused) return reused;
+	const { store } = coreCtx;
+	const { chapterList } = options;
+	const currentChapter = chapterList.find((chapter) => chapter.id === options.currentId) ?? chapterList[0];
+	if ((currentChapter?.id ?? "") !== "" && store.currentImgListId === "" && store.imgListMap[""].getImgList?.type === void 0 && (!nowManager || nowManager.comicId === options.comicId)) return transferToChapters(coreCtx, options, currentChapter);
+	return activateManager(createManager(coreCtx, options), currentChapter, nowManager);
+};
+//#endregion
 //#region node_modules/.pnpm/@material-design-icons+svg@0.14.15/node_modules/@material-design-icons/svg/round/settings.svg
-var _tmpl$$16 = /*#__PURE__*/ solid_js_web.template(\`<svg xmlns=http://www.w3.org/2000/svg viewBox="0 0 24 24"stroke=currentColor fill=currentColor stroke-width=0><path d="M19.5 12c0-.23-.01-.45-.03-.68l1.86-1.41c.4-.3.51-.86.26-1.3l-1.87-3.23a.987.987 0 0 0-1.25-.42l-2.15.91c-.37-.26-.76-.49-1.17-.68l-.29-2.31c-.06-.5-.49-.88-.99-.88h-3.73c-.51 0-.94.38-1 .88l-.29 2.31c-.41.19-.8.42-1.17.68l-2.15-.91c-.46-.2-1-.02-1.25.42L2.41 8.62c-.25.44-.14.99.26 1.3l1.86 1.41a7.3 7.3 0 0 0 0 1.35l-1.86 1.41c-.4.3-.51.86-.26 1.3l1.87 3.23c.25.44.79.62 1.25.42l2.15-.91c.37.26.76.49 1.17.68l.29 2.31c.06.5.49.88.99.88h3.73c.5 0 .93-.38.99-.88l.29-2.31c.41-.19.8-.42 1.17-.68l2.15.91c.46.2 1 .02 1.25-.42l1.87-3.23c.25-.44.14-.99-.26-1.3l-1.86-1.41c.03-.23.04-.45.04-.68m-7.46 3.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5">\`);
+var _tmpl$$17 = /*#__PURE__*/ solid_js_web.template(\`<svg xmlns=http://www.w3.org/2000/svg viewBox="0 0 24 24"stroke=currentColor fill=currentColor stroke-width=0><path d="M19.5 12c0-.23-.01-.45-.03-.68l1.86-1.41c.4-.3.51-.86.26-1.3l-1.87-3.23a.987.987 0 0 0-1.25-.42l-2.15.91c-.37-.26-.76-.49-1.17-.68l-.29-2.31c-.06-.5-.49-.88-.99-.88h-3.73c-.51 0-.94.38-1 .88l-.29 2.31c-.41.19-.8.42-1.17.68l-2.15-.91c-.46-.2-1-.02-1.25.42L2.41 8.62c-.25.44-.14.99.26 1.3l1.86 1.41a7.3 7.3 0 0 0 0 1.35l-1.86 1.41c-.4.3-.51.86-.26 1.3l1.87 3.23c.25.44.79.62 1.25.42l2.15-.91c.37.26.76.49 1.17.68l.29 2.31c.06.5.49.88.99.88h3.73c.5 0 .93-.38.99-.88l.29-2.31c.41-.19.8-.42 1.17-.68l2.15.91c.46.2 1 .02 1.25-.42l1.87-3.23c.25-.44.14-.99-.26-1.3l-1.86-1.41c.03-.23.04-.45.04-.68m-7.46 3.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5">\`);
 var settings_default = (props = {}) => (() => {
-	var _el$ = _tmpl$$16();
+	var _el$ = _tmpl$$17();
 	solid_js_web.spread(_el$, props, true, true);
 	return _el$;
 })();
@@ -10537,12 +11437,528 @@ const handleEsc = () => {
 };
 //#endregion
 //#region node_modules/.pnpm/@material-design-icons+svg@0.14.15/node_modules/@material-design-icons/svg/round/checklist.svg
-var _tmpl$$15 = /*#__PURE__*/ solid_js_web.template(\`<svg xmlns=http://www.w3.org/2000/svg viewBox="0 0 24 24"stroke=currentColor fill=currentColor stroke-width=0><path d="M22 8c0-.55-.45-1-1-1h-7c-.55 0-1 .45-1 1s.45 1 1 1h7c.55 0 1-.45 1-1m-9 8c0 .55.45 1 1 1h7c.55 0 1-.45 1-1s-.45-1-1-1h-7c-.55 0-1 .45-1 1M10.47 4.63c.39.39.39 1.02 0 1.41l-4.23 4.25c-.39.39-1.02.39-1.42 0L2.7 8.16a.996.996 0 1 1 1.41-1.41l1.42 1.42 3.54-3.54c.38-.38 1.02-.38 1.4 0m.01 8.01c.39.39.39 1.02 0 1.41L6.25 18.3c-.39.39-1.02.39-1.42 0L2.7 16.16a.996.996 0 1 1 1.41-1.41l1.42 1.42 3.54-3.54c.38-.38 1.02-.38 1.41.01">\`);
+var _tmpl$$16 = /*#__PURE__*/ solid_js_web.template(\`<svg xmlns=http://www.w3.org/2000/svg viewBox="0 0 24 24"stroke=currentColor fill=currentColor stroke-width=0><path d="M22 8c0-.55-.45-1-1-1h-7c-.55 0-1 .45-1 1s.45 1 1 1h7c.55 0 1-.45 1-1m-9 8c0 .55.45 1 1 1h7c.55 0 1-.45 1-1s-.45-1-1-1h-7c-.55 0-1 .45-1 1M10.47 4.63c.39.39.39 1.02 0 1.41l-4.23 4.25c-.39.39-1.02.39-1.42 0L2.7 8.16a.996.996 0 1 1 1.41-1.41l1.42 1.42 3.54-3.54c.38-.38 1.02-.38 1.4 0m.01 8.01c.39.39.39 1.02 0 1.41L6.25 18.3c-.39.39-1.02.39-1.42 0L2.7 16.16a.996.996 0 1 1 1.41-1.41l1.42 1.42 3.54-3.54c.38-.38 1.02-.38 1.41.01">\`);
 var checklist_default = (props = {}) => (() => {
-	var _el$ = _tmpl$$15();
+	var _el$ = _tmpl$$16();
 	solid_js_web.spread(_el$, props, true, true);
 	return _el$;
 })();
+//#endregion
+//#region src/userscript/core/multiSelect/SelectionMask.tsx
+var _tmpl$$15 = /*#__PURE__*/ solid_js_web.template(\`<svg xmlns=http://www.w3.org/2000/svg viewBox="0 0 24 24"width=1.5em height=1.5em fill=none opacity=0.4 style=display:inline;vertical-align:-0.15em><rect x=2 y=2 width=20 height=20 rx=5 stroke=currentColor stroke-width=1.3 stroke-dasharray="3 2">\`);
+var _tmpl$2$1 = /*#__PURE__*/ solid_js_web.template(\`<div class=selection-mask><span class=selection-mask-order>\`);
+const DashedRoundedSquare = () => _tmpl$$15();
+const SelectionMask = (props) => {
+	const id = () => props.registeredItems().get(props.dom);
+	const isSelected = () => props.selection.isSelected(id());
+	helper.css\`
+    \${props.dom}
+    .selection-mask {
+      touch-action: none;
+      cursor: pointer;
+      cursor: cell;
+      user-select: none;
+
+      position: absolute;
+      z-index: 2147483646;
+      top: 0;
+      left: 0;
+
+      container-type: size;
+      overflow: clip;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      width: 100%;
+      height: 100%;
+
+      font-size: 4cqmin;
+
+      background: rgb(0 0 0 / 60%);
+    }
+
+    .selection-mask-order {
+      font-family: sans-serif;
+      font-size: 2em;
+      font-weight: bold;
+      text-shadow: none;
+
+      -webkit-text-stroke: 0;
+    }
+  \`;
+	helper.css(".selection-mask", { color: () => isSelected() ? "#ffffffbf" : "#fffb" }, props.dom);
+	return solid_js_web.createComponent(solid_js.Show, {
+		get when() {
+			return props.isEnabled();
+		},
+		get children() {
+			var _el$2 = _tmpl$2$1(), _el$3 = _el$2.firstChild;
+			solid_js_web.addEventListener(_el$2, "click", helper.withEventStop(), true);
+			solid_js_web.addEventListener(_el$2, "contextmenu", helper.withEventStop(), true);
+			solid_js_web.addEventListener(_el$2, "mouseover", helper.withEventStop(), true);
+			solid_js_web.addEventListener(_el$2, "pointerover", helper.withEventStop(), true);
+			solid_js_web.addEventListener(_el$2, "pointerenter", helper.withEventStop((e) => props.drag.onPointerEnter(props.dom, e)));
+			solid_js_web.addEventListener(_el$2, "pointerdown", helper.withEventStop((e) => props.drag.onPointerDown(props.dom, e)), true);
+			solid_js_web.insert(_el$3, () => props.selection.getOrder(id()) ?? solid_js_web.createComponent(DashedRoundedSquare, {}));
+			return _el$2;
+		}
+	});
+};
+solid_js_web.delegateEvents([
+	"pointerdown",
+	"pointerover",
+	"mouseover",
+	"contextmenu",
+	"click"
+]);
+//#endregion
+//#region src/userscript/core/multiSelect/useDragSelect.ts
+const useDragSelect = ({ isEnabled, registeredItems, isSelected, setSession, session, commit, cancel }) => {
+	/** 当前活跃手势的 pointerId，null 表示无活跃手势 */
+	let pointerId = null;
+	/** 锚点在 items 中的索引，固定不变 */
+	let anchorIndex = -1;
+	/** 当前手势是否扩展过范围（用于判断是否应撤销选择） */
+	let hasExpanded = false;
+	return {
+		onPointerDown: (dom, e) => {
+			if (!isEnabled() || !e.isPrimary) return;
+			if (e.pointerType === "mouse" && e.button !== 0) return;
+			const entries = [...registeredItems().entries()];
+			anchorIndex = entries.findIndex(([d]) => d === dom);
+			if (anchorIndex === -1) return;
+			({pointerId} = e);
+			hasExpanded = false;
+			setSession((state) => {
+				state.operationType = isSelected(registeredItems().get(dom)) ? "unselect" : "select";
+				state.items = entries.map(([, id]) => id);
+				state.range = [anchorIndex, anchorIndex];
+			});
+		},
+		onPointerEnter: (dom, e) => {
+			if (!isEnabled() || pointerId === null || e.pointerId !== pointerId) return;
+			if (e.pointerType === "mouse" && (e.buttons & 1) === 0) {
+				pointerId = null;
+				return cancel();
+			}
+			const currentIndex = [...registeredItems().keys()].indexOf(dom);
+			if (currentIndex === -1) return;
+			const newRange = anchorIndex <= currentIndex ? [anchorIndex, currentIndex] : [currentIndex, anchorIndex];
+			setSession((state) => {
+				if (state.range[0] === newRange[0] && state.range[1] === newRange[1]) return;
+				state.range = newRange;
+				if (newRange[0] !== newRange[1]) hasExpanded = true;
+			});
+		},
+		onPointerUp: (e) => {
+			if (e.pointerId !== pointerId) return;
+			pointerId = null;
+			if (session.range[0] === session.range[1] && hasExpanded) cancel();
+			else commit();
+		},
+		onPointerCancel: (e) => {
+			if (e.pointerId !== pointerId) return;
+			pointerId = null;
+			cancel();
+		},
+		/** 取消活跃手势并重置状态 */
+		clear: () => {
+			if (pointerId !== null) cancel();
+			pointerId = null;
+		}
+	};
+};
+//#endregion
+//#region src/userscript/core/multiSelect/useSelection.ts
+/** 创建选中状态管理器 */
+const createSelectionController = () => {
+	/** 已确认的选中项 */
+	const baselineIds = new helper.ReactiveSet();
+	const { store: session, setState: setSession } = helper.useStore({
+		items: [],
+		range: [-1, -1],
+		operationType: "select"
+	});
+	/** 判断 session 是否处于活跃状态 */
+	const isSessionActive = () => session.range[0] >= 0 && session.range[1] >= 0;
+	/** 当前 range 区间内的 id 集合 */
+	const rangeIds = helper.createRootMemo(() => {
+		if (!isSessionActive()) return /* @__PURE__ */ new Set();
+		return new Set(session.items.slice(session.range[0], session.range[1] + 1));
+	});
+	const selectedIds = helper.createRootMemo(() => {
+		if (!isSessionActive()) return [...baselineIds];
+		return session.operationType === "select" ? [...baselineIds.union(rangeIds())] : [...baselineIds.difference(rangeIds())];
+	});
+	/** 记录每个 id 的选中顺序 */
+	const orderMap = helper.createRootMemo(() => Object.fromEntries(selectedIds().map((id, i) => [id, i + 1])));
+	const cancel = () => setSession((state) => {
+		state.items = [];
+		state.range = [-1, -1];
+		state.operationType = "select";
+	});
+	return {
+		/** 当前会话状态（只读） */
+		session,
+		/** 当前选中项 id 列表 */
+		selectedIds,
+		/** 记录每个 id 的选中顺序 */
+		orderMap,
+		/** 判断指定 id 是否被选中 */
+		isSelected: (id) => id in orderMap(),
+		/** 获取指定 id 的选中顺序，未选中返回 undefined */
+		getOrder: (id) => orderMap()[id],
+		/** 修改会话状态 */
+		setSession,
+		/** 将 session 的修改应用到基线，然后重置 session */
+		commit: () => {
+			if (!isSessionActive()) return;
+			if (session.operationType === "select") for (const id of rangeIds()) baselineIds.add(id);
+			else for (const id of rangeIds()) baselineIds.delete(id);
+			cancel();
+		},
+		/** 重置 session 为初始状态 */
+		cancel,
+		/** 直接设置基线选中项列表 */
+		setBaseline: (ids) => {
+			baselineIds.clear();
+			for (const id of ids) baselineIds.add(id);
+		},
+		/** 清空基线选中项列表 */
+		clearBaseline: () => baselineIds.clear()
+	};
+};
+//#endregion
+//#region src/userscript/core/multiSelect/useMultiSelect.tsx
+const useMultiSelect = ({ onStart, registeredItems }) => solid_js.createRoot((dispose) => {
+	const [isEnabled, setIsEnabled] = solid_js.createSignal(false);
+	const selectionController = createSelectionController();
+	const drag = useDragSelect({
+		isEnabled,
+		registeredItems,
+		...selectionController
+	});
+	/** 所有需要在 unmount 时执行的清理函数（DOM dispose、事件监听等） */
+	const cleanups = [];
+	let isInitialized = false;
+	let elementIndex = 0;
+	/** 注册一个可选元素：挂载 SelectionMask */
+	const register = (dom) => {
+		if (!registeredItems().get(dom)) return;
+		const index = elementIndex++;
+		const container = document.createElement("div");
+		dom.append(container);
+		const disposeDom = solid_js_web.render(() => solid_js_web.createComponent(SelectionMask, {
+			dom,
+			index,
+			isEnabled,
+			registeredItems,
+			selection: selectionController,
+			drag
+		}), container);
+		cleanups.push(() => {
+			disposeDom();
+			container.remove();
+		});
+	};
+	/** 卸载所有 DOM 注册和事件监听，但保留选中状态（翻页场景） */
+	const unmount = () => {
+		drag.clear();
+		setIsEnabled(false);
+		isInitialized = false;
+		for (let i = cleanups.length - 1; i >= 0; i--) cleanups[i]?.();
+		cleanups.length = 0;
+	};
+	return {
+		/** 当前是否处于多选模式 */
+		isEnabled,
+		/** 开启多选模式并注册元素 */
+		start: () => {
+			if (isEnabled()) return;
+			setIsEnabled(true);
+			if (isInitialized) return;
+			document.addEventListener("pointerup", drag.onPointerUp);
+			document.addEventListener("pointercancel", drag.onPointerCancel);
+			cleanups.push(() => {
+				document.removeEventListener("pointerup", drag.onPointerUp);
+				document.removeEventListener("pointercancel", drag.onPointerCancel);
+			});
+			const cleanup = onStart?.();
+			if (cleanup) cleanups.push(cleanup);
+			for (const dom of registeredItems().keys()) register(dom);
+			isInitialized = true;
+		},
+		/** 结束多选模式，并发处理所有选中项并返回结果列表 */
+		collect: async (process, limit) => {
+			const ids = selectionController.selectedIds();
+			if (ids.length === 0) return [];
+			setIsEnabled(false);
+			return await helper.plimit(ids.map((id) => async () => {
+				try {
+					return await process(id);
+				} catch (error) {
+					return error instanceof Error ? error : new Error(String(error));
+				}
+			}), void 0, limit);
+		},
+		/** 清空选中状态并卸载所有 DOM 注册 */
+		clear: () => {
+			selectionController.clearBaseline();
+			selectionController.cancel();
+			unmount();
+		},
+		unmount,
+		/** 清理所有 SolidJS 响应式资源 */
+		dispose,
+		/** 当前选中项 ID 列表 */
+		selectedIds: selectionController.selectedIds,
+		/** 根据 ID 列表恢复选中状态（翻页后重新注册 DOM 时使用） */
+		setSelectedIds: selectionController.setBaseline
+	};
+});
+//#endregion
+//#region src/userscript/core/multiSelect/useMultiSelectLoad.tsx
+const createMultiSelectLoadController = (coreCtx, options) => {
+	const { id: initListId, onStart, allItemIds, getImgList, isSameList } = options;
+	return solid_js.createRoot(async (rootDispose) => {
+		const { store, setState, showComic } = coreCtx;
+		const cache = await helper.useCache({
+			pending: "id",
+			confirmed: "id"
+		}, "MultiSelect");
+		const [registeredItems, setRegisteredItems] = solid_js.createSignal(/* @__PURE__ */ new Map());
+		const controller = useMultiSelect({
+			onStart,
+			registeredItems
+		});
+		const urlMap = {};
+		const targetIds = helper.createRootMemo(() => {
+			const ids = controller.selectedIds();
+			if (controller.isEnabled() && ids.length > 0) return ids;
+			return allItemIds?.() ?? [];
+		});
+		const computeImgList = () => targetIds().flatMap((id) => urlMap[id] ?? [""]);
+		/** 将 Manga 组件的扁平图片索引转为对应的选中项 ID */
+		const getItemIdsFromIndices = (indices) => {
+			const ids = [];
+			let offset = 0;
+			for (const id of targetIds()) {
+				const len = urlMap[id]?.length ?? 1;
+				for (const idx of indices) if (helper.inRange(offset, idx, offset + len - 1)) {
+					ids.push(id);
+					break;
+				}
+				offset += len;
+			}
+			return ids;
+		};
+		const reSetStore = () => {
+			setState("imgListMap", "", { getImgList: Object.assign(async () => {
+				if (store.imgListMap[""].imgList?.length) return store.imgListMap[""].imgList;
+				await new Promise((resolve) => {
+					const queue = new helper.PQueue(async (id) => {
+						try {
+							urlMap[id] = await getImgList(id);
+						} catch (error) {
+							helper.log.error(error);
+						}
+						setState("imgListMap", "", "imgList", computeImgList());
+						resolve();
+					}, 2);
+					setState((state) => {
+						state.imgListMap[""].imgList = computeImgList();
+						state.manga.onWaitUrlImgs = (imgs) => {
+							queue.set(...getItemIdsFromIndices(imgs));
+						};
+					});
+					if (targetIds().some((id) => urlMap[id])) resolve();
+				});
+				return store.imgListMap[""].imgList;
+			}, allItemIds ? {} : { type: "multiSelect" }) });
+		};
+		reSetStore();
+		const multiSelectLoad = helper.singleThreaded(async () => {
+			if (!controller.isEnabled()) {
+				controller.start();
+				const confirmed = await cache.get("confirmed", initListId);
+				if (confirmed) controller.setSelectedIds(confirmed.selecteds);
+				return;
+			}
+			await cache.del("pending", initListId);
+			await cache.set("confirmed", {
+				id: initListId,
+				selecteds: controller.selectedIds()
+			});
+			if (controller.selectedIds().length === 0) return;
+			setState("imgListMap", "", "imgList", void 0);
+			await showComic("");
+		});
+		let unregisterEscHandler;
+		helper.createEffectOn([controller.isEnabled], ([enabled]) => {
+			if (enabled) {
+				unregisterEscHandler?.();
+				unregisterEscHandler = registerEsc(-1, () => controller.isEnabled() && !store.manga.show ? unmount() : "SKIP");
+			}
+		});
+		setState("fab", "extraSpeedDial", [{
+			name: helper.t("hotkeys.multi_select_load"),
+			onClick: multiSelectLoad,
+			icon: checklist_default
+		}]);
+		helper.createEffectOn([controller.isEnabled, () => controller.selectedIds().length], ([enabled]) => {
+			const selecteds = controller.selectedIds();
+			(async () => {
+				await cache.del("pending", initListId);
+				await (selecteds.length === 0 ? cache.del("confirmed", initListId) : cache.set(enabled ? "pending" : "confirmed", {
+					id: initListId,
+					selecteds
+				}));
+			})();
+		}, { defer: true });
+		components_Manga.listenHotkey({
+			multi_select_load: multiSelectLoad,
+			enter_read_mode: () => controller.isEnabled() || !coreCtx.canLoadComic() ? multiSelectLoad() : coreCtx.showComic()
+		}, true);
+		let oldIdSet = [];
+		/** 清理副作用，但保留选中状态（用于翻页） */
+		const unmount = () => {
+			setState("imgListMap", "", "imgList", void 0);
+			unregisterEscHandler?.();
+			oldIdSet = [...registeredItems().values()];
+			controller.unmount();
+		};
+		/** 注册当前列表的可选项，等待至和上次的注册项不同 */
+		const registerItems = async (fillItems) => {
+			const map = await helper.wait(async () => {
+				const newMap = /* @__PURE__ */ new Map();
+				await fillItems(newMap);
+				if (newMap.size === 0) return;
+				if (helper.isEqual(oldIdSet, [...newMap.values()])) return;
+				return newMap;
+			}, 5e3);
+			if (!map) throw new Error("等待新 DOM 超时");
+			setRegisteredItems(map);
+			const pending = await cache.get("pending", initListId);
+			if (pending?.selecteds.length) {
+				controller.start();
+				controller.setSelectedIds(pending.selecteds);
+			}
+		};
+		const completeDispose = () => {
+			oldIdSet = [];
+			unmount();
+			controller.dispose();
+			setRegisteredItems(/* @__PURE__ */ new Map());
+			setMultiSelectController(void 0);
+			rootDispose();
+		};
+		await registerItems(options.registerItems);
+		return {
+			reSetStore,
+			/** 注册当前列表的可选项，通常由 useMultiSelectLoad 自动调用，无需手动调用 */
+			registerItems,
+			unmount,
+			/** 完全清理所有状态和副作用 */
+			dispose: completeDispose,
+			/** 页面切换时的清理策略 */
+			createCleanup: () => (nextPageCtx) => {
+				unmount();
+				if (!isSameList?.(nextPageCtx)) completeDispose();
+			},
+			load: multiSelectLoad,
+			start: controller.start,
+			isEnabled: controller.isEnabled,
+			selectedIds: controller.selectedIds,
+			clear: controller.clear,
+			setSelectedIds: controller.setSelectedIds
+		};
+	});
+};
+/** 当前的多选加载控制器（core 内部读取，如 useFab） */
+const [multiSelectController, setMultiSelectController] = solid_js.createSignal();
+const useMultiSelectLoad = async (coreCtx, options) => {
+	const controller = multiSelectController();
+	if (controller) {
+		controller.reSetStore();
+		await controller.registerItems(options.registerItems);
+		return controller;
+	}
+	const newController = await createMultiSelectLoadController(coreCtx, options);
+	setMultiSelectController(newController);
+	return newController;
+};
+//#endregion
+//#region src/userscript/core/readProgress.ts
+let cache = void 0;
+const initCache = async () => {
+	if (cache) return cache;
+	cache = await helper.useCache({ progress: "id" }, "ReadProgress");
+	const nowTime = Date.now();
+	cache.each("progress", (data, cursor) => {
+		if (nowTime - data.time < 25056e5) return;
+		return helper.promisifyRequest(cursor.delete());
+	});
+};
+/** 计算当前进度的存储标识 */
+const getProgressId = ({ store: { comicId, currentImgListId, flag } }) => {
+	if (!comicId) return;
+	return flag.isChapterMode ? \`\${currentImgListId}\` : comicId;
+};
+let saveInfo;
+/** 与 saveInfo 同批快照的进度标识，防止保存执行期间漫画切换导致存错 */
+let saveId;
+let lastIndex = -1;
+const doSave = helper.throttle(async () => {
+	const info = saveInfo;
+	const id = saveId;
+	if (!info || !id) return;
+	const index = info.activeImgIndex;
+	if (index === lastIndex) return;
+	lastIndex = index;
+	await initCache();
+	if (info.imgList.length < 50 || index >= info.imgList.length - 5) return await cache.del("progress", id);
+	const imgSize = {};
+	for (const [i, img] of info.imgList.entries()) if (img.width && img.height) imgSize[i] = [img.width, img.height];
+	await cache.set("progress", {
+		id,
+		time: Date.now(),
+		index,
+		imgSize,
+		fillEffect: info.fillEffect
+	});
+}, 1e3);
+/** 监听当前显示图片的变化，存储图片显示相关数据 */
+const useReadProgress = (coreCtx) => {
+	addShowImgsListener((info) => {
+		saveInfo = info;
+		saveId = getProgressId(coreCtx);
+		doSave();
+	});
+};
+/** 根据存储的阅读进度创建初始图片显示数据 */
+const restoreReadProgress = async (id, imgList) => {
+	await initCache();
+	const progress = await cache.get("progress", id);
+	if (!progress) return;
+	return {
+		imgList: imgList.map((item, i) => {
+			const size = progress.imgSize[i];
+			if (!size) return item;
+			return typeof item === "string" ? {
+				src: item,
+				width: size[0],
+				height: size[1]
+			} : {
+				...item,
+				width: size[0],
+				height: size[1]
+			};
+		}),
+		fillEffect: progress.fillEffect,
+		initialImgIndex: Math.min(progress.index, imgList.length - 1)
+	};
+};
 //#endregion
 //#region node_modules/.pnpm/@material-design-icons+svg@0.14.15/node_modules/@material-design-icons/svg/round/clear_all.svg
 var _tmpl$$14 = /*#__PURE__*/ solid_js_web.template(\`<svg xmlns=http://www.w3.org/2000/svg viewBox="0 0 24 24"stroke=currentColor fill=currentColor stroke-width=0><path d="M6 13h12c.55 0 1-.45 1-1s-.45-1-1-1H6c-.55 0-1 .45-1 1s.45 1 1 1m-2 4h12c.55 0 1-.45 1-1s-.45-1-1-1H4c-.55 0-1 .45-1 1s.45 1 1 1m3-9c0 .55.45 1 1 1h12c.55 0 1-.45 1-1s-.45-1-1-1H8c-.55 0-1 .45-1 1">\`);
@@ -10721,7 +12137,7 @@ const useSpeedDial = ({ store, setState, options, setOptions }) => {
 //#endregion
 //#region src/userscript/core/useFab.tsx
 var _tmpl$$2 = /*#__PURE__*/ solid_js_web.template(\`<div style=text-align:center;line-height:1.2><span style=opacity:0.6;font-size:0.75em></span><br>\`);
-const useFab = (coreCtx, nowImgList) => {
+const useFab = (coreCtx, currentImgListId) => {
 	const { store, setState, options, setOptions, showComic } = coreCtx;
 	helper.css\`
     #fab {
@@ -10738,7 +12154,7 @@ const useFab = (coreCtx, nowImgList) => {
 		"--top": () => \`\${options.fabPosition.top}px\`
 	});
 	/** 当前已取得 url 的图片数量 */
-	const doneImgNum = helper.createRootMemo(() => nowImgList()?.filter(Boolean)?.length);
+	const doneImgNum = helper.createRootMemo(() => currentImgListId()?.filter(Boolean)?.length);
 	/** 已加载完毕的图片数量 */
 	const loadedImgNum = helper.createRootMemo(() => {
 		let i = 0;
@@ -10748,15 +12164,15 @@ const useFab = (coreCtx, nowImgList) => {
 	helper.createEffectOn([
 		doneImgNum,
 		loadedImgNum,
-		() => nowImgList()?.length,
+		() => currentImgListId()?.length,
 		coreCtx.canLoadComic,
 		coreCtx.canMultiSelect,
-		() => coreCtx.multiSelect?.isEnabled(),
-		() => coreCtx.multiSelect?.selectedIds().length,
+		() => multiSelectController()?.isEnabled(),
+		() => multiSelectController()?.selectedIds().length,
 		() => options.hiddenFab
 	], ([doneNum, loadNum, totalNum, canLoadComic, canMultiSelect, enabled, selectedCount, hiddenFab]) => setState((state) => {
 		if (enabled || canMultiSelect && !canLoadComic) {
-			const ms = coreCtx.multiSelect;
+			const ms = multiSelectController();
 			const isActive = enabled && helper.isNumber(selectedCount);
 			state.fab.show = isActive ? true : void 0;
 			state.fab.children = isActive ? (() => {
@@ -10848,6 +12264,23 @@ const useFab = (coreCtx, nowImgList) => {
 	});
 	dom.style.setProperty("z-index", "2147483646", "important");
 	useSpeedDial(coreCtx);
+};
+//#endregion
+//#region src/userscript/core/useImgList.ts
+/** 处理传递给 Manga 的初始图片数据 */
+const useImgList = (coreCtx, currentImgListId) => {
+	/** 当前进度的存储标识，变化时需要重新查询阅读进度 */
+	const progressId = helper.createRootMemo(() => getProgressId(coreCtx));
+	helper.createEffectOn([currentImgListId, progressId], async ([imgList, id]) => {
+		if (!imgList) return;
+		const progress = id && await restoreReadProgress(id, imgList) || {
+			imgList,
+			fillEffect: void 0,
+			initialImgIndex: void 0
+		};
+		if (progressId() !== id) return;
+		return coreCtx.setState("manga", progress);
+	});
 };
 //#endregion
 //#region node_modules/.pnpm/@material-design-icons+svg@0.14.15/node_modules/@material-design-icons/svg/round/sync.svg
@@ -11042,7 +12475,10 @@ const useManga = ({ store, setState, options, setOptions }) => {
 			setState("hotkeys", newValue);
 		}
 	});
-	dom = helper.mountComponents("comicRead", () => solid_js_web.createComponent(components_Manga.Manga, solid_js_web.mergeProps(() => store.manga)));
+	dom = helper.mountComponents("comicRead", () => solid_js_web.createComponent(components_Manga.Manga, solid_js_web.mergeProps(() => store.manga, { onShowImgsChange: (info) => {
+		store.manga.onShowImgsChange?.(info);
+		dispatchShowImgsChange(info);
+	} })));
 	dom.style.setProperty("z-index", "2147483647", "important");
 	const toastDom = helper.querySelector("#toast");
 	if (toastDom) dom.after(toastDom);
@@ -11121,6 +12557,11 @@ const handleVersionUpdate = async () => {
 	if (helper.lang() === "zh") {
 		components_Toast.toast(() => {
 			const changes = Object.entries({
+				"12.15.0": {
+					"date": "2026-09-24",
+					"feat": ["支持 E-Hentai 镜像站（ex.moonchan.xyz）", "拷贝漫画支持章节模式"],
+					"fix": ["修复 hanime1 改版导致的失效", "修复绅士漫画改版导致的失效"]
+				},
 				"12.14.0": {
 					"date": "2026-09-09",
 					"feat": ["增加跳转至指定页的快捷键「G」"],
@@ -11256,12 +12697,13 @@ const useInit = async (name, initSiteOptions = {}) => {
 			...structuredClone(defaultOptions),
 			...saveOptions
 		},
-		comicMap: { "": { getImgList: Object.assign(() => [], { type: "init" }) } },
-		nowComic: "",
+		imgListMap: { "": { getImgList: Object.assign(() => [], { type: "init" }) } },
+		currentImgListId: "",
 		flag: {
 			isStored: saveOptions !== void 0,
 			needAutoShow: true,
-			hasPageHandler: false
+			hasPageHandler: false,
+			isChapterMode: false
 		}
 	});
 	components_Manga.setDefaultHotkeys((_hotkeys) => ({
@@ -11275,24 +12717,27 @@ const useInit = async (name, initSiteOptions = {}) => {
 		if (options.lockOption && newOptions?.lockOption !== false) return;
 		return GM.setValue(store.name, helper.difference(options, defaultOptions));
 	};
-	const loadComic = async (id = store.nowComic) => {
-		if (!Reflect.has(store.comicMap, id)) throw new Error("comic not found");
+	const loadComic = async (id = store.currentImgListId) => {
+		if (!Reflect.has(store.imgListMap, id)) throw new Error("imgList not found");
+		const { getImgList } = store.imgListMap[id];
 		try {
-			setState("comicMap", id, "imgList", []);
-			const newImgList = await store.comicMap[id].getImgList(coreCtx);
+			setState("imgListMap", id, "imgList", []);
+			const newImgList = await getImgList(coreCtx);
 			if (newImgList.length === 0) throw new Error(helper.t("alert.fetch_comic_img_failed"));
-			setState("comicMap", id, "imgList", newImgList);
+			if (store.imgListMap[id]?.getImgList !== getImgList) return;
+			setState("imgListMap", id, "imgList", newImgList);
 		} catch (error) {
-			setState("comicMap", id, "imgList", void 0);
+			if (store.imgListMap[id]?.getImgList !== getImgList) return;
+			setState("imgListMap", id, "imgList", void 0);
 			helper.log.error(error);
 			throw error;
 		}
 	};
-	const showComic = async (id = store.nowComic) => {
-		if (!Reflect.has(store.comicMap, id)) throw new Error("comic not found");
-		if (store.comicMap[id].getImgList?.type === "init") return;
-		if (id !== store.nowComic) setState("nowComic", id);
-		switch (store.comicMap[id].imgList?.length) {
+	const showComic = async (id = store.currentImgListId) => {
+		if (!Reflect.has(store.imgListMap, id)) throw new Error("imgList not found");
+		if (store.imgListMap[id].getImgList?.type === "init") return;
+		if (id !== store.currentImgListId) setState("currentImgListId", id);
+		switch (store.imgListMap[id].imgList?.length) {
 			case 0: return components_Toast.toast.warn(helper.t("alert.repeat_load"), { duration: 1500 });
 			case void 0: try {
 				await loadComic(id);
@@ -11315,9 +12760,8 @@ const useInit = async (name, initSiteOptions = {}) => {
 			Escape: () => handleEsc() || "SKIP"
 		}, true);
 	});
-	helper.createEffectOn(() => store.comicMap[""].getImgList, (_, prev) => !prev && init(), { defer: true });
-	const canLoadComic = helper.createRootMemo(() => Object.values(store.comicMap).some((entry) => entry.getImgList?.type === void 0));
-	const [multiSelect, setMultiSelect] = solid_js.createSignal();
+	const canLoadComic = helper.createRootMemo(() => Object.values(store.imgListMap).some((entry) => entry.getImgList?.type === void 0));
+	helper.createEffectOn(canLoadComic, (canLoad, prev) => canLoad && !prev && init(), { defer: true });
 	const coreCtx = {
 		store,
 		setState,
@@ -11327,52 +12771,53 @@ const useInit = async (name, initSiteOptions = {}) => {
 		showComic,
 		init,
 		canLoadComic,
-		canMultiSelect: helper.createRootMemo(() => Boolean(multiSelect())),
-		get multiSelect() {
-			return multiSelect();
-		},
-		setMultiSelect,
+		canMultiSelect: helper.createRootMemo(() => Boolean(multiSelectController())),
 		dynamicLoad: async (loadImgFn, length, id = "") => {
-			if (store.comicMap[id].imgList?.length) return store.comicMap[id].imgList;
+			if (store.imgListMap[id].imgList?.length) return store.imgListMap[id].imgList;
 			const imgNum = typeof length === "number" ? length : length();
-			setState("comicMap", id, "imgList", helper.range(imgNum, ""));
+			setState("imgListMap", id, "imgList", helper.range(imgNum, ""));
 			await new Promise(async (resolve) => {
 				try {
 					await loadImgFn((i, img) => {
-						setState("comicMap", id, "imgList", (list) => list.with(i, img));
+						setState("imgListMap", id, "imgList", (list) => list.with(i, img));
 						resolve();
 					});
 				} catch (error) {
 					components_Toast.toast.error(error.message);
 				}
 			});
-			return store.comicMap[id].imgList;
+			return store.imgListMap[id].imgList;
 		},
-		dynamicLazyLoad: async ({ loadImg, length, id = "", concurrency = 4 }) => {
-			if (store.comicMap[id].imgList?.length) return store.comicMap[id].imgList;
+		dynamicLazyLoad: async ({ loadImg, length, id = "", concurrency = 2 }) => {
+			if (store.imgListMap[id].imgList?.length) return store.imgListMap[id].imgList;
 			const imgNum = typeof length === "number" ? length : length();
 			await new Promise((resolve) => {
 				const queue = new helper.PQueue(async (i) => {
-					const img = await loadImg(i);
-					setState("comicMap", id, "imgList", (list) => list.with(i, img));
-					resolve();
+					try {
+						const img = await loadImg(i);
+						setState("imgListMap", id, "imgList", (list) => list.with(i, img));
+					} finally {
+						resolve();
+					}
 				}, concurrency);
 				setState((state) => {
-					state.comicMap[id].imgList = helper.range(imgNum, "");
+					state.imgListMap[id].imgList = helper.range(imgNum, "");
 					state.manga.onWaitUrlImgs = (imgs) => queue.set(...imgs);
 				});
 			});
-			return store.comicMap[id].imgList;
+			return store.imgListMap[id].imgList;
 		}
 	};
-	const nowImgList = helper.createRootMemo(() => {
-		const comic = store.comicMap[store.nowComic];
-		if (!comic?.imgList) return;
-		if (!comic.adList?.size) return comic.imgList;
-		return comic.imgList.filter((_, i) => !comic.adList?.has(i));
+	const currentImgList = helper.createRootMemo(() => {
+		const entry = store.imgListMap[store.currentImgListId];
+		if (!entry?.imgList) return;
+		if (!entry.adList?.size) return entry.imgList;
+		return entry.imgList.filter((_, i) => !entry.adList?.has(i));
 	});
-	helper.createEffectOn(nowImgList, (list) => list && setState("manga", "imgList", list));
-	useFab(coreCtx, nowImgList);
+	useReadProgress(coreCtx);
+	useImgList(coreCtx, currentImgList);
+	helper.createEffectOn(() => store.imgListMap[store.currentImgListId]?.commentList, (list) => setState("manga", "commentList", list ?? []));
+	useFab(coreCtx, currentImgList);
 	useManga(coreCtx);
 	let menuId;
 	/** 更新显示/隐藏悬浮按钮的菜单项 */
@@ -11396,37 +12841,7 @@ const useInit = async (name, initSiteOptions = {}) => {
 	return coreCtx;
 };
 //#endregion
-//#region src/userscript/core/siteAdapter.ts
-/** 快速适配简单网站 */
-const setup = async ({ name, initOptions, isMangaPage, getImgList, onPrev, onNext, onExit, handler: userHandler }) => {
-	await setupSiteAdapter({
-		name,
-		options: initOptions,
-		getPageContext: async () => {
-			const data = isMangaPage ? await isMangaPage() : {};
-			if (!data) return;
-			return {
-				type: "manga",
-				...data === true ? {} : data
-			};
-		},
-		handlers: { manga: async (coreCtx, pageCtx) => {
-			const { setState } = coreCtx;
-			setState((state) => {
-				state.comicMap[""] = { getImgList: (ctx) => getImgList(ctx, pageCtx) };
-				state.manga.onExit = (isEnd) => {
-					onExit?.(isEnd);
-					setState("manga", "show", false);
-				};
-			});
-			await userHandler?.(coreCtx, pageCtx);
-			(async () => {
-				if (onPrev) setState("manga", { onPrev: await helper.wait(onPrev, 5e3) });
-				if (onNext) setState("manga", { onNext: await helper.wait(onNext, 5e3) });
-			})();
-		} }
-	});
-};
+//#region src/userscript/core/siteAdapter/setupSiteAdapter.ts
 const setupSiteAdapter = async ({ name, options: initOptions, getPageContext, handlers, features }) => {
 	let pageCtx;
 	const cleanupFns = [];
@@ -11441,15 +12856,21 @@ const setupSiteAdapter = async ({ name, options: initOptions, getPageContext, ha
 		pageCtx = newPageCtx;
 		const isMangePage = newPageCtx?.isManga ?? newPageCtx?.type === "manga";
 		const keepShow = wasMangaPage && isMangePage && store.manga.show;
+		if (!keepShow) exitChapterMode();
 		setState((state) => {
 			state.flag.hasPageHandler = Boolean(newPageCtx?.type) && Reflect.has(handlers, newPageCtx.type);
 			if (!keepShow) {
 				state.manga.show = false;
-				state.comicMap = { "": { getImgList: Object.assign(() => [], { type: "init" }) } };
+				state.imgListMap = { "": { getImgList: Object.assign(() => [], { type: "init" }) } };
 			}
+			state.comicId = isMangePage && newPageCtx?.id || void 0;
 		});
-		const allCleanup = await handlers.all?.(coreCtx, newPageCtx);
-		if (allCleanup) cleanupFns.push(allCleanup);
+		try {
+			const allCleanup = await handlers.all?.(coreCtx, newPageCtx);
+			if (allCleanup) cleanupFns.push(allCleanup);
+		} catch (error) {
+			helper.log.error(error);
+		}
 		if (features) for (const [featureName, handler] of Object.entries(features)) {
 			if (!options[featureName] || !handler) continue;
 			if (handler.length >= 2 && !newPageCtx) continue;
@@ -11460,9 +12881,20 @@ const setupSiteAdapter = async ({ name, options: initOptions, getPageContext, ha
 		}
 		if (!newPageCtx) return;
 		init(isMangePage);
-		const handlerCleanup = await handlers[newPageCtx.type]?.(coreCtx, newPageCtx);
-		if (handlerCleanup) cleanupFns.push(handlerCleanup);
+		try {
+			const handlerCleanup = await handlers[newPageCtx.type]?.(coreCtx, newPageCtx);
+			if (handlerCleanup) cleanupFns.push(handlerCleanup);
+		} catch (error) {
+			helper.log.error(error);
+		}
 		if (keepShow) {
+			const manager = getChapterManager();
+			const chapter = manager && store.flag.isChapterMode && findChapterByUrl(manager, location.href);
+			if (manager && chapter) {
+				if (manager.key(chapter.id) !== store.currentImgListId) await switchChapter(chapter.id, false);
+				return;
+			}
+			if (store.imgListMap[store.currentImgListId]?.imgList) return;
 			try {
 				await loadComic();
 			} catch {
@@ -11471,11 +12903,17 @@ const setupSiteAdapter = async ({ name, options: initOptions, getPageContext, ha
 			return;
 		}
 		if (!isMangePage || !store.options.autoShow) return;
-		const lastImg = store.comicMap[store.nowComic].imgList?.[0];
+		const lastImg = store.imgListMap[store.currentImgListId].imgList?.[0];
 		if (await helper.wait(async () => {
 			await helper.sleep(200);
-			await loadComic();
-			return store.comicMap[store.nowComic].imgList?.[0] !== lastImg;
+			if (store.imgListMap[store.currentImgListId]?.getImgList?.type === "init") return false;
+			try {
+				await loadComic();
+				return store.imgListMap[store.currentImgListId].imgList?.[0] !== lastImg;
+			} catch (error) {
+				helper.log.error(error);
+				return false;
+			}
 		}, 1e4)) await showComic();
 	};
 	helper.onUrlChange(async (lastUrl) => {
@@ -11483,6 +12921,63 @@ const setupSiteAdapter = async ({ name, options: initOptions, getPageContext, ha
 		await processPageContext(await getPageContext(pageCtx));
 	});
 };
+//#endregion
+//#region src/userscript/core/siteAdapter/setup.ts
+/** 快速适配简单网站 */
+const setup = async ({ name, initOptions, isMangaPage, getImgList, getChapterList, getCurrentId, getChapterImgList, onPrev, onNext, onExit, handler: userHandler }) => {
+	await setupSiteAdapter({
+		name,
+		options: initOptions,
+		getPageContext: async () => {
+			const data = isMangaPage ? await isMangaPage() : {};
+			if (!data) return;
+			return {
+				type: "manga",
+				...data === true ? {} : data
+			};
+		},
+		handlers: { manga: async (coreCtx, pageCtx) => {
+			const { setState } = coreCtx;
+			setState((state) => {
+				state.manga.onExit = (isEnd) => {
+					onExit?.(isEnd);
+					setState("manga", "show", false);
+				};
+			});
+			const cleanup = getChapterList && setupChapters(coreCtx, {
+				getChapterList,
+				getChapterImgList,
+				currentId: getCurrentId()
+			});
+			if (!getChapterList && getImgList) {
+				exitChapterMode();
+				setState((state) => {
+					state.imgListMap[""] = { getImgList: (ctx) => getImgList(ctx, pageCtx) };
+				});
+			}
+			try {
+				await userHandler?.(coreCtx, pageCtx);
+			} catch (error) {
+				helper.log.error(error);
+			}
+			if (cleanup) return cleanup;
+			(async () => {
+				if (onPrev) try {
+					setState("manga", { onPrev: await helper.wait(onPrev, 5e3) });
+				} catch (error) {
+					helper.log.error(error);
+				}
+				if (onNext) try {
+					setState("manga", { onNext: await helper.wait(onNext, 5e3) });
+				} catch (error) {
+					helper.log.error(error);
+				}
+			})();
+		} }
+	});
+};
+//#endregion
+//#region src/userscript/core/siteAdapter/setupSimple.ts
 /** 适配「将所有图片显示在一个页面上」的网站 */
 const setupSimple = async ({ name, initOptions, isMangaPage, onPrev, onNext, onExit, selector, sortImageByTop }) => {
 	let scanner;
@@ -11505,7 +13000,7 @@ const setupSimple = async ({ name, initOptions, isMangaPage, onPrev, onNext, onE
 			scanner ??= new userscript_autoImageScanner.AutoImageScanner({
 				selector,
 				sortImageByTop,
-				onImgListChange: (imgList) => setState("comicMap", "", "imgList", imgList),
+				onImgListChange: (imgList) => setState("imgListMap", "", { imgList }),
 				onChapterSwitchChange: async ({ prev, next }) => {
 					const customPrev = onPrev ? await onPrev() : void 0;
 					const customNext = onNext ? await onNext() : void 0;
@@ -11517,7 +13012,7 @@ const setupSimple = async ({ name, initOptions, isMangaPage, onPrev, onNext, onE
 				shouldTriggerLazyLoad: () => store.manga.show || store.manga.imgList.length === 0
 			});
 			setState((state) => {
-				state.comicMap[""] = { getImgList: () => {
+				state.imgListMap[""] = { getImgList: () => {
 					scanner.start();
 					scanner.triggerLazyLoad();
 					return scanner.waitFirstImage(1e4);
@@ -11533,17 +13028,25 @@ const setupSimple = async ({ name, initOptions, isMangaPage, onPrev, onNext, onE
 	});
 };
 //#endregion
+exports.exitChapterMode = exitChapterMode;
+exports.findChapterByUrl = findChapterByUrl;
+exports.getChapterManager = getChapterManager;
 exports.handleEsc = handleEsc;
 exports.handleVersionUpdate = handleVersionUpdate;
 exports.listenHotkey = components_Manga.listenHotkey;
+exports.multiSelectController = multiSelectController;
 exports.registerEsc = registerEsc;
 exports.request = request.request;
 exports.setEscPriority = setEscPriority;
+exports.setMultiSelectController = setMultiSelectController;
 exports.setup = setup;
+exports.setupChapters = setupChapters;
 exports.setupSimple = setupSimple;
 exports.setupSiteAdapter = setupSiteAdapter;
+exports.switchChapter = switchChapter;
 exports.toast = components_Toast.toast;
 exports.useInit = useInit;
+exports.useMultiSelectLoad = useMultiSelectLoad;
 exports.useSpeedDial = useSpeedDial;
 `,
 	"userscript/autoImageScanner": `\nlet helper = require("helper");
@@ -12903,471 +14406,6 @@ Object.defineProperty(exports, "supportWorker", {
 		return supportWorker;
 	}
 });
-`,
-	"userscript/multiSelect": `\nlet solid_js_web = require("solid-js/web");
-let helper = require("helper");
-let solid_js = require("solid-js");
-let core = require("core");
-//#region src/userscript/multiSelect/SelectionMask.tsx
-var _tmpl$$1 = /*#__PURE__*/ solid_js_web.template(\`<svg xmlns=http://www.w3.org/2000/svg viewBox="0 0 24 24"width=1.5em height=1.5em fill=none opacity=0.4 style=display:inline;vertical-align:-0.15em><rect x=2 y=2 width=20 height=20 rx=5 stroke=currentColor stroke-width=1.3 stroke-dasharray="3 2">\`);
-var _tmpl$2 = /*#__PURE__*/ solid_js_web.template(\`<div class=selection-mask><span class=selection-mask-order>\`);
-const DashedRoundedSquare = () => _tmpl$$1();
-const SelectionMask = (props) => {
-	const id = () => props.registeredItems().get(props.dom);
-	const isSelected = () => props.selection.isSelected(id());
-	helper.css\`
-    \${props.dom}
-    .selection-mask {
-      touch-action: none;
-      cursor: pointer;
-      cursor: cell;
-      user-select: none;
-
-      position: absolute;
-      z-index: 2147483646;
-      top: 0;
-      left: 0;
-
-      container-type: size;
-      overflow: clip;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      width: 100%;
-      height: 100%;
-
-      font-size: 4cqmin;
-
-      background: rgb(0 0 0 / 60%);
-    }
-
-    .selection-mask-order {
-      font-family: sans-serif;
-      font-size: 2em;
-      font-weight: bold;
-      text-shadow: none;
-
-      -webkit-text-stroke: 0;
-    }
-  \`;
-	helper.css(".selection-mask", { color: () => isSelected() ? "#ffffffbf" : "#fffb" }, props.dom);
-	return solid_js_web.createComponent(solid_js.Show, {
-		get when() {
-			return props.isEnabled();
-		},
-		get children() {
-			var _el$2 = _tmpl$2(), _el$3 = _el$2.firstChild;
-			solid_js_web.addEventListener(_el$2, "click", helper.withEventStop(), true);
-			solid_js_web.addEventListener(_el$2, "contextmenu", helper.withEventStop(), true);
-			solid_js_web.addEventListener(_el$2, "mouseover", helper.withEventStop(), true);
-			solid_js_web.addEventListener(_el$2, "pointerover", helper.withEventStop(), true);
-			solid_js_web.addEventListener(_el$2, "pointerenter", helper.withEventStop((e) => props.drag.onPointerEnter(props.dom, e)));
-			solid_js_web.addEventListener(_el$2, "pointerdown", helper.withEventStop((e) => props.drag.onPointerDown(props.dom, e)), true);
-			solid_js_web.insert(_el$3, () => props.selection.getOrder(id()) ?? solid_js_web.createComponent(DashedRoundedSquare, {}));
-			return _el$2;
-		}
-	});
-};
-solid_js_web.delegateEvents([
-	"pointerdown",
-	"pointerover",
-	"mouseover",
-	"contextmenu",
-	"click"
-]);
-//#endregion
-//#region src/userscript/multiSelect/useDragSelect.ts
-const useDragSelect = ({ isEnabled, registeredItems, isSelected, setSession, session, commit, cancel }) => {
-	/** 当前活跃手势的 pointerId，null 表示无活跃手势 */
-	let pointerId = null;
-	/** 锚点在 items 中的索引，固定不变 */
-	let anchorIndex = -1;
-	/** 当前手势是否扩展过范围（用于判断是否应撤销选择） */
-	let hasExpanded = false;
-	return {
-		onPointerDown: (dom, e) => {
-			if (!isEnabled() || !e.isPrimary) return;
-			if (e.pointerType === "mouse" && e.button !== 0) return;
-			const entries = [...registeredItems().entries()];
-			anchorIndex = entries.findIndex(([d]) => d === dom);
-			if (anchorIndex === -1) return;
-			({pointerId} = e);
-			hasExpanded = false;
-			setSession((state) => {
-				state.operationType = isSelected(registeredItems().get(dom)) ? "unselect" : "select";
-				state.items = entries.map(([, id]) => id);
-				state.range = [anchorIndex, anchorIndex];
-			});
-		},
-		onPointerEnter: (dom, e) => {
-			if (!isEnabled() || pointerId === null || e.pointerId !== pointerId) return;
-			if (e.pointerType === "mouse" && (e.buttons & 1) === 0) {
-				pointerId = null;
-				return cancel();
-			}
-			const currentIndex = [...registeredItems().keys()].indexOf(dom);
-			if (currentIndex === -1) return;
-			const newRange = anchorIndex <= currentIndex ? [anchorIndex, currentIndex] : [currentIndex, anchorIndex];
-			setSession((state) => {
-				if (state.range[0] === newRange[0] && state.range[1] === newRange[1]) return;
-				state.range = newRange;
-				if (newRange[0] !== newRange[1]) hasExpanded = true;
-			});
-		},
-		onPointerUp: (e) => {
-			if (e.pointerId !== pointerId) return;
-			pointerId = null;
-			if (session.range[0] === session.range[1] && hasExpanded) cancel();
-			else commit();
-		},
-		onPointerCancel: (e) => {
-			if (e.pointerId !== pointerId) return;
-			pointerId = null;
-			cancel();
-		},
-		/** 取消活跃手势并重置状态 */
-		clear: () => {
-			if (pointerId !== null) cancel();
-			pointerId = null;
-		}
-	};
-};
-//#endregion
-//#region src/userscript/multiSelect/useSelection.ts
-/** 创建选中状态管理器 */
-const createSelectionController = () => {
-	/** 已确认的选中项 */
-	const baselineIds = new helper.ReactiveSet();
-	const { store: session, setState: setSession } = helper.useStore({
-		items: [],
-		range: [-1, -1],
-		operationType: "select"
-	});
-	/** 判断 session 是否处于活跃状态 */
-	const isSessionActive = () => session.range[0] >= 0 && session.range[1] >= 0;
-	/** 当前 range 区间内的 id 集合 */
-	const rangeIds = helper.createRootMemo(() => {
-		if (!isSessionActive()) return /* @__PURE__ */ new Set();
-		return new Set(session.items.slice(session.range[0], session.range[1] + 1));
-	});
-	const selectedIds = helper.createRootMemo(() => {
-		if (!isSessionActive()) return [...baselineIds];
-		return session.operationType === "select" ? [...baselineIds.union(rangeIds())] : [...baselineIds.difference(rangeIds())];
-	});
-	/** 记录每个 id 的选中顺序 */
-	const orderMap = helper.createRootMemo(() => Object.fromEntries(selectedIds().map((id, i) => [id, i + 1])));
-	const cancel = () => setSession((state) => {
-		state.items = [];
-		state.range = [-1, -1];
-		state.operationType = "select";
-	});
-	return {
-		/** 当前会话状态（只读） */
-		session,
-		/** 当前选中项 id 列表 */
-		selectedIds,
-		/** 记录每个 id 的选中顺序 */
-		orderMap,
-		/** 判断指定 id 是否被选中 */
-		isSelected: (id) => id in orderMap(),
-		/** 获取指定 id 的选中顺序，未选中返回 undefined */
-		getOrder: (id) => orderMap()[id],
-		/** 修改会话状态 */
-		setSession,
-		/** 将 session 的修改应用到基线，然后重置 session */
-		commit: () => {
-			if (!isSessionActive()) return;
-			if (session.operationType === "select") for (const id of rangeIds()) baselineIds.add(id);
-			else for (const id of rangeIds()) baselineIds.delete(id);
-			cancel();
-		},
-		/** 重置 session 为初始状态 */
-		cancel,
-		/** 直接设置基线选中项列表 */
-		setBaseline: (ids) => {
-			baselineIds.clear();
-			for (const id of ids) baselineIds.add(id);
-		},
-		/** 清空基线选中项列表 */
-		clearBaseline: () => baselineIds.clear()
-	};
-};
-//#endregion
-//#region src/userscript/multiSelect/useMultiSelect.tsx
-const useMultiSelect = ({ onStart, registeredItems }) => solid_js.createRoot((dispose) => {
-	const [isEnabled, setIsEnabled] = solid_js.createSignal(false);
-	const selectionController = createSelectionController();
-	const drag = useDragSelect({
-		isEnabled,
-		registeredItems,
-		...selectionController
-	});
-	/** 所有需要在 unmount 时执行的清理函数（DOM dispose、事件监听等） */
-	const cleanups = [];
-	let isInitialized = false;
-	let elementIndex = 0;
-	/** 注册一个可选元素：挂载 SelectionMask */
-	const register = (dom) => {
-		if (!registeredItems().get(dom)) return;
-		const index = elementIndex++;
-		const container = document.createElement("div");
-		dom.append(container);
-		const disposeDom = solid_js_web.render(() => solid_js_web.createComponent(SelectionMask, {
-			dom,
-			index,
-			isEnabled,
-			registeredItems,
-			selection: selectionController,
-			drag
-		}), container);
-		cleanups.push(() => {
-			disposeDom();
-			container.remove();
-		});
-	};
-	/** 卸载所有 DOM 注册和事件监听，但保留选中状态（翻页场景） */
-	const unmount = () => {
-		drag.clear();
-		setIsEnabled(false);
-		isInitialized = false;
-		for (let i = cleanups.length - 1; i >= 0; i--) cleanups[i]?.();
-		cleanups.length = 0;
-	};
-	return {
-		/** 当前是否处于多选模式 */
-		isEnabled,
-		/** 开启多选模式并注册元素 */
-		start: () => {
-			if (isEnabled()) return;
-			setIsEnabled(true);
-			if (isInitialized) return;
-			document.addEventListener("pointerup", drag.onPointerUp);
-			document.addEventListener("pointercancel", drag.onPointerCancel);
-			cleanups.push(() => {
-				document.removeEventListener("pointerup", drag.onPointerUp);
-				document.removeEventListener("pointercancel", drag.onPointerCancel);
-			});
-			const cleanup = onStart?.();
-			if (cleanup) cleanups.push(cleanup);
-			for (const dom of registeredItems().keys()) register(dom);
-			isInitialized = true;
-		},
-		/** 结束多选模式，并发处理所有选中项并返回结果列表 */
-		collect: async (process, limit) => {
-			const ids = selectionController.selectedIds();
-			if (ids.length === 0) return [];
-			setIsEnabled(false);
-			return await helper.plimit(ids.map((id) => async () => {
-				try {
-					return await process(id);
-				} catch (error) {
-					return error instanceof Error ? error : new Error(String(error));
-				}
-			}), void 0, limit);
-		},
-		/** 清空选中状态并卸载所有 DOM 注册 */
-		clear: () => {
-			selectionController.clearBaseline();
-			selectionController.cancel();
-			unmount();
-		},
-		unmount,
-		/** 清理所有 SolidJS 响应式资源 */
-		dispose,
-		/** 当前选中项 ID 列表 */
-		selectedIds: selectionController.selectedIds,
-		/** 根据 ID 列表恢复选中状态（翻页后重新注册 DOM 时使用） */
-		setSelectedIds: selectionController.setBaseline
-	};
-});
-//#endregion
-//#region node_modules/.pnpm/@material-design-icons+svg@0.14.15/node_modules/@material-design-icons/svg/round/checklist.svg
-var _tmpl$ = /*#__PURE__*/ solid_js_web.template(\`<svg xmlns=http://www.w3.org/2000/svg viewBox="0 0 24 24"stroke=currentColor fill=currentColor stroke-width=0><path d="M22 8c0-.55-.45-1-1-1h-7c-.55 0-1 .45-1 1s.45 1 1 1h7c.55 0 1-.45 1-1m-9 8c0 .55.45 1 1 1h7c.55 0 1-.45 1-1s-.45-1-1-1h-7c-.55 0-1 .45-1 1M10.47 4.63c.39.39.39 1.02 0 1.41l-4.23 4.25c-.39.39-1.02.39-1.42 0L2.7 8.16a.996.996 0 1 1 1.41-1.41l1.42 1.42 3.54-3.54c.38-.38 1.02-.38 1.4 0m.01 8.01c.39.39.39 1.02 0 1.41L6.25 18.3c-.39.39-1.02.39-1.42 0L2.7 16.16a.996.996 0 1 1 1.41-1.41l1.42 1.42 3.54-3.54c.38-.38 1.02-.38 1.41.01">\`);
-var checklist_default = (props = {}) => (() => {
-	var _el$ = _tmpl$();
-	solid_js_web.spread(_el$, props, true, true);
-	return _el$;
-})();
-//#endregion
-//#region src/userscript/multiSelect/useMultiSelectLoad.tsx
-const createMultiSelectLoadController = (coreCtx, { id: initListId, onStart, allItemIds, getImgList }) => solid_js.createRoot(async (rootDispose) => {
-	const { setState, showComic } = coreCtx;
-	const cache = await helper.useCache({
-		pending: "id",
-		confirmed: "id"
-	}, "MultiSelect");
-	const [listId, setListId] = solid_js.createSignal(initListId);
-	const [registeredItems, setRegisteredItems] = solid_js.createSignal(/* @__PURE__ */ new Map());
-	const controller = useMultiSelect({
-		onStart,
-		registeredItems
-	});
-	helper.createEffectOn([listId], ([currentId], prev) => {
-		const prevId = prev?.[0];
-		if (prevId !== void 0 && prevId !== currentId) controller.clear();
-	});
-	const urlMap = {};
-	const targetIds = helper.createRootMemo(() => {
-		const ids = controller.selectedIds();
-		if (controller.isEnabled() && ids.length > 0) return ids;
-		return allItemIds?.() ?? [];
-	});
-	const computeImgList = () => targetIds().flatMap((id) => urlMap[id] ?? [""]);
-	/** 将 Manga 组件的扁平图片索引转为对应的选中项 ID */
-	const getItemIdsFromIndices = (indices) => {
-		const ids = [];
-		let offset = 0;
-		for (const id of targetIds()) {
-			const len = urlMap[id]?.length ?? 1;
-			for (const idx of indices) if (helper.inRange(offset, idx, offset + len - 1)) {
-				ids.push(id);
-				break;
-			}
-			offset += len;
-		}
-		return ids;
-	};
-	const reSetStore = () => {
-		setState("comicMap", "", { getImgList: Object.assign(async () => {
-			if (coreCtx.store.comicMap[""].imgList?.length) return coreCtx.store.comicMap[""].imgList;
-			await new Promise((resolve) => {
-				const queue = new helper.PQueue(async (id) => {
-					try {
-						urlMap[id] = await getImgList(id);
-					} catch (error) {
-						console.error(error);
-					}
-					setState("comicMap", "", "imgList", computeImgList());
-					resolve();
-				}, 4);
-				setState((state) => {
-					state.comicMap[""].imgList = computeImgList();
-					state.manga.onWaitUrlImgs = (imgs) => {
-						queue.set(...getItemIdsFromIndices(imgs));
-					};
-				});
-				if (targetIds().some((id) => urlMap[id])) resolve();
-			});
-			return coreCtx.store.comicMap[""].imgList;
-		}, allItemIds ? {} : { type: "multiSelect" }) });
-	};
-	reSetStore();
-	const multiSelectLoad = helper.singleThreaded(async () => {
-		if (!controller.isEnabled()) {
-			controller.start();
-			const confirmed = await cache.get("confirmed", listId());
-			if (confirmed) controller.setSelectedIds(confirmed.selecteds);
-			return;
-		}
-		await cache.del("pending", listId());
-		await cache.set("confirmed", {
-			id: listId(),
-			selecteds: controller.selectedIds()
-		});
-		if (controller.selectedIds().length === 0) return;
-		setState("comicMap", "", "imgList", void 0);
-		await showComic("");
-	});
-	let unregisterEscHandler;
-	helper.createEffectOn([controller.isEnabled], ([enabled]) => {
-		if (enabled) {
-			unregisterEscHandler?.();
-			unregisterEscHandler = core.registerEsc(-1, () => controller.isEnabled() && !coreCtx.store.manga.show ? unmount() : "SKIP");
-		}
-	});
-	setState("fab", "extraSpeedDial", [{
-		name: helper.t("hotkeys.multi_select_load"),
-		onClick: multiSelectLoad,
-		icon: checklist_default
-	}]);
-	helper.createEffectOn([
-		controller.isEnabled,
-		() => controller.selectedIds().length,
-		listId
-	], ([enabled, , id]) => {
-		const selecteds = controller.selectedIds();
-		(async () => {
-			await cache.del("pending", id);
-			await (selecteds.length === 0 ? cache.del("confirmed", id) : cache.set(enabled ? "pending" : "confirmed", {
-				id,
-				selecteds
-			}));
-		})();
-	}, { defer: true });
-	core.listenHotkey({
-		multi_select_load: multiSelectLoad,
-		enter_read_mode: () => controller.isEnabled() || !coreCtx.canLoadComic() ? multiSelectLoad() : coreCtx.showComic()
-	}, true);
-	let oldIdSet = [];
-	/** 清理副作用，但保留选中状态（用于翻页） */
-	const unmount = () => {
-		setState("comicMap", "", "imgList", void 0);
-		unregisterEscHandler?.();
-		oldIdSet = [...registeredItems().values()];
-		controller.unmount();
-	};
-	const completeDispose = () => {
-		oldIdSet = [];
-		unmount();
-		controller.dispose();
-		setRegisteredItems(/* @__PURE__ */ new Map());
-		coreCtx.setMultiSelect(void 0);
-		rootDispose();
-	};
-	return {
-		reSetStore,
-		/** 注册新的可选项，并等待至和上次的注册项不同 */
-		registerItems: async (newId, fillItems, maxWaitTime = 5e3) => {
-			setListId(newId);
-			const map = await helper.wait(async () => {
-				const newMap = /* @__PURE__ */ new Map();
-				await fillItems(newMap);
-				if (newMap.size === 0) return;
-				if (helper.isEqual(oldIdSet, [...newMap.values()])) return;
-				return newMap;
-			}, maxWaitTime);
-			if (!map) throw new Error("等待新 DOM 超时");
-			setRegisteredItems(map);
-			const pending = await cache.get("pending", listId());
-			if (pending?.selecteds.length) {
-				controller.start();
-				controller.setSelectedIds(pending.selecteds);
-			}
-		},
-		unmount,
-		/** 完全清理所有状态和副作用 */
-		dispose: completeDispose,
-		/** 页面切换时的清理策略 */
-		createCleanup: (id) => (nextPageCtx) => {
-			unmount();
-			if (nextPageCtx?.type !== "list" || nextPageCtx?.id !== id) {
-				completeDispose();
-				multiSelectLoadController = void 0;
-			}
-		},
-		load: multiSelectLoad,
-		isEnabled: controller.isEnabled,
-		selectedIds: controller.selectedIds,
-		clear: controller.clear,
-		setSelectedIds: controller.setSelectedIds
-	};
-});
-let multiSelectLoadController;
-const useMultiSelectLoad = async (coreCtx, options) => {
-	if (multiSelectLoadController) {
-		multiSelectLoadController.reSetStore();
-		return multiSelectLoadController;
-	}
-	multiSelectLoadController = await createMultiSelectLoadController(coreCtx, options);
-	coreCtx.setMultiSelect(multiSelectLoadController);
-	return multiSelectLoadController;
-};
-//#endregion
-exports.SelectionMask = SelectionMask;
-exports.createMultiSelectLoadController = createMultiSelectLoadController;
-exports.useMultiSelect = useMultiSelect;
-exports.useMultiSelectLoad = useMultiSelectLoad;
 `,
 	"worker/detectAd": `\n//#region \\0rolldown/runtime.js
 var __create = Object.create;
@@ -14847,7 +15885,7 @@ const otherSite = async () => {
 	let timeout = 0;
 	const scanner = new userscript_autoImageScanner.AutoImageScanner({
 		selector: options.selector,
-		onImgListChange: (imgList) => setState("comicMap", "", "imgList", imgList),
+		onImgListChange: (imgList) => setState("imgListMap", "", { imgList }),
 		onEmpty: () => setState((state) => {
 			state.fab.show = false;
 			state.manga.show = false;
@@ -14861,7 +15899,7 @@ const otherSite = async () => {
 		sortImageByTop: true
 	});
 	helper.exposeToGlobal({ scanner });
-	setState("comicMap", "", { async getImgList() {
+	setState("imgListMap", "", { async getImgList() {
 		if (options.selector && scanner.imgList.length === 0 && !await helper.waitDom(options.selector, 2, 1e3)) return [];
 		if (scanner.imgList.length === 0) {
 			scanner.start();
@@ -14882,7 +15920,7 @@ const otherSite = async () => {
 		core.toast.dismiss("no_img");
 		return scanner.imgList;
 	} });
-	setState("manga", { onShowImgsChange: helper.throttle((showImgs) => {
+	setState("manga", { onShowImgsChange: helper.throttle(({ showImgs }) => {
 		if (!store.manga.show) return;
 		scanner.slotElements[[...showImgs].at(-1)]?.scrollIntoView({
 			behavior: "instant",
@@ -14900,7 +15938,7 @@ const otherSite = async () => {
 	});
 	helper.onUrlChange((lastUrl, nowUrl) => {
 		if (!lastUrl || lastUrl.split("/").length === nowUrl.split("/").length) return;
-		setState("comicMap", "", "imgList", void 0);
+		setState("imgListMap", "", "imgList", void 0);
 	});
 };
 //#endregion
@@ -15286,7 +16324,7 @@ let helper = require("helper");
 let userscript_copyApi = require("userscript/copyApi");
 let solid_js_web = require("solid-js/web");
 let solid_js = require("solid-js");
-//#region src/site/copymanga/chapters.tsx
+//#region src/site/copymanga/buildCatalog.tsx
 var _tmpl$ = /*#__PURE__*/ solid_js_web.template(\`<span>\`);
 var _tmpl$2 = /*#__PURE__*/ solid_js_web.template(\`<div class=table-default><div class=table-default-title><ul class="nav nav-tabs"role=tablist></ul><div class=table-default-right><span>更新內容：</span><a target=_blank></a><span>更新時間：</span><span></span></div></div><div class=table-default-box><div class=tab-content>\`);
 var _tmpl$3 = /*#__PURE__*/ solid_js_web.template(\`<div class="detailsTextContentTabs van-tabs van-tabs--line">\`);
@@ -15299,10 +16337,8 @@ var _tmpl$9 = /*#__PURE__*/ solid_js_web.template(\`<a target=_blank style=displ
 var _tmpl$0 = /*#__PURE__*/ solid_js_web.template(\`<div class=card style="max-width:100em;margin:1em auto"><div class=card-body><h2 class=card-title></h2><ul>\`);
 var _tmpl$1 = /*#__PURE__*/ solid_js_web.template(\`<a class="btn btn-outline-primary">\`);
 /** 生成目录 */
-const buildChapters = async (comicName, hiddenType) => {
-	const data = await userscript_copyApi.getChapters(comicName);
-	helper.log(data);
-	const { build: { type }, groups } = data;
+const buildCatalog = async (comicId, hiddenType) => {
+	const { build: { type }, groups } = await userscript_copyApi.getChapters(comicId);
 	const Group = (props) => {
 		const chapters = Object.fromEntries(type.map(({ id }) => [id, []]));
 		for (const chapter of props.chapters) chapters[chapter.type].push(chapter);
@@ -15337,7 +16373,7 @@ const buildChapters = async (comicName, hiddenType) => {
 														var _el$19 = _tmpl$6(), _el$20 = _el$19.firstChild, _el$21 = _el$20.firstChild;
 														solid_js_web.insert(_el$21, () => chapter.name);
 														solid_js_web.effect((_p$) => {
-															var _v$ = !!(props.last_chapter.uuid === chapter.id), _v$2 = \`/comic/\${comicName}/chapter/\${chapter.id}\`;
+															var _v$ = !!(props.last_chapter.uuid === chapter.id), _v$2 = \`/comic/\${comicId}/chapter/\${chapter.id}\`;
 															_v$ !== _p$.e && _el$19.classList.toggle("red", _p$.e = _v$);
 															_v$2 !== _p$.t && solid_js_web.setAttribute(_el$20, "href", _p$.t = _v$2);
 															return _p$;
@@ -15398,7 +16434,7 @@ const buildChapters = async (comicName, hiddenType) => {
 											var _el$26 = _tmpl$9(), _el$27 = _el$26.firstChild;
 											solid_js_web.insert(_el$27, () => chapter.name);
 											solid_js_web.effect((_p$) => {
-												var _v$5 = \`/comic/\${comicName}/chapter/\${chapter.id}\`, _v$6 = chapter.name;
+												var _v$5 = \`/comic/\${comicId}/chapter/\${chapter.id}\`, _v$6 = chapter.name;
 												_v$5 !== _p$.e && solid_js_web.setAttribute(_el$26, "href", _p$.e = _v$5);
 												_v$6 !== _p$.t && solid_js_web.setAttribute(_el$26, "title", _p$.t = _v$6);
 												return _p$;
@@ -15413,7 +16449,7 @@ const buildChapters = async (comicName, hiddenType) => {
 									return _el$24;
 								})()
 							}));
-							solid_js_web.effect(() => solid_js_web.setAttribute(_el$7, "href", \`/comic/\${comicName}/chapter/\${props.last_chapter.comic_id}\`));
+							solid_js_web.effect(() => solid_js_web.setAttribute(_el$7, "href", \`/comic/\${comicId}/chapter/\${props.last_chapter.comic_id}\`));
 							return _el$2;
 						})()];
 					}
@@ -15438,7 +16474,7 @@ const buildChapters = async (comicName, hiddenType) => {
 											var _el$32 = _tmpl$1();
 											solid_js_web.insert(_el$32, () => chapter.name);
 											solid_js_web.effect((_p$) => {
-												var _v$7 = !!(props.last_chapter.uuid === chapter.id), _v$8 = \`/comic/\${comicName}/chapter/\${chapter.id}\`;
+												var _v$7 = !!(props.last_chapter.uuid === chapter.id), _v$8 = \`/comic/\${comicId}/chapter/\${chapter.id}\`;
 												_v$7 !== _p$.e && _el$32.classList.toggle("active", _p$.e = _v$7);
 												_v$8 !== _p$.t && solid_js_web.setAttribute(_el$32, "href", _p$.t = _v$8);
 												return _p$;
@@ -15490,18 +16526,18 @@ const buildChapters = async (comicName, hiddenType) => {
 //#endregion
 //#region src/site/copymanga/helper.ts
 const getPageContext = async () => {
-	let comicName = "";
 	let id = "";
-	if (location.href.includes("/chapter/")) [, , comicName, , id] = location.pathname.split("/");
-	else if (location.href.includes("/comicContent/")) [, , , comicName, id] = location.pathname.split("/");
-	if (comicName && id) return {
+	let chapterId = "";
+	if (location.href.includes("/chapter/")) [, , id, , chapterId] = location.pathname.split("/");
+	else if (location.href.includes("/comicContent/")) [, , , id, chapterId] = location.pathname.split("/");
+	if (id && chapterId) return {
 		type: "manga",
-		comicName,
-		id
+		id,
+		chapterId
 	};
-	if (!id && location.href.includes("/comic/")) {
-		[, comicName] = location.href.split("/comic/");
-		if (!comicName) return;
+	if (!chapterId && location.href.includes("/comic/")) {
+		[, id] = location.href.split("/comic/");
+		if (!id) return;
 		const isMobile = location.href.includes("/h5/");
 		let hiddenType;
 		if (document.title === "404 - 拷貝漫畫") hiddenType = isMobile ? "mobile" : "404";
@@ -15519,7 +16555,7 @@ const getPageContext = async () => {
 		} else if (Boolean(helper.querySelector(".wargin")?.textContent?.includes("不提供閱覽")) || !await helper.wait(() => helper.querySelector(".upLoop .table-default-title"), 1e3) || !await helper.wait(() => helper.querySelector("main .upLoop ul a li"), 1e3)) hiddenType = helper.querySelector(".comicParticulars-title") ? "web" : "404";
 		return {
 			type: "catalog",
-			comicName,
+			id,
 			hiddenType,
 			isMobile
 		};
@@ -15528,7 +16564,7 @@ const getPageContext = async () => {
 //#endregion
 //#region src/site/copymanga/lastChapter.ts
 /** 在目录页显示上次阅读记录 */
-const handleLastChapter = (comicName) => {
+const handleLastChapter = (comicId) => {
 	let a;
 	const stylesheet = new CSSStyleSheet();
 	document.adoptedStyleSheets.push(stylesheet);
@@ -15545,7 +16581,7 @@ const handleLastChapter = (comicName) => {
 		a.textContent = "獲取中";
 		a.removeAttribute("href");
 		try {
-			const data = (await userscript_copyApi.getLastChapter(comicName)).response?.results?.browse;
+			const data = (await userscript_copyApi.getLastChapter(comicId)).response?.results?.browse;
 			if (!data) {
 				a.textContent = data === null ? "無" : "未返回數據";
 				return;
@@ -15574,67 +16610,71 @@ core.setupSiteAdapter({
 	name: "copymanga",
 	getPageContext,
 	handlers: {
-		manga: ({ setState }, { comicName, id }) => {
+		manga: (coreCtx, { id: comicId, chapterId }) => {
 			/** 漫画不存在时才会出现的提示 */
 			const titleDom = helper.querySelector("main .img+.title");
-			if (titleDom) titleDom.textContent = "ComicRead 提示您：你訪問的內容暫不存在，請點選右下角按鈕嘗試加載漫畫";
-			/** 通过网页 API 加载漫画（可以获取隐藏漫画） */
-			const getImgListByApi = async () => {
-				const data = await userscript_copyApi.getChapterData(comicName, id);
-				if (data.status !== 200) {
-					const message = \`漫畫加載失敗：\${data.message || data.status}\`;
-					if (titleDom) titleDom.textContent = message;
-					throw new Error(message);
-				}
-				if (titleDom) {
-					titleDom.textContent = "漫畫加載成功🥳";
-					document.title = \`\${data.comicName} - \${data.chapter.name} - 拷貝漫畫 拷贝漫画\`;
-				}
-				if (titleDom ?? !helper.querySelector(".comicContent-next")) {
-					const { next, prev } = data.chapter;
-					setState("manga", {
-						onNext: next ? () => location.assign(\`/comic/\${comicName}/chapter/\${next}\`) : void 0,
-						onPrev: prev ? () => location.assign(\`/comic/\${comicName}/chapter/\${prev}\`) : void 0
-					});
-				}
-				return data.urls;
+			/** 通过页面上的标题元素展示加载状态 */
+			const setTip = (text) => {
+				if (titleDom) titleDom.textContent = text;
 			};
-			setState("comicMap", "", { async getImgList() {
-				if (helper.querySelector(".comicContent-next")) setState("manga", {
-					onNext: helper.querySelectorClick(".comicContent-next a:not(.prev-null)"),
-					onPrev: helper.querySelectorClick(".comicContent-prev:not(.index,.list) a:not(.prev-null)")
-				});
-				if (titleDom) return getImgListByApi();
-				try {
-					const imgList = await userscript_copyApi.getImglistByHtml(\`\${location.origin}/comic/\${comicName}/chapter/\${id}\`);
-					if (imgList.length === 0) throw new Error("解析網頁變量失敗");
-					return imgList;
+			/** 加载章节图片列表 */
+			const getChapterImgList = async (id) => {
+				if (id === chapterId) try {
+					const imgList = await userscript_copyApi.getImglistByHtml(\`\${location.origin}/comic/\${comicId}/chapter/\${chapterId}\`);
+					if (imgList.length > 0) {
+						setTip("漫畫加載成功🥳");
+						return imgList;
+					}
 				} catch (error) {
 					helper.log.error(error);
-					return getImgListByApi();
 				}
-			} });
-			(async () => {
-				const chapter_id = location.pathname.split("/").at(-1);
-				const comments = await userscript_copyApi.getComments(chapter_id);
-				if (comments.length > 0) setState("manga", "commentList", comments);
-			})();
+				const data = await userscript_copyApi.getChapterData(comicId, id);
+				if (data.status !== 200) {
+					const message = \`漫畫加載失敗：\${data.message || data.status}\`;
+					setTip(message);
+					throw new Error(message);
+				}
+				setTip("漫畫加載成功🥳");
+				if (titleDom) document.title = \`\${data.comicName} - \${data.chapter.name} - 拷貝漫畫 拷贝漫画\`;
+				return data.urls;
+			};
+			setTip("ComicRead 提示您：你訪問的內容暫不存在，請點選右下角按鈕嘗試加載漫畫");
+			coreCtx.setState("imgListMap", "", { getImgList: () => getChapterImgList(chapterId) });
+			return core.setupChapters(coreCtx, {
+				currentId: chapterId,
+				getChapterList: async () => {
+					const { groups } = await userscript_copyApi.getChapters(comicId);
+					return Object.values(groups).flatMap((group) => {
+						const chapters = group.chapters.map(({ id, name }) => ({
+							id,
+							title: name,
+							url: \`/comic/\${comicId}/chapter/\${id}\`
+						}));
+						return chapters.length > 0 ? [{
+							title: group.name,
+							chapters
+						}] : [];
+					});
+				},
+				getChapterImgList,
+				getComments: userscript_copyApi.getComments
+			});
 		},
-		catalog: async (_, { comicName, hiddenType, isMobile }) => {
+		catalog: async (_, { id, hiddenType, isMobile }) => {
 			if (hiddenType) {
 				const tip = helper.querySelector(".isBan, .wargin");
 				if (tip) tip.style.textDecoration = "line-through";
 				const titleDom = helper.querySelector("main .img+.title");
 				if (titleDom) titleDom.textContent = "ComicRead 提示您：你訪問的內容暫不存在，請坐和放寬，等待目錄生成";
 				try {
-					await buildChapters(comicName, hiddenType);
+					await buildCatalog(id, hiddenType);
 				} catch (error) {
 					helper.log.error(error);
 					if (titleDom) titleDom.textContent = "ComicRead 提示您：目錄生成失敗😢";
 					core.toast.error("目錄生成失敗😢", { duration: Infinity });
 				}
 			}
-			if (!isMobile && userscript_copyApi.token) handleLastChapter(comicName);
+			if (!isMobile && userscript_copyApi.token) handleLastChapter(id);
 		}
 	}
 });
@@ -15646,7 +16686,7 @@ let helper = require("helper");
 (() => {
 	if (!Reflect.has(unsafeWindow, "DM5_CID")) return;
 	const imgNum = unsafeWindow.DM5_IMAGE_COUNT ?? unsafeWindow.imgsLen;
-	if (!(Number.isSafeInteger(imgNum) && imgNum > 0)) {
+	if (!(helper.isSafeInteger(imgNum) && imgNum > 0)) {
 		core.toast.error(helper.t("site.changed_load_failed"));
 		return;
 	}
@@ -15698,7 +16738,6 @@ let solid_js_store = require("solid-js/store");
 let components_Toast = require("components/Toast");
 let request = require("request");
 let components_InputDialog = require("components/InputDialog");
-let userscript_multiSelect = require("userscript/multiSelect");
 let userscript_detectAd = require("userscript/detectAd");
 let userscript_ehTagRules = require("userscript/ehTagRules");
 //#region src/site/ehentai/myTags.ts
@@ -15925,7 +16964,10 @@ const featureOptions = {
 	/** 展开标签列表 */
 	expand_tag_list: true,
 	autoShow: false,
-	defaultOption: { imgRecognition: { enabled: true } }
+	defaultOption: {
+		imgRecognition: { enabled: true },
+		darkMode: false
+	}
 };
 const getPageContext = async () => {
 	if (location.pathname === "/mytags") return { type: "mytags" };
@@ -15967,7 +17009,7 @@ var _tmpl$$7 = /*#__PURE__*/ solid_js_web.template(\`<a href=javascript:;>\`);
 /** 放在原生右侧工具栏和标签选项里的漫画加载按钮 */
 const LoadButton = (props) => {
 	const tip = solid_js.createMemo(() => {
-		const imgList = props.context.store.comicMap[props.id]?.imgList;
+		const imgList = props.context.store.imgListMap[props.id]?.imgList;
 		if (imgList?.length === 0) return \` loading - 0/\${props.imgNum}\`;
 		const progress = imgList?.filter(Boolean).length;
 		switch (imgList?.length) {
@@ -16078,7 +17120,7 @@ var _tmpl$6 = /*#__PURE__*/ solid_js_web.template(\`<a target=_blank>\`);
 const nhentai = async ({ setState }, { galleryTitle, galleryId }) => {
 	return (await searchNhentai(galleryTitle)).map(({ id, english_title, japanese_title, media_id }) => {
 		const itemId = \`@nh:\${id}\`;
-		setState("comicMap", itemId, { getImgList: async ({ dynamicLazyLoad }) => {
+		setState("imgListMap", itemId, { getImgList: async ({ dynamicLazyLoad }) => {
 			const galleryData = await getNhentaiData(\`\${id}\`);
 			const imgList = toImgList(galleryData);
 			return dynamicLazyLoad({
@@ -16126,7 +17168,7 @@ const hitomi = async ({ setState }, { galleryId }) => {
 	}
 	const data = JSON.parse(res.responseText.slice(18));
 	const itemId = \`@hitomi:\${data.id}\`;
-	setState("comicMap", itemId, { getImgList: async ({ dynamicLazyLoad }) => {
+	setState("imgListMap", itemId, { getImgList: async ({ dynamicLazyLoad }) => {
 		const { responseText: ggScript } = await core.request(\`https://ltn.\${domain}/gg.js?_=\${Date.now()}\`, {
 			errorText: helper.t("site.ehentai.hitomi_error"),
 			noTip: true
@@ -16265,15 +17307,15 @@ const crossSiteLink = async (coreCtx, pageCtx) => {
 			else setComicMap(getSiteComic.name, "null");
 		} catch (error) {
 			const errorTip = getSiteComic.errorTip(coreCtx, pageCtx);
-			console.error(errorTip, error);
+			helper.log.error(errorTip, error);
 			setComicMap(getSiteComic.name, errorTip);
 		}
 	}
-	const { adList } = coreCtx.store.comicMap[""];
+	const { adList } = coreCtx.store.imgListMap[""];
 	if (!adList) return;
 	for (const itemList of Object.values(comicMap)) {
 		if (typeof itemList === "string") continue;
-		if (itemList.length === 1) coreCtx.setState("comicMap", itemList[0].id, { adList });
+		if (itemList.length === 1) coreCtx.setState("imgListMap", itemList[0].id, { adList });
 	}
 };
 //#endregion
@@ -16775,7 +17817,7 @@ const extractSpriteImage = async (style) => {
 /** 识别广告 */
 const detectAd = ({ store, setState, options }, { imgList, pageList, fileNameList }) => {
 	if (!(options.detect_ad && document.getElementById("ta_other:extraneous_ads"))) return;
-	setState("comicMap", "", "adList", new helper.ReactiveSet());
+	setState("imgListMap", "", "adList", new helper.ReactiveSet());
 	/** 缩略图列表 */
 	const thumbnailList = [];
 	(async () => {
@@ -16788,26 +17830,26 @@ const detectAd = ({ store, setState, options }, { imgList, pageList, fileNameLis
 			if (helper.isImageElement(thumbnail)) thumbnailList[index] = thumbnail;
 			if (thumbnail.style.background.includes("url(")) thumbnailList[index] = await extractSpriteImage(thumbnail.style);
 		}
-		await userscript_detectAd.getAdPageByFileName(fileNameList, store.comicMap[""].adList);
-		if (store.comicMap[""].adList.size === 0) await userscript_detectAd.getAdPageByContent(thumbnailList, store.comicMap[""].adList);
+		await userscript_detectAd.getAdPageByFileName(fileNameList, store.imgListMap[""].adList);
+		if (store.imgListMap[""].adList.size === 0) await userscript_detectAd.getAdPageByContent(thumbnailList, store.imgListMap[""].adList);
 	})();
 	helper.css(helper.createRootMemo(() => {
-		if (!store.comicMap[""]?.adList?.size) return "";
-		return [...store.comicMap[""].adList].map((i) => \`a[href="\${pageList[i]}"] [title]:not(:hover) {
+		if (!store.imgListMap[""]?.adList?.size) return "";
+		return [...store.imgListMap[""].adList].map((i) => \`a[href="\${pageList[i]}"] [title]:not(:hover) {
               filter: blur(8px);
               clip-path: border-box;
               backdrop-filter: blur(8px);
             }\`).join("\\n");
 	}));
 	return {
-		checkFileName: helper.once(() => userscript_detectAd.getAdPageByFileName(fileNameList, store.comicMap[""].adList)),
-		checkContent: helper.once(() => userscript_detectAd.getAdPageByContent(imgList, store.comicMap[""].adList))
+		checkFileName: helper.once(() => userscript_detectAd.getAdPageByFileName(fileNameList, store.imgListMap[""].adList)),
+		checkContent: helper.once(() => userscript_detectAd.getAdPageByContent(imgList, store.imgListMap[""].adList))
 	};
 };
 //#endregion
 //#region src/site/ehentai/multiSelectLoad.tsx
 const multiSelectLoad = async (coreCtx, pageCtx) => {
-	const { setState, showComic } = coreCtx;
+	const { setState } = coreCtx;
 	helper.css\`
     #gdt > a [title] {
       position: relative;
@@ -16830,9 +17872,15 @@ const multiSelectLoad = async (coreCtx, pageCtx) => {
 			helper.log.warn("checkKey failed", error);
 		}
 	});
-	await (await userscript_multiSelect.useMultiSelectLoad(coreCtx, {
+	const ms = await core.useMultiSelectLoad(coreCtx, {
 		id: pageCtx.galleryId,
 		allItemIds: () => helper.range(pageCtx.imgNum).map(String),
+		registerItems: (map) => {
+			for (const dom of helper.querySelectorAll("#gdt a")) {
+				const imgIndex = Number(/(?<=-)\\d+(?:\\?|$)/u.exec(dom.href)?.[0]) - 1;
+				if (!Number.isNaN(imgIndex)) map.set(dom.querySelector("[title]"), String(imgIndex));
+			}
+		},
 		getImgList: async (id) => {
 			await ensureSetup();
 			const i = Number(id);
@@ -16843,16 +17891,11 @@ const multiSelectLoad = async (coreCtx, pageCtx) => {
 				name: pageCtx.fileNameList[i]
 			}];
 		}
-	})).registerItems(pageCtx.galleryId, (map) => {
-		for (const dom of helper.querySelectorAll("#gdt a")) {
-			const imgIndex = Number(/(?<=-)\\d+(?:\\?|$)/u.exec(dom.href)?.[0]) - 1;
-			if (!Number.isNaN(imgIndex)) map.set(dom.querySelector("[title]"), String(imgIndex));
-		}
 	});
 	return { handleClick: async (e) => {
 		if (!e.shiftKey) return;
 		e.stopPropagation();
-		const defaultValue = coreCtx.multiSelect ? helper.descRange(coreCtx.multiSelect.selectedIds().map(Number), pageCtx.imgNum) : "";
+		const defaultValue = helper.descRange(ms.selectedIds().map(Number), pageCtx.imgNum);
 		const [message, tip] = helper.t("other.page_range").split("\\n");
 		const pageRange = await components_InputDialog.askInput({
 			message,
@@ -16860,9 +17903,9 @@ const multiSelectLoad = async (coreCtx, pageCtx) => {
 			defaultValue
 		});
 		if (!pageRange) return;
-		coreCtx.multiSelect?.setSelectedIds([...helper.extractRange(pageRange, pageCtx.imgNum)].map(String));
-		setState("comicMap", "", "imgList", void 0);
-		await showComic("");
+		if (!ms.isEnabled()) ms.start();
+		ms.setSelectedIds([...helper.extractRange(pageRange, pageCtx.imgNum)].map(String));
+		await ms.load();
 	} };
 };
 //#endregion
@@ -17347,7 +18390,7 @@ const quickTagDefine = (_, pageCtx) => {
 		try {
 			await saveTagContent(unsafeWindow.selected_tagname);
 		} catch (error) {
-			console.error(error);
+			helper.log.error(error);
 			setShow(false);
 		}
 	};
@@ -17695,7 +18738,7 @@ core.setupSiteAdapter({
 			]);
 		},
 		mpv: ({ setState }) => {
-			setState("comicMap", "", { getImgList({ dynamicLazyLoad }) {
+			setState("imgListMap", "", { getImgList({ dynamicLazyLoad }) {
 				const imagelist = unsafeWindow.imagelist;
 				const loadImg = async (i) => {
 					const url = () => imagelist[i].i;
@@ -17752,7 +18795,7 @@ core.setupSiteAdapter({
 						return reloadImg(url);
 					}
 				}
-				setState("comicMap", "", "imgList", i, pageCtx.imgList[i]);
+				setState("imgListMap", "", "imgList", i, pageCtx.imgList[i]);
 				for (const img of components_Manga.imgList()) if (img.loadType === "error") return reloadImg(img.src);
 			});
 			setState((state) => {
@@ -17929,7 +18972,7 @@ core.setupSiteAdapter({
 			onNext: helper.querySelectorClick(".menu-bolock-ul :has(> .fa-angle-double-right)")
 		});
 		const imgEleList = helper.querySelectorAll(".scramble-page:not(.thewayhome) > img");
-		if (unsafeWindow.aid < unsafeWindow.scramble_id || unsafeWindow.speed === "1") return setState("comicMap", "", { getImgList: () => imgEleList.map((e) => e.dataset.original ?? "") });
+		if (unsafeWindow.aid < unsafeWindow.scramble_id || unsafeWindow.speed === "1") return setState("imgListMap", "", { getImgList: () => imgEleList.map((e) => e.dataset.original ?? "") });
 		const downloadImg = async (url) => {
 			try {
 				return await core.request(url, {
@@ -17989,7 +19032,7 @@ core.setupSiteAdapter({
 			const loadedNum = helper.querySelectorAll(".lazy-loaded").length;
 			return loadedNum > 0 && helper.querySelectorAll("canvas").length - loadedNum <= 1;
 		});
-		setState("comicMap", "", { getImgList: ({ dynamicLazyLoad }) => dynamicLazyLoad({
+		setState("imgListMap", "", { getImgList: ({ dynamicLazyLoad }) => dynamicLazyLoad({
 			loadImg,
 			length: imgEleList.length
 		}) });
@@ -17999,7 +19042,6 @@ core.setupSiteAdapter({
 `,
 	"site/kemono": `\nlet core = require("core");
 let helper = require("helper");
-let userscript_multiSelect = require("userscript/multiSelect");
 //#region src/site/kemono.tsx
 const fileNameOf = (a) => {
 	if (!a) return "";
@@ -18067,32 +19109,32 @@ core.setupSiteAdapter({
 			await helper.waitDom(".post__thumbnail");
 			handlePwa();
 			helper.createEffectOn(() => store.options.load_original_image, (isOriginal, prev) => {
-				setState("nowComic", isOriginal ? "original" : "thumbnail");
+				setState("currentImgListId", isOriginal ? "original" : "thumbnail");
 				if (prev) showComic();
 			});
 			setState((state) => {
-				state.comicMap.original = { getImgList: () => original(document, store.options.sort_by_filename) };
-				state.comicMap.thumbnail = { getImgList: () => thumbnail(document, store.options.sort_by_filename) };
+				state.imgListMap.original = { getImgList: () => original(document, store.options.sort_by_filename) };
+				state.imgListMap.thumbnail = { getImgList: () => thumbnail(document, store.options.sort_by_filename) };
 				state.manga.onNext = helper.querySelectorClick(".post__nav-link.next");
 				state.manga.onPrev = helper.querySelectorClick(".post__nav-link.prev");
 			});
 		},
 		list: async (coreCtx, { id }) => {
-			const ms = await userscript_multiSelect.useMultiSelectLoad(coreCtx, {
+			return (await core.useMultiSelectLoad(coreCtx, {
 				id,
 				onStart: () => {
 					for (const item of helper.querySelectorAll(".post-card")) item.style.position = "relative";
 				},
+				registerItems: async (map) => {
+					for (const dom of await helper.waitDom(".post-card", 20)) map.set(dom, dom.dataset.id);
+				},
+				isSameList: (nextPageCtx) => nextPageCtx?.type === "list" && nextPageCtx.id === id,
 				getImgList: async (postId) => {
 					const res = await core.request(\`\${location.pathname}/post/\${postId}\`);
 					const doc = helper.domParse(res.responseText);
 					return coreCtx.options.load_original_image ? original(doc, coreCtx.options.sort_by_filename) : thumbnail(doc, coreCtx.options.sort_by_filename);
 				}
-			});
-			await ms.registerItems(id, async (map) => {
-				for (const dom of await helper.waitDom(".post-card", 20)) map.set(dom, dom.dataset.id);
-			});
-			return ms.createCleanup(id);
+			})).createCleanup();
 		}
 	},
 	features: { sort_by_filename: () => {
@@ -18214,7 +19256,7 @@ core.setup({
 		})).response.pages;
 	},
 	handler: ({ setState }, { id }) => {
-		setState("manga", { onShowImgsChange: helper.debounce((showImgs, imgList) => {
+		setState("manga", { onShowImgsChange: helper.debounce(({ showImgs, imgList }) => {
 			if (imgList.length > 0 && initFlag) {
 				initFlag = false;
 				(async () => {
@@ -18237,7 +19279,7 @@ let helper = require("helper");
 (() => {
 	if (!Reflect.has(unsafeWindow, "MANGABZ_CID")) return;
 	const imgNum = unsafeWindow.MANGABZ_IMAGE_COUNT ?? unsafeWindow.imgsLen;
-	if (!(Number.isSafeInteger(imgNum) && imgNum > 0)) {
+	if (!(helper.isSafeInteger(imgNum) && imgNum > 0)) {
 		core.toast.error(helper.t("site.changed_load_failed"));
 		return;
 	}
@@ -18413,7 +19455,7 @@ core.setupSiteAdapter({
 			if (isEnd) helper.scrollIntoView("#comment-container");
 			setState("manga", "show", false);
 		} });
-		setState("comicMap", "", { getImgList: async () => {
+		setState("imgListMap", "", { getImgList: async () => {
 			const galleryId = /^\\/g\\/(?<id>\\d+)/u.exec(location.pathname)?.groups?.id;
 			if (!galleryId) throw new Error(helper.t("site.changed_load_failed"));
 			const galleryData = await getNhentaiData(galleryId);
@@ -18429,15 +19471,15 @@ core.setupSiteAdapter({
 	} },
 	features: {
 		/** 识别广告页 */
-		detect_ad: async ({ store, setState }, pageCtx) => {
+		detect_ad: async ({ store: { imgListMap }, setState }, pageCtx) => {
 			if (pageCtx.type !== "manga") return;
 			if (!helper.querySelector("#tags .tag[href=\\"/tag/extraneous-ads/\\"]")) return;
-			setState("comicMap", "", "adList", new helper.ReactiveSet());
-			await userscript_detectAd.getAdPageByContent(helper.querySelectorAll(".thumb-container img").map((img) => img.src), store.comicMap[""].adList);
-			helper.createEffectOn(() => store.comicMap[""].imgList, (imgList) => imgList?.length && userscript_detectAd.getAdPageByContent(imgList.map((img) => typeof img === "string" ? img : img.src), store.comicMap[""].adList));
+			setState("imgListMap", "", "adList", new helper.ReactiveSet());
+			await userscript_detectAd.getAdPageByContent(helper.querySelectorAll(".thumb-container img").map((img) => img.src), imgListMap[""].adList);
+			helper.createEffectOn(() => imgListMap[""].imgList, (imgList) => imgList?.length && userscript_detectAd.getAdPageByContent(imgList.map((img) => typeof img === "string" ? img : img.src), imgListMap[""].adList));
 			helper.css(() => {
-				if (!store.comicMap[""]?.adList?.size) return "";
-				return [...store.comicMap[""].adList].map((i) => \`
+				if (!imgListMap[""]?.adList?.size) return "";
+				return [...imgListMap[""].adList].map((i) => \`
               .thumb-container:nth-of-type(\${i + 1}):not(:hover) {
                 filter: blur(8px);
                 clip-path: border-box;
@@ -18658,7 +19700,6 @@ let helper = require("helper");
 `,
 	"site/pixiv": `\nlet core = require("core");
 let helper = require("helper");
-let userscript_multiSelect = require("userscript/multiSelect");
 //#region src/site/pixiv.tsx
 let imgs = [];
 core.setupSiteAdapter({
@@ -18688,7 +19729,7 @@ core.setupSiteAdapter({
 	handlers: {
 		manga: ({ store, setState, showComic }) => {
 			helper.createEffectOn(() => store.options.load_original_image, (isOriginal, prev) => {
-				setState("nowComic", isOriginal ? "original" : "regular");
+				setState("currentImgListId", isOriginal ? "original" : "regular");
 				if (prev) showComic();
 			});
 			const getImgList = (isOriginal) => () => imgs.map((img) => {
@@ -18699,8 +19740,8 @@ core.setupSiteAdapter({
 				};
 			});
 			setState((state) => {
-				state.comicMap.original = { getImgList: getImgList(true) };
-				state.comicMap.regular = { getImgList: getImgList(false) };
+				state.imgListMap.original = { getImgList: getImgList(true) };
+				state.imgListMap.regular = { getImgList: getImgList(false) };
 			});
 			return (nextPageCtx) => {
 				if (nextPageCtx?.type !== "manga") imgs.length = 0;
@@ -18708,18 +19749,18 @@ core.setupSiteAdapter({
 		},
 		list: async (coreCtx, { id }) => {
 			const { options } = coreCtx;
-			const ms = await userscript_multiSelect.useMultiSelectLoad(coreCtx, {
+			return (await core.useMultiSelectLoad(coreCtx, {
 				id,
+				registerItems: async (map) => {
+					for (const dom of await helper.waitDom("li div[data-worktype=\\"illusts\\"]")) map.set(dom, dom.dataset.workid);
+				},
+				isSameList: (nextPageCtx) => nextPageCtx?.type === "list" && nextPageCtx.id === id,
 				getImgList: async (workId) => {
 					const res = await core.request(\`/ajax/illust/\${workId}/pages\`, { responseType: "json" });
 					if (options.load_original_image) return res.response.body.map((img) => img.urls.original);
 					return res.response.body.map((img) => img.urls.regular);
 				}
-			});
-			await ms.registerItems(id, async (map) => {
-				for (const dom of await helper.waitDom("li div[data-worktype=\\"illusts\\"]")) map.set(dom, dom.dataset.workid);
-			});
-			return ms.createCleanup(id);
+			})).createCleanup();
 		}
 	}
 });
@@ -18915,7 +19956,7 @@ core.setup({
 			loadImg: async (i) => URL.createObjectURL(await request.downloadImg(getImgUrl(i)))
 		});
 	},
-	handler: ({ setState }) => setState("manga", { onShowImgsChange: helper.debounce((showImgs, imgList) => {
+	handler: ({ setState }) => setState("manga", { onShowImgsChange: helper.debounce(({ showImgs, imgList }) => {
 		const lastImgUrl = imgList[[...showImgs].at(-1)].src;
 		helper.querySelector(\`img[src$="\${lastImgUrl}"]\`)?.scrollIntoView({
 			behavior: "instant",
@@ -18981,11 +20022,11 @@ core.setupSiteAdapter({
 	handlers: {
 		tarticle: ({ setState }) => {
 			const getImgList = () => helper.querySelectorAll("[node-type=\\"articleContent\\"] figure img").map((e) => imgUrl(e.getAttribute("pid")) || e.src);
-			setState("comicMap", "", { getImgList });
+			setState("imgListMap", "", { getImgList });
 		},
 		detail: ({ setState }) => {
 			const getImgList = () => helper.querySelectorAll(".woo-box-wrap .woo-picture-img").map((e) => imgUrl(/(?<pid>[^/]+)\\.jpg$/u.exec(e.src)?.groups?.pid) || e.src);
-			setState("comicMap", "", { getImgList });
+			setState("imgListMap", "", { getImgList });
 		}
 	}
 });
@@ -19001,12 +20042,12 @@ let helper = require("helper");
 		buttonDom.style.setProperty("background-image", "none");
 	}
 	const match = /\\/photos-(?<type>slist|slide|list)-aid-(?<id>\\d+)/u.exec(location.pathname)?.groups;
-	if (!match?.type || !match?.id || match?.type === "index") return;
+	if (!match?.type || !match?.id) return;
 	const getImgList = unsafeWindow.imglist ? () => unsafeWindow.imglist.filter(({ caption }) => caption !== "喜歡紳士漫畫的同學請加入收藏哦！").map(({ url }) => url) : async () => {
 		const res = await core.request(\`/photos-item-aid-\${match.id}.html\`);
-		const pageUrl = /"page_url":(?<pageUrl>\\[.+\\]),/u.exec(res.responseText)?.groups.pageUrl;
-		if (!pageUrl) throw new Error(helper.t("site.changed_load_failed"));
-		return eval(pageUrl);
+		const data = /\\.initData\\((?<data>\\{.+\\})\\);/u.exec(res.responseText)?.groups.data;
+		if (!data) throw new Error(helper.t("site.changed_load_failed"));
+		return JSON.parse(data.replaceAll(/,\\s*(?=[\\]}])/gu, "")).page_url.map((url) => url.replace(/^http:\\/\\//u, "https://"));
 	};
 	core.setup({
 		name: "wnacg",
@@ -19183,7 +20224,7 @@ const threadHandler = ({ setState, options, showComic, loadComic }, { isManga })
 			}
 			return imgList.map((img) => img.src);
 		};
-		setState("comicMap", "", { getImgList });
+		setState("imgListMap", "", { getImgList });
 		setState("manga", {
 			onLoading(_imgList, img) {
 				if (img && img.width < 500 && img.height < 500) return loadComic();
@@ -19289,11 +20330,13 @@ core.setupSiteAdapter({
 		thread: threadHandler
 	},
 	features: {
-		固定导航条: () => helper.css\`
+		固定导航条: () => {
+			helper.css\`
         .header-stackup {
           position: fixed !important;
         }
-      \`,
+      \`;
+		},
 		关闭快捷导航的跳转: () => helper.querySelector("#qmenu a")?.setAttribute("href", "javascript:;"),
 		修正点击页数时的跳转判定: (_, pageCtx) => {
 			if (pageCtx.type !== "forum") return;
@@ -19367,7 +20410,7 @@ core.setupSiteAdapter({
 				const imgList = helper.querySelector(".content-hidden").getElementsByTagName("img");
 				if (await helper.wait(() => imgList.length, 1e3)) {
 					const getImgList = () => Array.from(imgList, (e) => e.src);
-					setState("comicMap", "", { getImgList });
+					setState("imgListMap", "", { getImgList });
 				}
 				break;
 			}
@@ -19379,13 +20422,13 @@ core.setupSiteAdapter({
 				const switchChapter = (i) => {
 					showComic(i);
 					setState("manga", {
-						onPrev: Reflect.has(store.comicMap, i - 1) ? () => switchChapter(i - 1) : void 0,
-						onNext: Reflect.has(store.comicMap, i + 1) ? () => switchChapter(i + 1) : void 0
+						onPrev: Reflect.has(store.imgListMap, i - 1) ? () => switchChapter(i - 1) : void 0,
+						onNext: Reflect.has(store.imgListMap, i + 1) ? () => switchChapter(i + 1) : void 0
 					});
 				};
 				for (const [i, a] of helper.querySelectorAll(".xControl > a").entries()) {
 					const item = a.parentElement.nextElementSibling;
-					setState("comicMap", i, { getImgList: () => Array.from(item.querySelectorAll("img"), (e) => e.dataset.src ?? e.src) });
+					setState("imgListMap", i, { getImgList: () => Array.from(item.querySelectorAll("img"), (e) => e.dataset.src ?? e.src) });
 					a.addEventListener("click", () => setTimeout(() => item.style.display !== "none" && switchChapter(i)));
 				}
 				init();
@@ -19394,7 +20437,7 @@ core.setupSiteAdapter({
 			case "simple": {
 				await helper.wait(() => helper.querySelectorAll(".entry-content img").length);
 				const getImgList = () => helper.querySelectorAll(".entry-content img").map((e) => e.dataset.src || e.src);
-				setState("comicMap", "", { getImgList });
+				setState("imgListMap", "", { getImgList });
 				break;
 			}
 		}
@@ -19681,6 +20724,8 @@ try {
 		case "yuri.website":
 			selfImport("site/yurifans");
 			break;
+		case "www.copy5000.com":
+		case "www.copy4000.com":
 		case "www.copy3000.com":
 		case "copy3000.com":
 		case "www.2026copy.com":
@@ -19689,7 +20734,6 @@ try {
 		case "2025copy.com":
 		case "www.copy20.com":
 		case "copy20.com":
-		case "www.copy4000.com":
 		case "mangacopy.com":
 		case "www.mangacopy.com":
 			selfImport("site/copymanga");
@@ -19773,6 +20817,7 @@ try {
 			});
 			break;
 		case "hanime1.me":
+		case "hanimeone.me":
 			if (!location.pathname.startsWith("/comic/")) break;
 			core.setup({
 				name: "hanime1",
@@ -19784,6 +20829,11 @@ try {
 					return toImgList(data);
 				}
 			});
+			break;
+		case "ex.810114.xyz":
+		case "e.810114.xyz":
+		case "ex.moonchan.xyz":
+			selfImport("site/ehentai");
 			break;
 		case "hitomi.la":
 			selfImport("site/hitomi");

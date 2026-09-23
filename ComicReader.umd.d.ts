@@ -4,7 +4,7 @@ import { ReactiveSet } from '@solid-primitives/set';
 import { dequal as isEqual } from 'dequal';
 import { Accessor, Component, EffectFunction, JSX, MemoOptions, Owner, createEffect, createMemo, createSignal, on } from 'solid-js';
 import { SetStoreFunction } from 'solid-js/store';
-import { PartialDeep, Promisable } from 'type-fest';
+import { PartialDeep, Promisable, ReadonlyDeep } from 'type-fest';
 
 /** 图片四边的空白边缘比例 */
 export type BlankMargin = {
@@ -135,10 +135,8 @@ type Option$1 = {
 	customBackground?: string;
 	/** 禁止自动放大图片 */
 	disableZoom: boolean;
-	/** 黑暗模式 */
-	darkMode: boolean;
-	/** 黑暗模式跟随系统 */
-	autoDarkMode: boolean;
+	/** 黑暗模式。undefined 表示跟随网站色调 */
+	darkMode: boolean | undefined;
 	/** 左右翻页键交换 */
 	swapPageTurnKey: boolean;
 	/** 始终加载所有图片 */
@@ -338,7 +336,23 @@ export type PropState = {
 		/** 快捷键配置发生变化时触发的回调 */
 		onHotkeysChange?: (hotkeys: Record<string, string[]>) => Promisable<void>;
 		/** 显示图片发生变化时触发的回调 */
-		onShowImgsChange?: (showImgs: Set<number>, imgList: ComicImg[]) => Promisable<void>;
+		onShowImgsChange?: (info: ReadonlyDeep<{
+			/** 当前显示的图片索引 */
+			showImgs: Set<number>;
+			/** 图片数据列表 */
+			imgList: ComicImg[];
+			/** 当前显示的页面范围 */
+			showRange: [
+				number,
+				number
+			];
+			/** 页面列表 */
+			pageList: PageList;
+			/** 当前显示的第一张图片的索引 */
+			activeImgIndex: number;
+			/** 当前生效的页面填充数据 */
+			fillEffect: FillEffect;
+		}>) => Promisable<unknown>;
 		/** 每次加载范围改变后触发的回调，返回加载范围中等待 url 的图片的 index */
 		onWaitUrlImgs?: (indexs: Set<number>, imgList: ComicImg[]) => void;
 		editButtonList: (list: ToolbarButtonList) => ToolbarButtonList;
@@ -414,6 +428,12 @@ declare const getImageData: (img: HTMLImageElement, maxSize?: number) => ImageDa
 declare const lang: import("solid-js").Accessor<"zh" | "en" | "ru">, setLang: import("solid-js").Setter<"zh" | "en" | "ru">;
 declare const setInitLang: () => Promise<"zh" | "en" | "ru">;
 declare const t: (keys: string, variables?: Record<string, unknown>) => string;
+declare const siteDark: Accessor<boolean | undefined>;
+declare const manualDark: Accessor<boolean | undefined>;
+declare const setManualDark: (val: boolean | undefined) => boolean | undefined;
+declare const effectiveDark: Accessor<boolean>;
+declare const registerSelfDom: (el: Element) => void;
+declare const startDetectSiteDark: () => void;
 declare const sleep: (ms: number) => Promise<unknown>;
 declare const once: <T extends (...args: any[]) => any>(fn: T) => ((...args: Parameters<T>) => ReturnType<T>);
 export type SingleThreadedState<T extends any[]> = {
@@ -490,8 +510,6 @@ declare const getKeyboardCode: (e: KeyboardEvent) => string;
 declare const keyboardCodeToText: (code: string) => string;
 declare const hijackFn: <T extends unknown[] = unknown[], R = unknown>(fnName: string, fn: (rawFn: (...args: T) => R, args: T) => R) => void;
 declare const ensureGmValue: <T extends string | number | object = string>(name: string, defaultValue: string | (() => Promisable<void | string>)) => Promise<T>;
-declare const onUrlChange: (fn: (lastUrl: string, nowUrl: string) => Promisable<void>, handleUrl?: (location: Location) => string) => () => void;
-declare const waitUrlChange: <T = unknown>(isValidUrl: () => T) => Promise<NonNullable<T>>;
 declare abstract class AnimationFrame {
 	animationId: number;
 	abstract frame: (timestamp: DOMHighResTimeStamp) => void;
@@ -509,6 +527,9 @@ declare const withEventStop: <T extends Event>(handler?: (e: T) => void) => (e: 
 declare const versionLt: (version1: string, version2: string) => boolean;
 declare const gql: (strings: TemplateStringsArray, ...values: string[]) => string;
 declare const getNaturalCollator: () => Intl.Collator;
+declare const claimUrlChange: (url: string) => void;
+declare const onUrlChange: (fn: (lastUrl: string, nowUrl: string) => Promisable<void>, handleUrl?: (location: Location) => string) => () => void;
+declare const waitUrlChange: <T = unknown>(isValidUrl: () => T) => Promise<NonNullable<T>>;
 declare const createEqualsSignal: typeof createSignal;
 declare const createRootMemo: typeof createMemo;
 declare const createThrottleMemo: <T>(fn: EffectFunction<T | undefined, T>, wait?: number, init?: T, options?: MemoOptions<T>) => Accessor<T>;
@@ -525,9 +546,8 @@ declare const useStore: <State extends object>(initState: State) => {
 };
 declare const throttle: ScheduleCallback;
 declare const debounce: ScheduleCallback;
-declare const isString: (val: unknown) => val is string;
 declare const isNumber: (val: unknown) => val is number;
-declare const isArray: (val: unknown) => val is unknown[];
+declare const isSafeInteger: (val: unknown) => val is number;
 declare const isHTMLElement: (node: Node) => node is HTMLElement;
 declare const isImageElement: (node: Node) => node is HTMLImageElement;
 export type UseStore = <T>(txMode: IDBTransactionMode, callback: (store: IDBObjectStore) => T | PromiseLike<T>) => Promise<T>;
@@ -576,9 +596,10 @@ declare const useDrag: ({ ref, handleDrag, easyMode, handleClick, skip, setCaptu
 export type StyleMap = {
 	[P in keyof JSX.CSSProperties]: Accessor<JSX.CSSProperties[P]>;
 };
-declare function css(styles: TemplateStringsArray, ...values: any[]): void;
-declare function css(cssText: string | Accessor<string>, e?: Element | null): void;
-declare function css(selector: string | Accessor<string>, styleMap: StyleMap | Accessor<JSX.CSSProperties> | (StyleMap | Accessor<JSX.CSSProperties>)[], e?: Element): void;
+export type StyleMapArg = StyleMap | Accessor<JSX.CSSProperties> | (StyleMap | Accessor<JSX.CSSProperties>)[];
+declare function css(styles: TemplateStringsArray, ...values: any[]): boolean;
+declare function css(cssText: string | Accessor<string>, e?: Element | null): boolean;
+declare function css(selector: string | Accessor<string>, styleMap: StyleMapArg, e?: Element): boolean;
 export type State = typeof imgState & typeof showState & typeof propState & typeof optionState & typeof otherState;
 type Response$1<T = any> = {
 	readonly responseText: string;
@@ -599,6 +620,8 @@ export type MangaProps = {
 	imgList: (ComicImgData | string)[];
 	/** 页面填充数据 */
 	fillEffect?: FillEffect;
+	/** 初始图片索引（用于恢复阅读进度等场景） */
+	initialImgIndex?: number;
 	/** 初始化配置 */
 	option?: PartialDeep<Option$1>;
 	/** 默认配置 */
@@ -688,7 +711,17 @@ export declare const initComicReader: {
 				onImgError?: (url: string) => Promisable<void>;
 				onOptionChange?: (option: Partial<Option$1>) => Promisable<void>;
 				onHotkeysChange?: (hotkeys: Record<string, string[]>) => Promisable<void>;
-				onShowImgsChange?: (showImgs: Set<number>, imgList: ComicImg[]) => Promisable<void>;
+				onShowImgsChange?: (info: import("type-fest").ReadonlyDeep<{
+					showImgs: Set<number>;
+					imgList: ComicImg[];
+					showRange: [
+						number,
+						number
+					];
+					pageList: PageList;
+					activeImgIndex: number;
+					fillEffect: FillEffect;
+				}>) => Promisable<unknown>;
 				onWaitUrlImgs?: (indexs: Set<number>, imgList: ComicImg[]) => void;
 				editButtonList: (list: ToolbarButtonList) => ToolbarButtonList;
 				editSettingList: (list: SettingList) => SettingList;
@@ -770,7 +803,17 @@ export declare const initComicReader: {
 				onImgError?: (url: string) => Promisable<void>;
 				onOptionChange?: (option: Partial<Option$1>) => Promisable<void>;
 				onHotkeysChange?: (hotkeys: Record<string, string[]>) => Promisable<void>;
-				onShowImgsChange?: (showImgs: Set<number>, imgList: ComicImg[]) => Promisable<void>;
+				onShowImgsChange?: (info: import("type-fest").ReadonlyDeep<{
+					showImgs: Set<number>;
+					imgList: ComicImg[];
+					showRange: [
+						number,
+						number
+					];
+					pageList: PageList;
+					activeImgIndex: number;
+					fillEffect: FillEffect;
+				}>) => Promisable<unknown>;
 				onWaitUrlImgs?: (indexs: Set<number>, imgList: ComicImg[]) => void;
 				editButtonList: (list: ToolbarButtonList) => ToolbarButtonList;
 				editSettingList: (list: SettingList) => SettingList;
@@ -832,7 +875,7 @@ export declare const initComicReader: {
 export declare const defaultConfig: () => InitConfig;
 
 declare namespace helper {
-	export { AnimationFrame, FaviconProgress, PQueue, PointerState, ReactiveMap, ReactiveSet, SetStateFunction, StyleMap, UseDrag, UseStore, WakeLock$1 as WakeLock, approx, assign, boolDataVal, byPath, canvasToBlob, canvasToBlobUrl, clamp, createEffectOn, createEqualsSignal, createMemoMap, createRootEffect, createRootMemo, createScheduled, createThrottleMemo, css, debounce, descRange, difference, domParse, ensureGmValue, exposeToGlobal, extractRange, fileType, getFileName, getImageData, getKeyboardCode, getMostItem, getNaturalCollator, gql, hijackFn, inRange, isArray, isEqual, isHTMLElement, isImageElement, isNumber, isString, isUrl, keyboardCodeToText, lang, log, mountComponents, needDarkMode, onAutoMount, onUrlChange, once, plimit, promisifyRequest, querySelector, querySelectorAll, querySelectorClick, range, requestIdleCallback$1 as requestIdleCallback, saveAs, scrollIntoView, setInitLang, setLang, singleThreaded, sleep, t, testImgUrl, throttle, useCache, useDrag, useFaviconProgress, useStore, versionLt, wait, waitDom, waitImgLoad, waitUrlChange, withEventStop };
+	export { AnimationFrame, FaviconProgress, PQueue, PointerState, ReactiveMap, ReactiveSet, SetStateFunction, StyleMap, UseDrag, UseStore, WakeLock$1 as WakeLock, approx, assign, boolDataVal, byPath, canvasToBlob, canvasToBlobUrl, claimUrlChange, clamp, createEffectOn, createEqualsSignal, createMemoMap, createRootEffect, createRootMemo, createScheduled, createThrottleMemo, css, debounce, descRange, difference, domParse, effectiveDark, ensureGmValue, exposeToGlobal, extractRange, fileType, getFileName, getImageData, getKeyboardCode, getMostItem, getNaturalCollator, gql, hijackFn, inRange, isEqual, isHTMLElement, isImageElement, isNumber, isSafeInteger, isUrl, keyboardCodeToText, lang, log, manualDark, mountComponents, needDarkMode, onAutoMount, onUrlChange, once, plimit, promisifyRequest, querySelector, querySelectorAll, querySelectorClick, range, registerSelfDom, requestIdleCallback$1 as requestIdleCallback, saveAs, scrollIntoView, setInitLang, setLang, setManualDark, singleThreaded, siteDark, sleep, startDetectSiteDark, t, testImgUrl, throttle, useCache, useDrag, useFaviconProgress, useStore, versionLt, wait, waitDom, waitImgLoad, waitUrlChange, withEventStop };
 }
 
 export {
